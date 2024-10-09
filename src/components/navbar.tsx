@@ -7,7 +7,7 @@ import logo from "@/assets/favicon.ico";
 
 export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [isServicesExpanded, setIsServicesExpanded] = useState(false);
+  // const [isServicesExpanded, setIsServicesExpanded] = useState(false);
 
   const hideDrawer = (e: Event) => {
     const services = document.getElementById("services");
@@ -22,22 +22,22 @@ export default function Navbar() {
       document.addEventListener("click", hideDrawer);
     }
   };
-  const hideDropdown = () => {
-    document.getElementById("dropdown")?.classList.add("hidden");
-    setIsServicesExpanded(false);
-    document.removeEventListener("click", hideDropdown);
-  };
-  const toggleDropdown = () => {
-    document.getElementById("dropdown")?.classList.toggle("hidden");
-    setIsServicesExpanded(
-      document.getElementById("dropdown")?.classList.contains("hidden")
-        ? false
-        : true
-    );
-    if (!document.getElementById("dropdown")?.classList.contains("hidden")) {
-      document.addEventListener("click", hideDropdown);
-    }
-  };
+  // const hideDropdown = () => {
+  //   document.getElementById("dropdown")?.classList.add("hidden");
+  //   setIsServicesExpanded(false);
+  //   document.removeEventListener("click", hideDropdown);
+  // };
+  // const toggleDropdown = () => {
+  //   document.getElementById("dropdown")?.classList.toggle("hidden");
+  //   setIsServicesExpanded(
+  //     document.getElementById("dropdown")?.classList.contains("hidden")
+  //       ? false
+  //       : true
+  //   );
+  //   if (!document.getElementById("dropdown")?.classList.contains("hidden")) {
+  //     document.addEventListener("click", hideDropdown);
+  //   }
+  // };
 
   const ulClass = isDrawerOpen
     ? "flex flex-col absolute top-20 right-0 bg-gray-300 w-[60vw] min-h-[90vh] z-[10] justify-start items-center"

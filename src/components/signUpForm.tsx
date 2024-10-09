@@ -2,26 +2,14 @@
 import React, { useState } from "react";
 import { ApiResponse } from "@/types/ApiResponse";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm, FieldValues } from "react-hook-form";
+import { useForm } from "react-hook-form";
 import axios, { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
-import {
-  emailValidation,
-  passwordValidation,
-  signUpValidationSchema,
-} from "@/schemas/signUpSchema";
+import { signUpValidationSchema } from "@/schemas/signUpSchema";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "./ui/form";
+import { Form, FormField, FormItem, FormMessage } from "./ui/form";
 import { Input } from "./ui/input";
 import * as z from "zod";
 import { Button } from "./ui/button";

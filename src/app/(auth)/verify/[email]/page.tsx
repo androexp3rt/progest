@@ -1,6 +1,5 @@
 import { Metadata } from "next";
 import VerifyForm from "@/components/verifyForm";
-import BoxIcon from "@/components/boxIcon";
 
 export const metadata: Metadata = {
   title: "Verify",

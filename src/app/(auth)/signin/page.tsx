@@ -1,7 +1,6 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import SignInForm from "@/components/signInForm";
-import BoxIcon from "@/components/boxIcon";
 
 export const metadata: Metadata = {
   title: "SignIn",
