@@ -1,5 +1,5 @@
 "use client";
-import { User } from "@/model/User";
+import { User } from "@/model/user";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
