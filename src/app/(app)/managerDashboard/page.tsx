@@ -8,40 +8,63 @@ import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BoxIcon from "@/components/boxIcon";
+import { Loader2 } from "lucide-react";
 
 export default function ManagerDashboard() {
   const [pageState, setPageState] = useState("Users");
-  const [users, setUsers] = useState<User[] | null>(null);
+  const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const [newUserName, setNewUserName] = useState("");
   const [newUserEmail, setNewUserEmail] = useState("");
   const [newUserPassword, setNewUserPassword] = useState("");
   const { data: session } = useSession();
-  const companyName: string | null = session?.user.companyName;
+  const companyName: string = session?.user.companyName;
   const getUsers = async () => {
     setLoadingUsers(true);
     try {
       const response = await axios.get(`/api/getUsersByCompany/${companyName}`);
       if (response.data.success) {
         setUsers(response.data.users);
+      } else {
+        setUsers([]);
       }
     } catch (error) {
       console.log(error);
+      setUsers([]);
+    } finally {
+      setLoadingUsers(false);
     }
   };
-  const showUsers = () => {
-    const page = document.getElementById("pageContent")!;
-    setPageState("Users");
-    getUsers();
-  };
   useEffect(() => {
-    getUsers();
-  }, [setUsers, companyName]);
+    const getCompanyUsers = async () => {
+      setLoadingUsers(true);
+      try {
+        const response = await axios.get(
+          `/api/getUsersByCompany/${companyName}`
+        );
+        if (response.data.success) {
+          setUsers(response.data.users);
+        } else {
+          setUsers([]);
+        }
+      } catch (error) {
+        console.log(error);
+        setUsers([]);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+    getCompanyUsers();
+  }, [session]);
 
-  const createUserButtonClick = () => {
+  const showCreateUserForm = () => {
     const newUserForm = document.getElementById("createUserForm")!;
     newUserForm.classList.remove("hidden");
-    document.getElementById("noUserMsg")?.classList.add("hidden");
+  };
+  const hideCreateUserForm = () => {
+    const newUserForm = document.getElementById("createUserForm")!;
+    (newUserForm as HTMLFormElement).reset();
+    newUserForm.classList.add("hidden");
   };
   const createUser = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,11 +77,8 @@ export default function ManagerDashboard() {
       });
       if (response.data.success) {
         toast(response.data.message, { type: "success" });
-        const newUserForm = document.getElementById("createUserForm")!;
-        (newUserForm as HTMLFormElement).reset();
-        newUserForm.classList.add("hidden");
+        hideCreateUserForm();
         getUsers();
-        document.getElementById("noUserMsg")?.classList.remove("hidden");
       } else {
         toast(response.data.message, { type: "error" });
       }
@@ -80,11 +100,14 @@ export default function ManagerDashboard() {
       toast("Error deleting User", { type: "error" });
     }
   };
-  const showForms = () => {
-    const page = document.getElementById("pageContent")!;
+  const showUsersPage = () => {
+    setPageState("Users");
+    users ? "" : getUsers();
+  };
+  const showFormsPage = () => {
     setPageState("Forms");
   };
-  const liClass = "w-full h-10 p-2 rounded-lg text-center";
+  const liClass = "w-full h-10 p-2 rounded-lg text-center cursor-pointer";
   return (
     <main className="relative w-full h-screen flex justify-start bg-slate-400">
       {/* sidebar */}
@@ -98,7 +121,7 @@ export default function ManagerDashboard() {
             className={`${liClass} ${
               pageState === "Users" ? "bg-[#C4A682]" : "bg-white/10"
             }`}
-            onClick={showUsers}
+            onClick={showUsersPage}
           >
             Users
           </li>
@@ -106,7 +129,7 @@ export default function ManagerDashboard() {
             className={`${liClass} ${
               pageState === "Forms" ? "bg-[#C4A682]" : "bg-white/10"
             }`}
-            onClick={showForms}
+            onClick={showFormsPage}
           >
             Forms
           </li>
@@ -119,8 +142,8 @@ export default function ManagerDashboard() {
       >
         <h1 className="w-full text-center text-3xl font-bold">{pageState}</h1>
         {pageState === "Users" ? (
-          <div className="flex flex-col items-center bg-white/30 backdrop-blur-sm rounded-lg p-2 space-y-2">
-            <Button className="max-w-md" onClick={createUserButtonClick}>
+          <div className="flex flex-col items-center bg-white/30 backdrop-blur-sm rounded-lg p-2 space-y-5">
+            <Button className="max-w-md" onClick={showCreateUserForm}>
               Create a new User
             </Button>
             <form
@@ -147,19 +170,32 @@ export default function ManagerDashboard() {
                   onChange={(e) => setNewUserPassword(e.target.value)}
                 />
               </div>
-              <Button className="max-w-md" type="submit" onClick={createUser}>
-                Submit
-              </Button>
+              <div className="flex items-center justify-center gap-2">
+                <Button className="max-w-md" type="submit" onClick={createUser}>
+                  Submit
+                </Button>
+                <Button className="max-w-md" onClick={hideCreateUserForm}>
+                  Discard
+                </Button>
+              </div>
             </form>
-            {users ? (
-              <>
+            {loadingUsers ? (
+              <Loader2 className="animate-spin" />
+            ) : users.length === 0 ? (
+              <div className="w-full flex flex-col space-y-2">
+                <p className="text-center text-xl font-bold">
+                  No Users Found, Please Create a User
+                </p>
+              </div>
+            ) : (
+              <div className="w-full flex flex-col space-y-2">
                 <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 bg-slate-500 rounded-lg">
                   <span className="w-1/4">Name</span>
                   <span className="w-1/4">Email</span>
                   <span className="w-1/4">Password</span>
                   <span className="w-1/4">Actions</span>
                 </div>
-                {users.map((user, index) => {
+                {users?.map((user, index) => {
                   return (
                     <div
                       key={index}
@@ -182,11 +218,7 @@ export default function ManagerDashboard() {
                     </div>
                   );
                 })}
-              </>
-            ) : (
-              <p id="noUserMsg" className="text-xl font-bold">
-                No user found, Please Create a user.
-              </p>
+              </div>
             )}
           </div>
         ) : (
