@@ -1,15 +1,18 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface User extends Document {
+export interface BusinessUser extends Document {
   name: string;
   companyName: string;
   email: string;
   password: string;
+  verifyCode: string;
+  verifyCodeExpiry: Date;
+  isVerified: boolean;
   role: string;
 }
 
 // Updated User schema
-const UserSchema: Schema<User> = new mongoose.Schema({
+const BusinessUserSchema: Schema<BusinessUser> = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -19,6 +22,7 @@ const UserSchema: Schema<User> = new mongoose.Schema({
     type: String,
     required: [true, "Company Name is required"],
     trim: true,
+    unique: true,
   },
   email: {
     type: String,
@@ -30,6 +34,18 @@ const UserSchema: Schema<User> = new mongoose.Schema({
     type: String,
     required: [true, "Password is required"],
   },
+  verifyCode: {
+    type: String,
+    required: [true, "Verify Code is required"],
+  },
+  verifyCodeExpiry: {
+    type: Date,
+    required: [true, "Verify Code Expiry is required"],
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+  },
   role: {
     type: String,
     default: "user",
@@ -37,8 +53,8 @@ const UserSchema: Schema<User> = new mongoose.Schema({
   },
 });
 
-const UserModel =
-  (mongoose.models.Users as mongoose.Model<User>) ||
-  mongoose.model<User>("Users", UserSchema);
+const BusinessUserModel =
+  (mongoose.models.BusinessUsers as mongoose.Model<BusinessUser>) ||
+  mongoose.model<BusinessUser>("BusinessUsers", BusinessUserSchema);
 
-export default UserModel;
+export default BusinessUserModel;

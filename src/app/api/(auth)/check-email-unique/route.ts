@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import BusinessUserModel from "@/model/user";
+import BusinessUserModel from "@/model/businessUser";
 import { z } from "zod";
 import { emailValidation } from "@/schemas/signUpSchema";
 
