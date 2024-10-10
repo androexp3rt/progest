@@ -17,6 +17,7 @@ export async function POST(request: NextRequest) {
         email,
         password: hashedPassword,
         role: "user",
+        isVerified: true,
       });
       await newUser.save();
       return NextResponse.json(

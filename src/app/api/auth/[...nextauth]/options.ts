@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
 import BusinessUserModel from "@/model/businessUser";
+import UserModel from "@/model/user";
 
 interface Nuser extends User {
   name: string;
@@ -30,14 +31,16 @@ export const authOptions: NextAuthOptions = {
         await dbConnect();
         try {
           if (credentials) {
-            const user = await BusinessUserModel.findOne({
-              $or: [
-                { email: credentials?.identifier },
-                { username: credentials?.identifier },
-              ],
+            let user = await BusinessUserModel.findOne({
+              email: credentials?.identifier,
             });
             if (!user) {
-              throw new Error("No user found with this email");
+              user = await UserModel.findOne({
+                email: credentials?.identifier,
+              });
+              if (!user) {
+                throw new Error("No user found with this email");
+              }
             }
             if (!user.isVerified) {
               throw new Error("Please verify your account before logging in");

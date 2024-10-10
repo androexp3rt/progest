@@ -1,4 +1,5 @@
 import mongoose, { Schema, Document } from "mongoose";
+import { boolean } from "zod";
 
 export interface User extends Document {
   name: string;
@@ -6,6 +7,7 @@ export interface User extends Document {
   email: string;
   password: string;
   role: string;
+  isVerified: boolean;
 }
 
 // Updated User schema
@@ -34,6 +36,11 @@ const UserSchema: Schema<User> = new mongoose.Schema({
     type: String,
     default: "user",
     required: [true, "User Role is required"],
+  },
+  isVerified: {
+    type: Boolean,
+    default: false,
+    required: [true, "User Verification Status is required"],
   },
 });
 

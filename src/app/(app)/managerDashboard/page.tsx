@@ -111,7 +111,6 @@ export default function ManagerDashboard() {
   return (
     <main className="relative w-full h-screen flex justify-start bg-slate-400">
       {/* sidebar */}
-
       <div className="w-60 h-full flex flex-col justify-start items-center px-2 py-5 space-y-20 bg-black text-white">
         <h1 className="max-sm:w-30 max-sm:text-lg w-full text-2xl text-center">
           {companyName ?? "companyName"}
@@ -156,18 +155,21 @@ export default function ManagerDashboard() {
                   type="text"
                   placeholder="Name"
                   onChange={(e) => setNewUserName(e.target.value)}
+                  required
                 />
                 <Input
                   className="w-1/3 bg-white"
                   type="text"
                   placeholder="Email"
                   onChange={(e) => setNewUserEmail(e.target.value)}
+                  required
                 />
                 <Input
                   className="w-1/3 bg-white"
                   type="password"
                   placeholder="Password"
                   onChange={(e) => setNewUserPassword(e.target.value)}
+                  required
                 />
               </div>
               <div className="flex items-center justify-center gap-2">
