@@ -16,6 +16,9 @@ export async function GET() {
     }
     let allUsers = [...businessUsers, ...users];
     allUsers = allUsers.filter((user) => user.companyName !== "ProGest");
+    allUsers = allUsers.toSorted((a, b) =>
+      a.companyName.localeCompare(b.companyName)
+    );
     if (allUsers.length === 0) {
       return NextResponse.json(
         { success: false, message: "No Users found" },
