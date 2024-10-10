@@ -102,7 +102,7 @@ export default function ManagerDashboard() {
   };
   const showUsersPage = () => {
     setPageState("Users");
-    users ? "" : getUsers();
+    getUsers();
   };
   const showFormsPage = () => {
     setPageState("Forms");
