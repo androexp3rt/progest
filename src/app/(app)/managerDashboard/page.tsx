@@ -55,7 +55,7 @@ export default function ManagerDashboard() {
       }
     };
     getCompanyUsers();
-  }, [session]);
+  }, [session, companyName]);
 
   const showCreateUserForm = () => {
     const newUserForm = document.getElementById("createUserForm")!;
