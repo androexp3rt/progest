@@ -2,7 +2,6 @@ import React, { ReactElement, useEffect, useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import FormItem from "./formItem";
 import { toast } from "react-toastify";
-import { Button } from "../ui/button";
 import { FormItemDetails } from "@/types/types";
 import EditInputField from "./editModalComponents/editInputField";
 import EditCalculation from "./editModalComponents/editCalculation";
@@ -133,9 +132,6 @@ export default function CreateForm() {
       setSelectedFormItem("");
     }
     document.removeEventListener("click", unselectFormItem);
-  };
-  const hideEditModal = () => {
-    document.getElementById("editModal")!.classList.add("hidden");
   };
   useEffect(() => {
     if (selectedFormItem !== "") {

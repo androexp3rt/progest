@@ -111,7 +111,6 @@ export default function ManagerDashboard() {
     }
   };
 
-  const liClass = "w-full h-10 p-2 rounded-lg text-center cursor-pointer";
   return (
     <main className="relative w-full h-[calc(100vh-theme(space.20))] flex justify-start bg-slate-400 overflow-auto">
       {/* sidebar */}
