@@ -117,7 +117,7 @@ export default function AdminDashboard() {
   };
   const liClass = "w-full h-10 p-2 rounded-lg text-center cursor-pointer";
   return (
-    <main className="relative w-full h-screen flex justify-start bg-slate-400">
+    <main className="relative w-full h-[calc(100vh-theme(space.20))] flex justify-start bg-slate-400">
       {/* sidebar */}
       <div className="w-60 h-full flex flex-col justify-start items-center px-2 py-5 space-y-20 bg-black text-white">
         <h1 className="max-sm:w-30 max-sm:text-lg w-full text-2xl text-center">
@@ -185,7 +185,7 @@ export default function AdminDashboard() {
                           {...field}
                           className="outline-none h-10 bg-white rounded-lg px-2"
                         >
-                          <option value="" disabled selected>
+                          <option value="" disabled>
                             Select User Role
                           </option>
                           <option value="user">user</option>
@@ -249,9 +249,12 @@ export default function AdminDashboard() {
                   <Button className="max-w-md" type="submit">
                     Submit
                   </Button>
-                  <Button className="max-w-md" onClick={hideCreateUserForm}>
+                  <span
+                    className="max-w-md inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 px-4 py-2"
+                    onClick={hideCreateUserForm}
+                  >
                     Discard
-                  </Button>
+                  </span>
                 </div>
               </form>
             </Form>

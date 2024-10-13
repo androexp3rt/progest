@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useState } from "react";
 import LoginBtn from "./loginBtn";
-import logo from "@/assets/favicon.ico";
+import logo from "@/../public/logo.png";
 
 export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -48,15 +48,15 @@ export default function Navbar() {
 
   return (
     <nav className="sticky top-0 z-10 w-full h-20 p-5 lg:p-10 flex justify-between items-center bg-slate-300 text-[#343666] shadow-2xl">
-      <div className="flex h-full items-center space-x-2">
+      <div className="flex h-full items-center">
         <Image
-          className="w-16 h-auto"
+          className="w-20 h-auto"
           src={logo}
           alt="logo"
-          width={200}
-          height={100}
+          width={2048}
+          height={2048}
         />
-        <span className="text-5xl">ProGest</span>
+        <span className="text-4xl">ProGest</span>
       </div>
       <div className="hamburger flex items-center justify-end w-[40%]">
         <ul id="drawer" className={ulClass}>

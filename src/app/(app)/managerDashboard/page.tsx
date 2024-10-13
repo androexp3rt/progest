@@ -5,20 +5,34 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import * as z from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { newUserFromManagerSchema } from "@/schemas/newUserFromManagerSchema";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BoxIcon from "@/components/boxIcon";
 import { Loader2 } from "lucide-react";
+import CreateForm from "@/components/createForm/createForm";
+import ManagerSidebar from "@/components/sidebar/managerSidebar";
 
 export default function ManagerDashboard() {
   const [pageState, setPageState] = useState("Users");
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
-  const [newUserName, setNewUserName] = useState("");
-  const [newUserEmail, setNewUserEmail] = useState("");
-  const [newUserPassword, setNewUserPassword] = useState("");
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
+
+  const form = useForm<z.infer<typeof newUserFromManagerSchema>>({
+    resolver: zodResolver(newUserFromManagerSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
+  });
+
   const getUsers = async () => {
     setLoadingUsers(true);
     try {
@@ -65,16 +79,12 @@ export default function ManagerDashboard() {
     const newUserForm = document.getElementById("createUserForm")!;
     (newUserForm as HTMLFormElement).reset();
     newUserForm.classList.add("hidden");
+    form.reset();
   };
-  const createUser = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const onSubmit = async (data: z.infer<typeof newUserFromManagerSchema>) => {
+    const newData = { ...data, companyName };
     try {
-      const response = await axios.post("/api/createUser", {
-        name: newUserName,
-        email: newUserEmail,
-        password: newUserPassword,
-        companyName,
-      });
+      const response = await axios.post("/api/createUser", newData);
       if (response.data.success) {
         toast(response.data.message, { type: "success" });
         hideCreateUserForm();
@@ -100,44 +110,20 @@ export default function ManagerDashboard() {
       toast("Error deleting User", { type: "error" });
     }
   };
-  const showUsersPage = () => {
-    setPageState("Users");
-    getUsers();
-  };
-  const showFormsPage = () => {
-    setPageState("Forms");
-  };
+
   const liClass = "w-full h-10 p-2 rounded-lg text-center cursor-pointer";
   return (
-    <main className="relative w-full h-screen flex justify-start bg-slate-400">
+    <main className="relative w-full h-[calc(100vh-theme(space.20))] flex justify-start bg-slate-400 overflow-auto">
       {/* sidebar */}
-      <div className="w-60 h-full flex flex-col justify-start items-center px-2 py-5 space-y-20 bg-black text-white">
-        <h1 className="max-sm:w-30 max-sm:text-lg w-full text-2xl text-center">
-          {companyName ?? "companyName"}
-        </h1>
-        <ul className="w-full flex flex-col space-y-2">
-          <li
-            className={`${liClass} ${
-              pageState === "Users" ? "bg-[#C4A682]" : "bg-white/10"
-            }`}
-            onClick={showUsersPage}
-          >
-            Users
-          </li>
-          <li
-            className={`${liClass} ${
-              pageState === "Forms" ? "bg-[#C4A682]" : "bg-white/10"
-            }`}
-            onClick={showFormsPage}
-          >
-            Forms
-          </li>
-        </ul>
-      </div>
+      <ManagerSidebar
+        companyName={companyName}
+        pageState={pageState}
+        setPageState={setPageState}
+      />
       {/* content */}
       <div
         id="pageContent"
-        className="w-full h-full flex flex-col space-y-10 p-5"
+        className="w-full h-full flex flex-col space-y-5 p-5"
       >
         <h1 className="w-full text-center text-3xl font-bold">{pageState}</h1>
         {pageState === "Users" ? (
@@ -145,42 +131,75 @@ export default function ManagerDashboard() {
             <Button className="max-w-md" onClick={showCreateUserForm}>
               Create a new User
             </Button>
-            <form
-              id="createUserForm"
-              className="flex flex-col items-center hidden gap-2"
-            >
-              <div className="w-full flex items-center justify-between font-bold p-2 gap-2 bg-[#FFEEAD] rounded-lg">
-                <Input
-                  className="w-1/3 bg-white"
-                  type="text"
-                  placeholder="Name"
-                  onChange={(e) => setNewUserName(e.target.value)}
-                  required
-                />
-                <Input
-                  className="w-1/3 bg-white"
-                  type="text"
-                  placeholder="Email"
-                  onChange={(e) => setNewUserEmail(e.target.value)}
-                  required
-                />
-                <Input
-                  className="w-1/3 bg-white"
-                  type="password"
-                  placeholder="Password"
-                  onChange={(e) => setNewUserPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="flex items-center justify-center gap-2">
-                <Button className="max-w-md" type="submit" onClick={createUser}>
-                  Submit
-                </Button>
-                <Button className="max-w-md" onClick={hideCreateUserForm}>
-                  Discard
-                </Button>
-              </div>
-            </form>
+            <Form {...form}>
+              <form
+                id="createUserForm"
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="flex flex-col items-center hidden gap-2"
+              >
+                <div className="w-full flex items-center justify-between font-bold p-2 gap-2 bg-[#FFEEAD] rounded-lg">
+                  <FormField
+                    name="name"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Input
+                          {...field}
+                          type="text"
+                          name="name"
+                          placeholder="Name"
+                          className="bg-white"
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="email"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Input
+                          {...field}
+                          type="text"
+                          name="email"
+                          placeholder="Email"
+                          className="bg-white"
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    name="password"
+                    control={form.control}
+                    render={({ field }) => (
+                      <FormItem>
+                        <Input
+                          {...field}
+                          type="password"
+                          name="password"
+                          placeholder="Password"
+                          className="bg-white"
+                        />
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
+                <div className="flex items-center justify-center gap-2">
+                  <Button className="max-w-md" type="submit">
+                    Submit
+                  </Button>
+                  <span
+                    className="max-w-md inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 px-4 py-2"
+                    onClick={hideCreateUserForm}
+                  >
+                    Discard
+                  </span>
+                </div>
+              </form>
+            </Form>
             {loadingUsers ? (
               <Loader2 className="animate-spin" />
             ) : users.length === 0 ? (
@@ -223,6 +242,8 @@ export default function ManagerDashboard() {
               </div>
             )}
           </div>
+        ) : pageState === "Create Form" ? (
+          <CreateForm />
         ) : (
           <></>
         )}
