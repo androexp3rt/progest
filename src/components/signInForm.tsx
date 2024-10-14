@@ -1,5 +1,4 @@
 "use client";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
@@ -8,21 +7,14 @@ import "react-toastify/dist/ReactToastify.css";
 export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const router = useRouter();
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const result = await signIn("credentials", {
-      redirect: false,
       identifier: email,
       password: password,
     });
     if (result?.error) {
       toast(result.error, { type: "error" });
-    }
-
-    if (result?.url) {
-      toast("Logged in successfully", { type: "success" });
-      router.replace("/");
     }
   };
 

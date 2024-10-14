@@ -44,33 +44,32 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
-  if (req.nextUrl.pathname.startsWith("/signin")) {
-    if (token) {
-      return NextResponse.redirect(new URL("/", req.url));
+  if (!token) {
+    console.log("not authenticated");
+    if (!req.nextUrl.pathname.startsWith("/signin")) {
+      console.log("redirect to signin");
+      return NextResponse.redirect(new URL("/signin", req.url));
     }
   }
-  if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/signin", req.url));
-    } else if (token.role === "admin") {
+  if (token && req.nextUrl.pathname.startsWith("/signin")) {
+    return NextResponse.redirect(new URL("/", req.url));
+  }
+  if (token && req.nextUrl.pathname.startsWith("/dashboard")) {
+    if (token.role === "admin") {
       return NextResponse.rewrite(new URL("/adminDashboard", req.url));
     } else if (token.role === "manager") {
       return NextResponse.rewrite(new URL("/managerDashboard", req.url));
     }
   }
-  if (req.nextUrl.pathname.startsWith("/adminDashboard")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/signin", req.url));
-    } else if (token.role === "user") {
+  if (token && req.nextUrl.pathname.startsWith("/adminDashboard")) {
+    if (token.role === "user") {
       return NextResponse.rewrite(new URL("/denied", req.url));
     } else if (token.role === "manager") {
       return NextResponse.rewrite(new URL("/denied", req.url));
     }
   }
-  if (req.nextUrl.pathname.startsWith("/managerDashboard")) {
-    if (!token) {
-      return NextResponse.redirect(new URL("/signin", req.url));
-    } else if (token.role === "user") {
+  if (token && req.nextUrl.pathname.startsWith("/managerDashboard")) {
+    if (token.role === "user") {
       return NextResponse.rewrite(new URL("/denied", req.url));
     }
   }
