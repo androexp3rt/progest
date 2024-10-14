@@ -51,7 +51,7 @@ export async function middleware(req: NextRequest) {
   }
   if (req.nextUrl.pathname.startsWith("/dashboard")) {
     if (!token) {
-      return NextResponse.rewrite(new URL("/signin", req.url));
+      return NextResponse.redirect(new URL("/signin", req.url));
     } else if (token.role === "admin") {
       return NextResponse.rewrite(new URL("/adminDashboard", req.url));
     } else if (token.role === "manager") {
@@ -60,7 +60,7 @@ export async function middleware(req: NextRequest) {
   }
   if (req.nextUrl.pathname.startsWith("/adminDashboard")) {
     if (!token) {
-      return NextResponse.rewrite(new URL("/signin", req.url));
+      return NextResponse.redirect(new URL("/signin", req.url));
     } else if (token.role === "user") {
       return NextResponse.rewrite(new URL("/denied", req.url));
     } else if (token.role === "manager") {
@@ -69,7 +69,7 @@ export async function middleware(req: NextRequest) {
   }
   if (req.nextUrl.pathname.startsWith("/managerDashboard")) {
     if (!token) {
-      return NextResponse.rewrite(new URL("/signin", req.url));
+      return NextResponse.redirect(new URL("/signin", req.url));
     } else if (token.role === "user") {
       return NextResponse.rewrite(new URL("/denied", req.url));
     }
