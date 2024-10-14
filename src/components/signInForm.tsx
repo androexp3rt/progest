@@ -21,7 +21,6 @@ export default function SignInForm() {
     }
 
     if (result?.url) {
-      console.log(result.url);
       toast("Logged in successfully", { type: "success" });
       router.replace("/");
     }

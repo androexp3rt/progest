@@ -5,10 +5,6 @@ import Link from "next/link";
 export default function Home() {
   const { status } = useSession();
 
-  if (status === "loading") {
-    return <p>Loading...</p>;
-  }
-
   if (status === "unauthenticated") {
     return (
       <main className="w-full min-h-screen flex flex-col items-center p-20 text-white bg-gradient-to-br from-[#325777] to-[#000987] space-y-5">

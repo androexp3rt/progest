@@ -44,29 +44,33 @@ import { getToken } from "next-auth/jwt";
 
 export async function middleware(req: NextRequest) {
   const token = await getToken({ req });
-  const user = token;
+  if (req.nextUrl.pathname.startsWith("/signin")) {
+    if (token) {
+      return NextResponse.redirect(new URL("/", req.url));
+    }
+  }
   if (req.nextUrl.pathname.startsWith("/dashboard")) {
-    if (!user) {
+    if (!token) {
       return NextResponse.rewrite(new URL("/signin", req.url));
-    } else if (user.role === "admin") {
+    } else if (token.role === "admin") {
       return NextResponse.rewrite(new URL("/adminDashboard", req.url));
-    } else if (user.role === "manager") {
+    } else if (token.role === "manager") {
       return NextResponse.rewrite(new URL("/managerDashboard", req.url));
     }
   }
   if (req.nextUrl.pathname.startsWith("/adminDashboard")) {
-    if (!user) {
+    if (!token) {
       return NextResponse.rewrite(new URL("/signin", req.url));
-    } else if (user.role === "user") {
+    } else if (token.role === "user") {
       return NextResponse.rewrite(new URL("/denied", req.url));
-    } else if (user.role === "manager") {
+    } else if (token.role === "manager") {
       return NextResponse.rewrite(new URL("/denied", req.url));
     }
   }
   if (req.nextUrl.pathname.startsWith("/managerDashboard")) {
-    if (!user) {
+    if (!token) {
       return NextResponse.rewrite(new URL("/signin", req.url));
-    } else if (user.role === "user") {
+    } else if (token.role === "user") {
       return NextResponse.rewrite(new URL("/denied", req.url));
     }
   }
@@ -75,5 +79,5 @@ export async function middleware(req: NextRequest) {
 // Applies next-auth only to matching routes - can be regex
 // Ref: https://nextjs.org/docs/app/building-your-application/routing/middleware#matcher
 export const config = {
-  matcher: ["/adminDashboard", "/dashboard", "/managerDashboard"],
+  matcher: ["/signin", "/adminDashboard", "/dashboard", "/managerDashboard"],
 };
