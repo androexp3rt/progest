@@ -1,40 +1,44 @@
 "use client";
 import { useSession } from "next-auth/react";
-// import { getToken } from "next-auth/jwt";
 import Link from "next/link";
 
 export default function Home() {
-  const { data: session } = useSession();
-  const user = session?.user;
-  if (user) {
+  const { status } = useSession();
+
+  if (status === "loading") {
+    return <p>Loading...</p>;
+  }
+
+  if (status === "unauthenticated") {
     return (
       <main className="w-full min-h-screen flex flex-col items-center p-20 text-white bg-gradient-to-br from-[#325777] to-[#000987] space-y-5">
         <h1 className="w-full text-center text-5xl font-bold">
           Welcome to ProGest
         </h1>
 
-        <p className="w-full text-center text-xl">Continue to your Dashboard</p>
+        <p className="w-full text-center text-xl">Please SignIn to Continue</p>
         <Link
           className="p-3 bg-white font-bold rounded-lg text-black"
-          href="/dashboard"
+          href="/signin"
         >
-          Dashboard
+          SignIn
         </Link>
       </main>
     );
   }
+
   return (
     <main className="w-full min-h-screen flex flex-col items-center p-20 text-white bg-gradient-to-br from-[#325777] to-[#000987] space-y-5">
       <h1 className="w-full text-center text-5xl font-bold">
         Welcome to ProGest
       </h1>
 
-      <p className="w-full text-center text-xl">Please SignIn to Continue</p>
+      <p className="w-full text-center text-xl">Continue to your Dashboard</p>
       <Link
         className="p-3 bg-white font-bold rounded-lg text-black"
-        href="/signin"
+        href="/dashboard"
       >
-        SignIn
+        Dashboard
       </Link>
     </main>
   );
