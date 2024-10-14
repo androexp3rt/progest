@@ -62,7 +62,6 @@ export default function CreateForm() {
         id={formItemsLength.toString()}
         f={f}
         setItemToCopy={setItemToCopy}
-        // unselectFormItem={unselectFormItem}
         setItemToDelete={setItemToDelete}
         setSelectedFormItem={setSelectedFormItem}
       />
