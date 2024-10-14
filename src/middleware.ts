@@ -1,8 +1,7 @@
 // Ref: https://next-auth.js.org/configuration/nextjs#advanced-usage
 // import { withAuth, NextRequestWithAuth } from "next-auth/middleware";
 import { NextRequest, NextResponse } from "next/server";
-import { getServerSession } from "next-auth";
-import { authOptions } from "./app/api/auth/[...nextauth]/options";
+import { getToken } from "next-auth/jwt";
 
 // export default withAuth(
 //   // `withAuth` augments your `Request` with the user's token.
@@ -43,32 +42,32 @@ import { authOptions } from "./app/api/auth/[...nextauth]/options";
 //   }
 // );
 
-export default async function middleware(request: NextRequest) {
-  const session = await getServerSession(authOptions);
-  const user = session?.user;
-  if (request.nextUrl.pathname.startsWith("/dashboard")) {
+export async function middleware(req: NextRequest) {
+  const token = await getToken({ req });
+  const user = token;
+  if (req.nextUrl.pathname.startsWith("/dashboard")) {
     if (!user) {
-      return NextResponse.rewrite(new URL("/signin", request.url));
+      return NextResponse.rewrite(new URL("/signin", req.url));
     } else if (user.role === "admin") {
-      return NextResponse.rewrite(new URL("/adminDashboard", request.url));
+      return NextResponse.rewrite(new URL("/adminDashboard", req.url));
     } else if (user.role === "manager") {
-      return NextResponse.rewrite(new URL("/managerDashboard", request.url));
+      return NextResponse.rewrite(new URL("/managerDashboard", req.url));
     }
   }
-  if (request.nextUrl.pathname.startsWith("/adminDashboard")) {
+  if (req.nextUrl.pathname.startsWith("/adminDashboard")) {
     if (!user) {
-      return NextResponse.rewrite(new URL("/signin", request.url));
+      return NextResponse.rewrite(new URL("/signin", req.url));
     } else if (user.role === "user") {
-      return NextResponse.rewrite(new URL("/denied", request.url));
+      return NextResponse.rewrite(new URL("/denied", req.url));
     } else if (user.role === "manager") {
-      return NextResponse.rewrite(new URL("/denied", request.url));
+      return NextResponse.rewrite(new URL("/denied", req.url));
     }
   }
-  if (request.nextUrl.pathname.startsWith("/managerDashboard")) {
+  if (req.nextUrl.pathname.startsWith("/managerDashboard")) {
     if (!user) {
-      return NextResponse.rewrite(new URL("/signin", request.url));
+      return NextResponse.rewrite(new URL("/signin", req.url));
     } else if (user.role === "user") {
-      return NextResponse.rewrite(new URL("/denied", request.url));
+      return NextResponse.rewrite(new URL("/denied", req.url));
     }
   }
 }
