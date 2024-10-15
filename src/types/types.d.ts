@@ -1,10 +1,26 @@
 export type FormItemDetails = {
   id: string;
   title: string;
+  newTitle: string;
   required?: boolean;
   type?: string;
   placeholder?: string;
   size?: string;
   color?: string;
+  newColor?: string;
   icon?: string;
+  defaultDate?: string;
+  defaultTime?: string;
+  checkBoxDefaultValue?: boolean;
+  listItems?: string[];
+  listMultipleSelection?: boolean;
+  listDefaultValue?: string;
+  listMulDefaultValue?: string[];
+  multiplePics?: boolean;
+  minPics?: number;
+  maxPics?: number;
+  maxPicSize?: number;
+  multipleAttachments?: boolean;
+  tableCols?: string[];
+  imageFiles?: File[];
 };

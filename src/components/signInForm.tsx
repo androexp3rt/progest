@@ -16,9 +16,6 @@ export default function SignInForm() {
     if (result?.error) {
       toast(result.error, { type: "error" });
     }
-    if (result?.url) {
-      toast("Logged in Successfully", { type: "success" });
-    }
   };
 
   const formGroup = "flex p1 w-full";

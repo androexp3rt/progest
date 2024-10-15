@@ -15,6 +15,7 @@ import EditList from "./editModalComponents/editList";
 import EditCheckBox from "./editModalComponents/editCheckBox";
 import EditDateTime from "./editModalComponents/editDate&Time";
 import EditTextArea from "./editModalComponents/editTextArea";
+import DeleteModal from "./deleteModal";
 
 export default function CreateForm() {
   const fields = [
@@ -68,16 +69,77 @@ export default function CreateForm() {
     );
     setFormItems([...formItems, newFormItem]);
 
-    const newFormItemDetail = {
+    let newFormItemDetail: FormItemDetails = {
       title: f.label,
-      type: "text",
-      required: false,
-      placeholder: "placeholder",
+      newTitle: f.label,
       id: formItemsLength.toString(),
       size: "normal",
       color: f.color,
+      newColor: "white",
       icon: f.icon,
     };
+    if (f.label === "Date & Time") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        type: "Date & Time",
+        required: true,
+      };
+    } else if (f.label === "Check Box") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        checkBoxDefaultValue: false,
+        required: false,
+      };
+    } else if (f.label === "List") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        required: true,
+        listItems: [],
+        listMultipleSelection: false,
+        listMulDefaultValue: [],
+        listDefaultValue: "No items in list",
+      };
+    } else if (f.label === "Choice") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        required: true,
+        listItems: [],
+        listDefaultValue: "No items in list",
+      };
+    } else if (f.label === "Photo") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        required: true,
+        multiplePics: false,
+        minPics: 0,
+        maxPics: 1,
+        maxPicSize: 2,
+      };
+    } else if (f.label === "Attached file") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        required: true,
+        multipleAttachments: false,
+      };
+    } else if (f.label === "Table") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        required: true,
+        tableCols: ["S.No."],
+      };
+    } else if (f.label === "Image") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        imageFiles: [],
+      };
+    } else {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        type: "text",
+        required: true,
+        placeholder: "Default Text",
+      };
+    }
     setFormItemDetails([...formItemDetails, newFormItemDetail]);
     setFormItemsLength(formItemsLength + 1);
   };
@@ -120,7 +182,6 @@ export default function CreateForm() {
       (e.target as HTMLElement).closest("#downButton") ||
       (e.target as HTMLElement).closest("#editModal")
     ) {
-      console.log("uselect not needed");
     } else {
       const formItems = Array.from(
         document.getElementById("leftPanel")!.children
@@ -285,66 +346,124 @@ export default function CreateForm() {
         </button>
       </div>
       {/* Delete Modal */}
-      <div
-        id="deleteModal"
-        className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden"
-      >
-        <div className="max-w-md bg-white p-6 rounded shadow-md text-center">
-          <h2 className="text-2xl font-bold mb-4">Delete</h2>
-          <p className="mb-4">
-            Can you confirm you want to delete the selected element?
-          </p>
-          <div className="flex justify-center">
-            <button
-              className="bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded mr-2"
-              onClick={deleteFormItem}
-            >
-              Delete
-            </button>
-            <button
-              className="bg-gray-300 hover:bg-gray-400 text-gray-700 py-2 px-4 rounded"
-              onClick={() => {
-                document.getElementById("deleteModal")!.classList.add("hidden");
-              }}
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      </div>
+      <DeleteModal deleteFormItem={deleteFormItem} />
       {/* edit Modal */}
       <div
         id="editModal"
-        className="fixed inset-0 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden"
+        className="fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden overflow-auto"
       >
         <div className="bg-white shadow-lg rounded-lg w-full max-w-lg max-w-4xl p-3">
           {formItemDetails.map((itemD, index) => {
             if (itemD.id === selectedFormItem.slice(1)) {
               switch (itemD.title) {
                 case "Input field":
-                  return <EditInputField key={index} itemD={itemD} />;
+                  return (
+                    <EditInputField
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Text Area":
-                  return <EditTextArea key={index} itemD={itemD} />;
+                  return (
+                    <EditTextArea
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Date & Time":
-                  return <EditDateTime key={index} itemD={itemD} />;
+                  return (
+                    <EditDateTime
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Check Box":
-                  return <EditCheckBox key={index} itemD={itemD} />;
+                  return (
+                    <EditCheckBox
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "List":
-                  return <EditList key={index} itemD={itemD} />;
+                  return (
+                    <EditList
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Choice":
-                  return <EditChoice key={index} itemD={itemD} />;
+                  return (
+                    <EditChoice
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Photo":
-                  return <EditPhoto key={index} itemD={itemD} />;
+                  return (
+                    <EditPhoto
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Voice Recorder":
-                  return <EditVoiceRecorder key={index} itemD={itemD} />;
+                  return (
+                    <EditVoiceRecorder
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Attached file":
-                  return <EditAttachedFile key={index} itemD={itemD} />;
+                  return (
+                    <EditAttachedFile
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Table":
-                  return <EditTable key={index} itemD={itemD} />;
+                  return (
+                    <EditTable
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Image":
-                  return <EditImage key={index} itemD={itemD} />;
+                  return (
+                    <EditImage
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
                 case "Calculation":
-                  return <EditCalculation key={index} itemD={itemD} />;
+                  return (
+                    <EditCalculation
+                      key={index}
+                      itemD={itemD}
+                      formItemDetails={formItemDetails}
+                      setFormItemDetails={setFormItemDetails}
+                    />
+                  );
               }
             }
           })}
