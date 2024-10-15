@@ -213,7 +213,6 @@ export default function EditImage({
             newFormItemDetails.splice(index, 1, newItemD);
             setFormItemDetails(newFormItemDetails);
             setImgFiles(newItemD.imageFiles!);
-            console.log(newItemD);
             (document.getElementById("editItemD")! as HTMLFormElement).reset();
             document.getElementById("colorValue")!.className =
               "w-full h-6 bg-white px-2";
