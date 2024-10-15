@@ -143,12 +143,6 @@ export default function CreateForm() {
     setFormItemDetails([...formItemDetails, newFormItemDetail]);
     setFormItemsLength(formItemsLength + 1);
   };
-  useEffect(() => {
-    if (itemToCopy !== "") {
-      duplicateFormItem();
-      setItemToCopy("");
-    }
-  }, [itemToCopy]);
   const duplicateFormItem = () => {
     const formItemToCopy = formItems.filter(
       (item) => item.key === selectedFormItem.slice(1)
@@ -168,6 +162,12 @@ export default function CreateForm() {
     setFormItems(newFormItems);
     setFormItemsLength(formItemsLength + 1);
   };
+  useEffect(() => {
+    if (itemToCopy !== "") {
+      duplicateFormItem();
+      setItemToCopy("");
+    }
+  }, [itemToCopy, duplicateFormItem]);
   const deleteFormItem = () => {
     const newItems = formItems.filter((item) => item.key !== itemToDelete);
     setFormItems(newItems);
@@ -204,7 +204,7 @@ export default function CreateForm() {
       document.getElementById(selectedFormItem)?.classList.add("bg-orange-100");
       document.addEventListener("click", unselectFormItem);
     }
-  }, [formItems, selectedFormItem]);
+  }, [formItems, selectedFormItem, unselectFormItem]);
 
   return (
     <div className="w-full bg-gray-100 p-4 rounded-lg space-y-2">

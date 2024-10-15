@@ -53,7 +53,10 @@ export default function EditChoice({
       </div>
       <p className="mt-2 text-lg font-bold">
         List items{" "}
-        <span className="text-sm">(example: "item1","item2",...)</span> :
+        <span className="text-sm">
+          (example: &quot;item1&quot;,&quot;item2&quot;,...)
+        </span>{" "}
+        :
       </p>
       <input
         id="listItems"

@@ -48,7 +48,10 @@ export default function EditTable({
       </div>
       <p className="mt-2 text-lg font-bold">
         Table Columns{" "}
-        <span className="text-sm">(Example : "col1","col2",...)</span> :
+        <span className="text-sm">
+          (Example : &quot;col1&quot;,&quot;col2&quot;,...)
+        </span>{" "}
+        :
       </p>
       <input
         id="tableColsInput"
