@@ -1,4 +1,4 @@
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useState } from "react";
 import "@fortawesome/fontawesome-free/css/all.min.css";
 import FormItem from "./formItem";
 import { toast } from "react-toastify";
@@ -196,7 +196,7 @@ export default function CreateForm() {
     formItemDetails,
     setFormItemDetails,
   ]);
-  const duplicateFormItem = () => {
+  const duplicateFormItem = useCallback(() => {
     const fiToCopy = formItems.filter(
       (item) => item.key === selectedFormItem.slice(1)
     );
@@ -224,13 +224,13 @@ export default function CreateForm() {
     setFormItemDetails(newFormItemDetails);
     setFormItems(newFormItems);
     setFormItemsLength(formItemsLength + 1);
-  };
+  }, [formItems, selectedFormItem, formItemDetails, formItemsLength]);
   useEffect(() => {
     if (itemToCopy !== "") {
       duplicateFormItem();
       setItemToCopy("");
     }
-  }, [itemToCopy, duplicateFormItem]);
+  }, [itemToCopy]);
   const deleteFormItem = () => {
     const newItems = formItems.filter((item) => item.key !== itemToDelete);
     const nfid = formItemDetails.filter((itemD) => itemD.id !== itemToDelete);
@@ -248,28 +248,28 @@ export default function CreateForm() {
       (e.target as HTMLElement).closest("#editModal")
     ) {
     } else {
-      const formItems = Array.from(
-        document.getElementById("leftPanel")!.children
-      );
-      formItems.forEach((item) => {
-        item.classList.remove("bg-orange-100");
-      });
-      setSelectedFormItem("");
+      if (document.getElementById("leftPanel")) {
+        const fItems = Array.from(
+          document.getElementById("leftPanel")!.children
+        );
+        fItems.forEach((item) => {
+          item.classList.remove("bg-orange-100");
+        });
+        setSelectedFormItem("");
+      }
     }
     document.removeEventListener("click", unselectFormItem);
   };
   useEffect(() => {
     if (selectedFormItem !== "") {
-      const formItems = Array.from(
-        document.getElementById("leftPanel")!.children
-      );
-      formItems.forEach((item) => {
+      const fItems = Array.from(document.getElementById("leftPanel")!.children);
+      fItems.forEach((item) => {
         item.classList.remove("bg-orange-100");
       });
       document.getElementById(selectedFormItem)?.classList.add("bg-orange-100");
       document.addEventListener("click", unselectFormItem);
     }
-  }, [formItems, selectedFormItem, unselectFormItem]);
+  }, [selectedFormItem, unselectFormItem]);
 
   return (
     <div className="w-full bg-gray-100 p-4 rounded-lg space-y-2">
