@@ -13,16 +13,21 @@ export default function EditTable({
   formItemDetails,
   setFormItemDetails,
 }: Props) {
+  const [title, setTitle] = useState(itemD.newTitle!);
   const [tableCols, setTableCols] = useState(itemD.tableCols!);
-  const showColorOptions = () => {
-    if (document.getElementById("ColorOptions")!.classList.contains("hidden")) {
-      document.getElementById("ColorOptions")?.classList.toggle("hidden");
-      document.getElementById("ColorDownArrow")!.classList.add("rotate-180");
-    } else {
-      document.getElementById("ColorOptions")?.classList.toggle("hidden");
-      document.getElementById("ColorDownArrow")!.classList.remove("rotate-180");
-    }
-  };
+  const [required, setRequired] = useState(itemD.required!);
+  const [itemSize, setItemSize] = useState(itemD.size!);
+  const [itemColor, setItemColor] = useState(itemD.newColor!);
+  const [arrowUp, setArrowUp] = useState(false);
+  const colorOptions = [
+    "white",
+    "red-500",
+    "blue-500",
+    "green-500",
+    "orange-500",
+    "indigo-500",
+    "yellow-500",
+  ];
   return (
     <form
       id="editItemD"
@@ -30,17 +35,18 @@ export default function EditTable({
     >
       <p className="text-lg font-bold">Title :</p>
       <input
-        id="titleInput"
         className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
         type="text"
-        defaultValue={itemD.newTitle}
+        defaultValue={title}
+        onChange={(e) => setTitle(e.target.value)}
       />
       <div className="mt-2 flex items-center justify-start space-x-2 text-lg">
         <input
           className="w-[20px] h-[20px]"
           type="checkbox"
           id="requiredInput"
-          defaultChecked={true}
+          checked={required}
+          onChange={(e) => setRequired(e.target.checked)}
         />
         <label className="text-lg font-bold" htmlFor="requiredInput">
           Entry required
@@ -57,7 +63,7 @@ export default function EditTable({
         id="tableColsInput"
         className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
         type="text"
-        defaultValue={`"${itemD.tableCols?.join('","')}"`}
+        defaultValue={`"${tableCols?.join('","')}"`}
         onChange={(e) => {
           let str = e.target.value;
           if (str.length > 2) {
@@ -72,7 +78,8 @@ export default function EditTable({
       />
       <p className="mt-2 text-lg font-bold">Size of the item :</p>
       <select
-        id="sizeInput"
+        value={itemSize}
+        onChange={(e) => setItemSize(e.target.value)}
         className="bg-gray-100 p-2 rounded-lg outline-none mr-2"
       >
         <option value="normal">Normal</option>
@@ -80,138 +87,46 @@ export default function EditTable({
         <option value="bigger">Bigger</option>
       </select>
       <p className="mt-2 text-lg font-bold">Color :</p>
-      <div className="custom-select bg-gray-100 rounded-lg mr-2">
+      <div className="bg-gray-100 rounded-lg mr-2">
         <div
-          className="relative flex items-center justify-between p-2"
-          onClick={showColorOptions}
+          className="flex items-center justify-between p-2"
+          onClick={() => setArrowUp(true)}
         >
-          <span id="colorValue" className="w-full h-6 bg-white px-2">
-            <span id="colorValueName" className="hidden">
-              white
-            </span>
-          </span>
+          <span className={`w-[95%] h-6 bg-${itemColor} px-2`}></span>
           <i
-            id="ColorDownArrow"
-            className="fa-solid fa-chevron-down text-xs absolute top-1/2 right-4 transform -translate-y-1/2 rotate-0"
+            className={`fa-solid fa-chevron-down text-xs transform ${
+              arrowUp ? "rotate-180" : "rotate-0"
+            }`}
           />
         </div>
         <ul
-          id="ColorOptions"
-          className="flex flex-col space-y-1 px-2 pb-2 hidden"
+          className={`flex flex-col space-y-1 px-2 pb-2 ${
+            arrowUp ? "" : "hidden"
+          }`}
         >
-          <li
-            className="w-full h-6 bg-white"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-white px-2";
-              document.getElementById("colorValueName")!.innerHTML = "white";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-red-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-red-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML = "red-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-blue-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-blue-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML = "blue-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-green-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-green-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "green-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-orange-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-orange-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "orange-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-indigo-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-indigo-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "indigo-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-yellow-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-yellow-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "yellow-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
+          {colorOptions.map((color, index) => {
+            return (
+              <li
+                key={index}
+                className={`w-full h-6 bg-${color}`}
+                onClick={() => {
+                  setItemColor(color);
+                  setArrowUp(false);
+                }}
+              />
+            );
+          })}
         </ul>
       </div>
       <div className="w-full flex items-center justify-end space-x-2 pr-2">
         <div
           className="bg-white text-indigo-900 border border-indigo-900 p-2 rounded-lg cursor-pointer"
           onClick={() => {
+            setTitle(itemD.newTitle!);
             setTableCols(itemD.tableCols!);
-            (document.getElementById("editItemD")! as HTMLFormElement).reset();
-            document.getElementById("colorValue")!.className =
-              "w-full h-6 bg-white px-2";
-            document.getElementById("colorValueName")!.innerHTML = "white";
+            setRequired(itemD.required!);
+            setItemSize(itemD.size!);
+            setItemColor(itemD.newColor!);
             document.getElementById("editModal")!.classList.add("hidden");
           }}
         >
@@ -222,20 +137,10 @@ export default function EditTable({
           className="bg-indigo-900 border border-indigo-900 text-white p-2 rounded-lg cursor-pointer"
           onClick={(e) => {
             e.preventDefault();
-            const newItemD: FormItemDetails = { ...itemD };
-            if (
-              (document.getElementById("titleInput")! as HTMLInputElement)
-                .value === ""
-            ) {
+            if (title === "") {
               toast("Title is Required", { type: "error" });
               return;
             }
-            newItemD.newTitle = (
-              document.getElementById("titleInput")! as HTMLInputElement
-            ).value;
-            newItemD.required = (
-              document.getElementById("requiredInput")! as HTMLInputElement
-            ).checked;
             if (
               tableCols.length === 0 ||
               (tableCols.length === 1 && tableCols[0] === "S.No.")
@@ -243,22 +148,18 @@ export default function EditTable({
               toast("Table Columns are Required", { type: "error" });
               return;
             }
-            newItemD.tableCols = tableCols;
-            newItemD.size = (
-              document.getElementById("sizeInput")! as HTMLSelectElement
-            ).value;
-            newItemD.newColor = (
-              document.getElementById("colorValueName")! as HTMLElement
-            ).innerText;
+            const newItemD: FormItemDetails = {
+              ...itemD,
+              newTitle: title,
+              required: required,
+              tableCols: tableCols,
+              size: itemSize,
+              newColor: itemColor,
+            };
             const index = formItemDetails.indexOf(itemD);
             const newFormItemDetails = [...formItemDetails];
             newFormItemDetails.splice(index, 1, newItemD);
             setFormItemDetails(newFormItemDetails);
-            setTableCols(newItemD.tableCols!);
-            (document.getElementById("editItemD")! as HTMLFormElement).reset();
-            document.getElementById("colorValue")!.className =
-              "w-full h-6 bg-white px-2";
-            document.getElementById("colorValueName")!.innerHTML = "white";
             document.getElementById("editModal")!.classList.add("hidden");
           }}
         >

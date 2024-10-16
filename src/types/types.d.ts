@@ -23,4 +23,6 @@ export type FormItemDetails = {
   multipleAttachments?: boolean;
   tableCols?: string[];
   imageFiles?: File[];
+  calcInput1?: string;
+  calcInput2?: string;
 };

@@ -51,6 +51,8 @@ export default function CreateForm() {
   const [selectedFormItem, setSelectedFormItem] = useState("");
   const [itemToDelete, setItemToDelete] = useState("");
   const [itemToCopy, setItemToCopy] = useState("");
+  const [nameEditFormItem, setNameEditFormItem] = useState("");
+  const [editedName, setEditedName] = useState("");
 
   const createFormItem = (f: {
     icon: string;
@@ -61,14 +63,16 @@ export default function CreateForm() {
       <FormItem
         key={formItemsLength}
         id={formItemsLength.toString()}
-        f={f}
+        title={f.label}
+        color={f.color}
+        icon={f.icon}
         setItemToCopy={setItemToCopy}
         setItemToDelete={setItemToDelete}
         setSelectedFormItem={setSelectedFormItem}
+        setNameEditFormItem={setNameEditFormItem}
+        setEditedName={setEditedName}
       />
     );
-    setFormItems([...formItems, newFormItem]);
-
     let newFormItemDetail: FormItemDetails = {
       title: f.label,
       newTitle: f.label,
@@ -81,7 +85,9 @@ export default function CreateForm() {
     if (f.label === "Date & Time") {
       newFormItemDetail = {
         ...newFormItemDetail,
-        type: "Date & Time",
+        type: "datetime-local",
+        defaultDate: "",
+        defaultTime: "",
         required: true,
       };
     } else if (f.label === "Check Box") {
@@ -132,33 +138,90 @@ export default function CreateForm() {
         ...newFormItemDetail,
         imageFiles: [],
       };
-    } else {
+    } else if (f.label === "Input field") {
       newFormItemDetail = {
         ...newFormItemDetail,
         type: "text",
         required: true,
         placeholder: "Default Text",
       };
+    } else if (f.label === "Calculation") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        type: "add",
+        calcInput1: "",
+        calcInput2: "",
+      };
     }
+    setFormItems([...formItems, newFormItem]);
     setFormItemDetails([...formItemDetails, newFormItemDetail]);
     setFormItemsLength(formItemsLength + 1);
   };
+  useEffect(() => {
+    if (nameEditFormItem !== "" && editedName !== "") {
+      const nfid = [...formItemDetails];
+      const nfidArray = nfid.filter(
+        (item) => item.id === nameEditFormItem.slice(1)
+      );
+      const nfi = [...formItems];
+      const nfiArray = nfi.filter(
+        (item) => item.key === nameEditFormItem.slice(1)
+      );
+      const item = nfiArray[0];
+      const copy = React.cloneElement(item, {
+        key: item.key,
+        id: item.props.id,
+        icon: item.props.icon,
+        title: editedName,
+        color: item.props.color,
+      });
+      const i = nfi.indexOf(item);
+      nfi.splice(i, 1, copy);
+      const itemD = nfidArray[0];
+      itemD.newTitle = editedName;
+      const index = nfid.indexOf(itemD);
+      nfid.splice(index, 1, itemD);
+      setFormItems(nfi);
+      setFormItemDetails(nfid);
+      setNameEditFormItem("");
+      setEditedName("");
+    }
+  }, [
+    nameEditFormItem,
+    setNameEditFormItem,
+    editedName,
+    setEditedName,
+    formItems,
+    setFormItems,
+    formItemDetails,
+    setFormItemDetails,
+  ]);
   const duplicateFormItem = () => {
-    const formItemToCopy = formItems.filter(
+    const fiToCopy = formItems.filter(
       (item) => item.key === selectedFormItem.slice(1)
     );
-    const index = formItems.indexOf(formItemToCopy[0]);
-    const copy = React.cloneElement(formItemToCopy[0], {
+    const index = formItems.indexOf(fiToCopy[0]);
+    const ficopy = React.cloneElement(fiToCopy[0], {
       key: formItemsLength.toString(),
       id: formItemsLength.toString(),
-      f: {
-        icon: formItemToCopy[0].props.f.icon,
-        label: `(copy) ${formItemToCopy[0].props.f.label}`,
-        color: formItemToCopy[0].props.f.color,
-      },
+      icon: fiToCopy[0].props.icon,
+      title: `(copy) ${fiToCopy[0].props.title}`,
+      color: fiToCopy[0].props.color,
     });
     const newFormItems = [...formItems];
-    newFormItems.splice(index + 1, 0, copy);
+    newFormItems.splice(index + 1, 0, ficopy);
+    const fidToCopy = formItemDetails.filter(
+      (itemD) => itemD.id === selectedFormItem.slice(1)
+    );
+    const i = formItemDetails.indexOf(fidToCopy[0]);
+    const fidcopy = {
+      ...fidToCopy[0],
+      newTitle: `(copy) ${fidToCopy[0].newTitle}`,
+      id: formItemsLength.toString(),
+    };
+    const newFormItemDetails = [...formItemDetails];
+    newFormItemDetails.splice(i + 1, 0, fidcopy);
+    setFormItemDetails(newFormItemDetails);
     setFormItems(newFormItems);
     setFormItemsLength(formItemsLength + 1);
   };
@@ -170,6 +233,8 @@ export default function CreateForm() {
   }, [itemToCopy, duplicateFormItem]);
   const deleteFormItem = () => {
     const newItems = formItems.filter((item) => item.key !== itemToDelete);
+    const nfid = formItemDetails.filter((itemD) => itemD.id !== itemToDelete);
+    setFormItemDetails(nfid);
     setFormItems(newItems);
     document.getElementById("deleteModal")!.classList.add("hidden");
     setItemToDelete("");

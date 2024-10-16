@@ -13,55 +13,46 @@ export default function EditList({
   formItemDetails,
   setFormItemDetails,
 }: Props) {
-  const [listItems, setListItems] = useState<string[]>(itemD.listItems!);
-  const [selValues, setSelValues] = useState<string[]>(
-    itemD.listMulDefaultValue!
-  );
+  const [title, setTitle] = useState(itemD.newTitle!);
+  const [listItems, setListItems] = useState(itemD.listItems!);
+  const [selValues, setSelValues] = useState(itemD.listMulDefaultValue!);
+  const [listSelVal, setListSelVal] = useState(itemD.listDefaultValue!);
   const [mul, setMul] = useState(itemD.listMultipleSelection!);
-  const [entryRequired, setEntryRequired] = useState(itemD.required!);
-  const [singleSelVal, setSingleSelVal] = useState(itemD.listDefaultValue!);
-  const showMulSelOptions = () => {
-    if (
-      document.getElementById("mulSelOptions")!.classList.contains("hidden")
-    ) {
-      document.getElementById("mulSelOptions")?.classList.toggle("hidden");
-      document.getElementById("mulDownArrow")!.classList.add("rotate-180");
-    } else {
-      document.getElementById("mulSelOptions")?.classList.toggle("hidden");
-      document.getElementById("mulDownArrow")!.classList.remove("rotate-180");
-    }
-  };
-  const showColorOptions = () => {
-    if (document.getElementById("ColorOptions")!.classList.contains("hidden")) {
-      document.getElementById("ColorOptions")?.classList.toggle("hidden");
-      document.getElementById("ColorDownArrow")!.classList.add("rotate-180");
-    } else {
-      document.getElementById("ColorOptions")?.classList.toggle("hidden");
-      document.getElementById("ColorDownArrow")!.classList.remove("rotate-180");
-    }
-  };
-
+  const [required, setRequired] = useState(itemD.required!);
+  const [itemSize, setItemSize] = useState(itemD.size!);
+  const [itemColor, setItemColor] = useState(itemD.newColor!);
+  const [mulArrowUp, setMulArrowUp] = useState(false);
+  const [arrowUp, setArrowUp] = useState(false);
+  const colorOptions = [
+    "white",
+    "red-500",
+    "blue-500",
+    "green-500",
+    "orange-500",
+    "indigo-500",
+    "yellow-500",
+  ];
   return (
     <form
       id="editItemD"
-      className="w-full h-[530px] flex flex-col pb-5 space-y-2 overflow-auto"
+      className="w-full flex flex-col pb-5 space-y-2 overflow-auto"
     >
       <p className="text-lg font-bold">Title :</p>
       <input
-        id="titleInput"
         className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
         type="text"
-        defaultValue={itemD.newTitle}
+        defaultValue={title}
+        onChange={(e) => setTitle(e.target.value)}
       />
       <div className="mt-2 flex items-center justify-start space-x-2 text-lg">
         <input
           className="w-[20px] h-[20px]"
           type="checkbox"
           id="multipleSelections"
-          defaultChecked={mul}
+          checked={mul}
           onChange={(e) => setMul(e.target.checked)}
         />
-        <label className="text-lg font-bold" htmlFor="requiredInput">
+        <label className="text-lg font-bold" htmlFor="multipleSelections">
           Multiple Selections
         </label>
       </div>
@@ -70,8 +61,8 @@ export default function EditList({
           className="w-[20px] h-[20px]"
           type="checkbox"
           id="requiredInput"
-          defaultChecked={entryRequired}
-          onChange={(e) => setEntryRequired(e.target.checked)}
+          checked={required}
+          onChange={(e) => setRequired(e.target.checked)}
         />
         <label className="text-lg font-bold" htmlFor="requiredInput">
           Entry required
@@ -85,9 +76,8 @@ export default function EditList({
         :
       </p>
       <input
-        id="listItems"
         className="bg-gray-100 rounded-lg outline-none p-2 mr-2"
-        defaultValue={`"${itemD.listItems?.join('","')}"`}
+        defaultValue={`"${listItems?.join('","')}"`}
         onChange={(e) => {
           let str = e.target.value;
           if (str.length > 2) {
@@ -114,7 +104,7 @@ export default function EditList({
                 !unsels.includes(e.target as HTMLElement) &&
                 !(e.target as HTMLElement).closest(".unself")
               ) {
-                showMulSelOptions();
+                setMulArrowUp(!mulArrowUp);
               }
             }}
           >
@@ -143,13 +133,15 @@ export default function EditList({
               })}
             </div>
             <i
-              id="mulDownArrow"
-              className="fa-solid fa-chevron-down text-xs transform rotate-0"
+              className={`fa-solid fa-chevron-down text-xs transform ${
+                mulArrowUp ? "rotate-180" : ""
+              }`}
             />
           </div>
           <ul
-            id="mulSelOptions"
-            className="flex flex-col space-y-1 px-2 pb-2 hidden"
+            className={`flex flex-col space-y-1 px-2 pb-2 ${
+              mulArrowUp ? "" : "hidden"
+            }`}
           >
             {listItems?.length > 0 ? (
               listItems.map((item, i) => {
@@ -172,7 +164,7 @@ export default function EditList({
                           if (val.length === 0) flag = 0;
                         });
                         if (flag === 1) {
-                          showMulSelOptions();
+                          setMulArrowUp(false);
                         }
                       }}
                     >
@@ -183,48 +175,37 @@ export default function EditList({
               })
             ) : (
               <li className="w-full border border-slate-200">
-                {itemD.listDefaultValue}
+                No items in List
               </li>
             )}
           </ul>
         </div>
       ) : (
         <select
-          id="listDefaultVal"
           className="bg-gray-100 rounded-lg outline-none p-2 mr-2"
+          value={listSelVal}
+          onChange={(e) => setListSelVal(e.target.value)}
         >
           {listItems?.length > 0 ? (
             <>
+              <option value="">No Default Value</option>
               {listItems.map((item, index) => {
-                if (singleSelVal === item) {
-                  return (
-                    <option key={index} value={item} selected>
-                      {item}
-                    </option>
-                  );
-                }
                 return (
                   <option key={index} value={item}>
                     {item}
                   </option>
                 );
               })}
-              {singleSelVal === "No Default Value" ? (
-                <option value="No Default Value" selected>
-                  No Default Value
-                </option>
-              ) : (
-                <option value="No Default Value">No Default Value</option>
-              )}
             </>
           ) : (
-            <option value="No items in list">No items in list</option>
+            <option value="">No items in list</option>
           )}
         </select>
       )}
       <p className="mt-2 text-lg font-bold">Size of the item :</p>
       <select
-        id="sizeInput"
+        value={itemSize}
+        onChange={(e) => setItemSize(e.target.value)}
         className="bg-gray-100 p-2 rounded-lg outline-none mr-2"
       >
         <option value="normal">Normal</option>
@@ -232,142 +213,49 @@ export default function EditList({
         <option value="bigger">Bigger</option>
       </select>
       <p className="mt-2 text-lg font-bold">Color :</p>
-      <div className="custom-select bg-gray-100 rounded-lg mr-2">
+      <div className="bg-gray-100 rounded-lg mr-2">
         <div
-          className="relative flex items-center justify-between p-2"
-          onClick={showColorOptions}
+          className="flex items-center justify-between p-2"
+          onClick={() => setArrowUp(true)}
         >
-          <span id="colorValue" className="w-full h-6 bg-white px-2">
-            <span id="colorValueName" className="hidden">
-              white
-            </span>
-          </span>
+          <span className={`w-[95%] h-6 bg-${itemColor} px-2`}></span>
           <i
-            id="ColorDownArrow"
-            className="fa-solid fa-chevron-down text-xs absolute top-1/2 right-4 transform -translate-y-1/2 rotate-0"
+            className={`fa-solid fa-chevron-down text-xs transform ${
+              arrowUp ? "rotate-180" : "rotate-0"
+            }`}
           />
         </div>
         <ul
-          id="ColorOptions"
-          className="flex flex-col space-y-1 px-2 pb-2 hidden"
+          className={`flex flex-col space-y-1 px-2 pb-2 ${
+            arrowUp ? "" : "hidden"
+          }`}
         >
-          <li
-            className="w-full h-6 bg-white"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-white px-2";
-              document.getElementById("colorValueName")!.innerHTML = "white";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-red-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-red-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML = "red-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-blue-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-blue-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML = "blue-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-green-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-green-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "green-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-orange-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-orange-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "orange-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-indigo-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-indigo-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "indigo-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
-          <li
-            className="w-full h-6 bg-yellow-500"
-            onClick={() => {
-              document.getElementById("colorValue")!.className =
-                "w-full h-6 bg-yellow-500 px-2";
-              document.getElementById("colorValueName")!.innerHTML =
-                "yellow-500";
-              document
-                .getElementById("ColorOptions")!
-                .classList.toggle("hidden");
-              document
-                .getElementById("ColorDownArrow")!
-                .classList.remove("rotate-180");
-            }}
-          />
+          {colorOptions.map((color, index) => {
+            return (
+              <li
+                key={index}
+                className={`w-full h-6 bg-${color}`}
+                onClick={() => {
+                  setItemColor(color);
+                  setArrowUp(false);
+                }}
+              />
+            );
+          })}
         </ul>
       </div>
       <div className="w-full flex items-center justify-end space-x-2 pr-2">
         <div
           className="bg-white text-indigo-900 border border-indigo-900 p-2 rounded-lg cursor-pointer"
           onClick={() => {
+            setTitle(itemD.newTitle!);
             setListItems(itemD.listItems!);
             setMul(itemD.listMultipleSelection!);
             setSelValues(itemD.listMulDefaultValue!);
-            setSingleSelVal(itemD.listDefaultValue!);
-            setEntryRequired(itemD.required!);
-            (document.getElementById("editItemD")! as HTMLFormElement).reset();
-            document.getElementById("colorValue")!.className =
-              "w-full h-6 bg-white px-2";
-            document.getElementById("colorValueName")!.innerHTML = "white";
+            setListSelVal(itemD.listDefaultValue!);
+            setRequired(itemD.required!);
+            setItemSize(itemD.size!);
+            setItemColor(itemD.newColor!);
             document.getElementById("editModal")!.classList.add("hidden");
           }}
         >
@@ -378,50 +266,29 @@ export default function EditList({
           className="bg-indigo-900 border border-indigo-900 text-white p-2 rounded-lg cursor-pointer"
           onClick={(e) => {
             e.preventDefault();
-            const newItemD: FormItemDetails = { ...itemD };
-            if (
-              (document.getElementById("titleInput")! as HTMLInputElement)
-                .value === ""
-            ) {
+            if (title === "") {
               toast("Title is Required", { type: "error" });
               return;
             }
-            newItemD.newTitle = (
-              document.getElementById("titleInput")! as HTMLInputElement
-            ).value;
-            newItemD.listMultipleSelection = mul;
-            newItemD.required = entryRequired;
             if (listItems.length === 0) {
               toast("List Items are Required", { type: "error" });
               return;
             }
-            newItemD.listItems = listItems;
-            if (mul) {
-              newItemD.listMulDefaultValue = selValues;
-            } else {
-              newItemD.listDefaultValue = (
-                document.getElementById("listDefaultVal")! as HTMLSelectElement
-              ).value;
-            }
-            newItemD.size = (
-              document.getElementById("sizeInput")! as HTMLSelectElement
-            ).value;
-            newItemD.newColor = (
-              document.getElementById("colorValueName")! as HTMLElement
-            ).innerText;
+            const newItemD: FormItemDetails = {
+              ...itemD,
+              newTitle: title,
+              listMultipleSelection: mul,
+              required: required,
+              listItems: listItems,
+              listMulDefaultValue: selValues,
+              listDefaultValue: listSelVal,
+              size: itemSize,
+              newColor: itemColor,
+            };
             const index = formItemDetails.indexOf(itemD);
             const newFormItemDetails = [...formItemDetails];
             newFormItemDetails.splice(index, 1, newItemD);
             setFormItemDetails(newFormItemDetails);
-            setListItems(newItemD.listItems!);
-            setMul(newItemD.listMultipleSelection!);
-            setSelValues(newItemD.listMulDefaultValue!);
-            setSingleSelVal(newItemD.listDefaultValue!);
-            setEntryRequired(newItemD.required!);
-            (document.getElementById("editItemD")! as HTMLFormElement).reset();
-            document.getElementById("colorValue")!.className =
-              "w-full h-6 bg-white px-2";
-            document.getElementById("colorValueName")!.innerHTML = "white";
             document.getElementById("editModal")!.classList.add("hidden");
           }}
         >

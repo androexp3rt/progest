@@ -1,24 +1,26 @@
 type Props = {
-  f: {
-    icon: string;
-    label: string;
-    color: string;
-  };
+  icon: string;
+  title: string;
+  color: string;
   id: string;
   setItemToCopy: (id: string) => void;
   setItemToDelete: (id: string) => void;
   setSelectedFormItem: (id: string) => void;
-  // unselectFormItem: (e: MouseEvent) => void;
+  setNameEditFormItem: (id: string) => void;
+  setEditedName: (name: string) => void;
 };
 
 export default function FormItem({
-  f,
+  title,
+  color,
+  icon,
   id,
   setItemToCopy,
   setItemToDelete,
   setSelectedFormItem,
-}: // unselectFormItem,
-Props) {
+  setNameEditFormItem,
+  setEditedName,
+}: Props) {
   let isNewItem = true;
   const idElement = document.getElementById(`s${id}`);
   if (idElement) {
@@ -39,7 +41,7 @@ Props) {
       }}
     >
       <div className="flex items-center">
-        <i className={`${f.icon} ${f.color}`} />
+        <i className={`${icon} ${color}`} />
         <input
           id={`${id}inputElement`}
           type="text"
@@ -47,7 +49,7 @@ Props) {
             isNewItem ? "" : "hidden"
           }`}
           autoFocus
-          defaultValue={`${f.label}`}
+          defaultValue={`${title}`}
           onBlur={(e) => {
             e.target.classList.add("hidden");
             document.getElementById(`${id}spanElement`)!.innerHTML =
@@ -55,6 +57,10 @@ Props) {
             document
               .getElementById(`${id}spanElement`)!
               .classList.remove("hidden");
+            if (e.target.value !== title) {
+              setNameEditFormItem(`s${id}`);
+              setEditedName(e.target.value);
+            }
           }}
         />
         <span
@@ -63,7 +69,7 @@ Props) {
             isNewItem ? "hidden" : ""
           }`}
         >
-          {f.label}
+          {title}
         </span>
       </div>
       <div className="flex space-x-5">

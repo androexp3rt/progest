@@ -1,3 +1,4 @@
+import Image from "next/image";
 import React, { useRef, useState } from "react";
 import { toast } from "react-toastify";
 
@@ -34,7 +35,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const droppedFiles = Array.from(e.dataTransfer.files);
     const newFiles = [...droppedFiles];
     droppedFiles.forEach((file, index) => {
-      const newName = `Uploaded Image ${files.length + 1}`;
+      const newName = `Uploaded Image ${files.length + index + 1}`;
       const blob = new Blob([file], { type: file.type });
       newFiles.splice(index, 1, new File([blob], newName, { type: file.type }));
     });
@@ -48,7 +49,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
     const droppedFiles = Array.from(e.target.files!);
     const newFiles = [...droppedFiles];
     droppedFiles.forEach((file, index) => {
-      const newName = `Uploaded Image ${files.length + 1}`;
+      const newName = `Uploaded Image ${files.length + index + 1}`;
       const blob = new Blob([file], { type: file.type });
       newFiles.splice(index, 1, new File([blob], newName, { type: file.type }));
     });
@@ -90,14 +91,34 @@ const FileUpload: React.FC<FileUploadProps> = ({
         style={{ display: "none" }}
       />
       <div
-        className="drop-zone h-40 bg-gray-100 mr-2 p-2 rounded-lg flex items-center justify-center"
+        className="drop-zone h-40 bg-gray-100 mr-2 p-2 rounded-lg overflow-scroll"
         onClick={handleClick}
         onDragOver={handleDragOver}
         onDragEnter={handleDragEnter}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
       >
-        <span>Drag and drop files here, or click to select files</span>
+        {files.length === 0 ? (
+          <span>Drag and drop files here, or click to select files</span>
+        ) : (
+          <div>
+            <span>Drag and drop files here, or click to select files</span>
+            <div className="flex items-center justify-center flex-wrap gap-5 p-2">
+              {files.map((file, index) => {
+                return (
+                  <Image
+                    key={index}
+                    src={URL.createObjectURL(file)}
+                    alt={file.name}
+                    width={100}
+                    height={100}
+                    className="w-[150px] h-auto"
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
       </div>
       <ul className="space-y-1">
         {files.map((file, index) => (
@@ -106,7 +127,7 @@ const FileUpload: React.FC<FileUploadProps> = ({
             className="flex items-center justify-between border border-green-500 rounded-lg p-1 mr-2"
           >
             <span>
-              {file.name} ({file.size / 1024} KB)
+              {file.name} ({(file.size / 1024).toFixed(2)} KB)
             </span>
             <i
               className="fa fa-trash"
