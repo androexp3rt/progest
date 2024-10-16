@@ -29,7 +29,7 @@ export default function EditCalculation({
     "indigo-500",
     "yellow-500",
   ];
-  let calcItemDetails = formItemDetails.filter((item) => {
+  const calcItemDetails = formItemDetails.filter((item) => {
     return (
       item.title === "Input field" ||
       item.title === "Text Area" ||
