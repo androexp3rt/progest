@@ -230,7 +230,7 @@ export default function CreateForm() {
       duplicateFormItem();
       setItemToCopy("");
     }
-  }, [itemToCopy]);
+  }, [itemToCopy, duplicateFormItem]);
   const deleteFormItem = () => {
     const newItems = formItems.filter((item) => item.key !== itemToDelete);
     const nfid = formItemDetails.filter((itemD) => itemD.id !== itemToDelete);
@@ -239,7 +239,7 @@ export default function CreateForm() {
     document.getElementById("deleteModal")!.classList.add("hidden");
     setItemToDelete("");
   };
-  const unselectFormItem = (e: MouseEvent) => {
+  const unselectFormItem = useCallback((e: MouseEvent) => {
     if (
       ((e.target as HTMLElement) !== document.getElementById("leftPanel")! &&
         (e.target as HTMLElement).closest("#leftPanel")) ||
@@ -247,6 +247,8 @@ export default function CreateForm() {
       (e.target as HTMLElement).closest("#downButton") ||
       (e.target as HTMLElement).closest("#editModal")
     ) {
+      document.removeEventListener("click", unselectFormItem);
+      return;
     } else {
       if (document.getElementById("leftPanel")) {
         const fItems = Array.from(
@@ -257,9 +259,9 @@ export default function CreateForm() {
         });
         setSelectedFormItem("");
       }
+      document.removeEventListener("click", unselectFormItem);
     }
-    document.removeEventListener("click", unselectFormItem);
-  };
+  }, []);
   useEffect(() => {
     if (selectedFormItem !== "") {
       const fItems = Array.from(document.getElementById("leftPanel")!.children);
