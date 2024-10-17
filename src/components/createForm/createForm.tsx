@@ -17,6 +17,7 @@ import EditDateTime from "./editModalComponents/editDate&Time";
 import EditTextArea from "./editModalComponents/editTextArea";
 import DeleteModal from "./deleteModal";
 import axios from "axios";
+import { Loader2 } from "lucide-react";
 
 type Props = {
   eFormItemDetails: FormItemDetails[];
@@ -69,6 +70,7 @@ export default function CreateForm({
   const [itemToCopy, setItemToCopy] = useState("");
   const [itemToEditName, setItemToEditName] = useState("");
   const [editedName, setEditedName] = useState("");
+  const [isSavingForm, setIsSavingForm] = useState(false);
 
   const createFormItem = (f: {
     icon: string;
@@ -524,7 +526,7 @@ export default function CreateForm({
               }
             }
             //save the form
-            console.log("Save form");
+            setIsSavingForm(true);
             try {
               const response = await axios.post("/api/saveForm", {
                 formName,
@@ -545,10 +547,22 @@ export default function CreateForm({
               toast("Error saving the form, Please try again", {
                 type: "error",
               });
+            } finally {
+              setIsSavingForm(false);
             }
           }}
         >
-          <i className="fas fa-check mr-2"></i> Save
+          {isSavingForm ? (
+            <div className="flex items-center justify-center space-x-2 text-white">
+              <Loader2 className="animate-spin" />
+              <span>Loading...</span>
+            </div>
+          ) : (
+            <div className="flex items-center justify-center space-x-2 text-white">
+              <i className="fas fa-check mr-2" />
+              <span>Save</span>
+            </div>
+          )}
         </button>
         <button className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center">
           <i className="fas fa-sign-out-alt mr-2"></i> Quit
