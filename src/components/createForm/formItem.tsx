@@ -6,7 +6,7 @@ type Props = {
   setItemToCopy: (id: string) => void;
   setItemToDelete: (id: string) => void;
   setSelectedFormItem: (id: string) => void;
-  setNameEditFormItem: (id: string) => void;
+  setItemToEditName: (id: string) => void;
   setEditedName: (name: string) => void;
 };
 
@@ -18,7 +18,7 @@ export default function FormItem({
   setItemToCopy,
   setItemToDelete,
   setSelectedFormItem,
-  setNameEditFormItem,
+  setItemToEditName,
   setEditedName,
 }: Props) {
   let isNewItem = true;
@@ -58,7 +58,7 @@ export default function FormItem({
               .getElementById(`${id}spanElement`)!
               .classList.remove("hidden");
             if (e.target.value !== title) {
-              setNameEditFormItem(`s${id}`);
+              setItemToEditName(`s${id}`);
               setEditedName(e.target.value);
             }
           }}

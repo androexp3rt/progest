@@ -6,12 +6,16 @@ type Props = {
   itemD: FormItemDetails;
   formItemDetails: FormItemDetails[];
   setFormItemDetails: (formItemDetails: FormItemDetails[]) => void;
+  setEditedName: (name: string) => void;
+  setItemToEditName: (id: string) => void;
 };
 
 export default function EditDateTime({
   itemD,
   formItemDetails,
   setFormItemDetails,
+  setEditedName,
+  setItemToEditName,
 }: Props) {
   const [title, setTitle] = useState(itemD.newTitle!);
   const [type, setType] = useState(itemD.type!);
@@ -198,6 +202,10 @@ export default function EditDateTime({
             const newFormItemDetails = [...formItemDetails];
             newFormItemDetails.splice(index, 1, newItemD);
             setFormItemDetails(newFormItemDetails);
+            if (itemD.newTitle !== title) {
+              setEditedName(title);
+              setItemToEditName(`s${itemD.id}`);
+            }
             document.getElementById("editModal")!.classList.add("hidden");
           }}
         >

@@ -242,7 +242,13 @@ export default function ManagerDashboard() {
             )}
           </div>
         ) : pageState === "Create Form" ? (
-          <CreateForm />
+          <CreateForm
+            eFormItemDetails={[]}
+            eFormItems={[]}
+            eFormItemsLength={0}
+            eFormName=""
+            companyName={companyName}
+          />
         ) : (
           <></>
         )}

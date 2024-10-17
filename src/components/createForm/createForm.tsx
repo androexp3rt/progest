@@ -16,8 +16,23 @@ import EditCheckBox from "./editModalComponents/editCheckBox";
 import EditDateTime from "./editModalComponents/editDate&Time";
 import EditTextArea from "./editModalComponents/editTextArea";
 import DeleteModal from "./deleteModal";
+import axios from "axios";
 
-export default function CreateForm() {
+type Props = {
+  eFormItemDetails: FormItemDetails[];
+  eFormItems: ReactElement[];
+  eFormItemsLength: number;
+  eFormName: string;
+  companyName: string;
+};
+
+export default function CreateForm({
+  eFormItemDetails,
+  eFormItems,
+  eFormItemsLength,
+  eFormName,
+  companyName,
+}: Props) {
   const fields = [
     { icon: "fas fa-font", label: "Input field", color: "text-teal-500" },
     { icon: "fas fa-align-left", label: "Text Area", color: "text-teal-500" },
@@ -44,14 +59,15 @@ export default function CreateForm() {
     { icon: "fas fa-image", label: "Image", color: "text-gray-500" },
     { icon: "fas fa-calculator", label: "Calculation", color: "text-red-500" },
   ];
-  const [formItemDetails, setFormItemDetails] = useState<FormItemDetails[]>([]);
-  const [formItems, setFormItems] = useState<ReactElement[]>([]);
-  const [formItemsLength, setFormItemsLength] = useState(0);
-  const [formName, setFormName] = useState("");
+  const [formItemDetails, setFormItemDetails] =
+    useState<FormItemDetails[]>(eFormItemDetails);
+  const [formItems, setFormItems] = useState<ReactElement[]>(eFormItems);
+  const [formItemsLength, setFormItemsLength] = useState(eFormItemsLength);
+  const [formName, setFormName] = useState(eFormName);
   const [selectedFormItem, setSelectedFormItem] = useState("");
   const [itemToDelete, setItemToDelete] = useState("");
   const [itemToCopy, setItemToCopy] = useState("");
-  const [nameEditFormItem, setNameEditFormItem] = useState("");
+  const [itemToEditName, setItemToEditName] = useState("");
   const [editedName, setEditedName] = useState("");
 
   const createFormItem = (f: {
@@ -69,7 +85,7 @@ export default function CreateForm() {
         setItemToCopy={setItemToCopy}
         setItemToDelete={setItemToDelete}
         setSelectedFormItem={setSelectedFormItem}
-        setNameEditFormItem={setNameEditFormItem}
+        setItemToEditName={setItemToEditName}
         setEditedName={setEditedName}
       />
     );
@@ -82,7 +98,14 @@ export default function CreateForm() {
       newColor: "white",
       icon: f.icon,
     };
-    if (f.label === "Date & Time") {
+    if (f.label === "Input field") {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        type: "text",
+        required: true,
+        placeholder: "Default Text",
+      };
+    } else if (f.label === "Date & Time") {
       newFormItemDetail = {
         ...newFormItemDetail,
         type: "datetime-local",
@@ -103,14 +126,14 @@ export default function CreateForm() {
         listItems: [],
         listMultipleSelection: false,
         listMulDefaultValue: [],
-        listDefaultValue: "No items in list",
+        listDefaultValue: "",
       };
     } else if (f.label === "Choice") {
       newFormItemDetail = {
         ...newFormItemDetail,
         required: true,
         listItems: [],
-        listDefaultValue: "No items in list",
+        listDefaultValue: "",
       };
     } else if (f.label === "Photo") {
       newFormItemDetail = {
@@ -138,13 +161,6 @@ export default function CreateForm() {
         ...newFormItemDetail,
         imageFiles: [],
       };
-    } else if (f.label === "Input field") {
-      newFormItemDetail = {
-        ...newFormItemDetail,
-        type: "text",
-        required: true,
-        placeholder: "Default Text",
-      };
     } else if (f.label === "Calculation") {
       newFormItemDetail = {
         ...newFormItemDetail,
@@ -157,38 +173,34 @@ export default function CreateForm() {
     setFormItemDetails([...formItemDetails, newFormItemDetail]);
     setFormItemsLength(formItemsLength + 1);
   };
-  useEffect(() => {
-    if (nameEditFormItem !== "" && editedName !== "") {
-      const nfid = [...formItemDetails];
-      const nfidArray = nfid.filter(
-        (item) => item.id === nameEditFormItem.slice(1)
-      );
-      const nfi = [...formItems];
-      const nfiArray = nfi.filter(
-        (item) => item.key === nameEditFormItem.slice(1)
-      );
-      const item = nfiArray[0];
-      const copy = React.cloneElement(item, {
-        key: item.key,
-        id: item.props.id,
-        icon: item.props.icon,
-        title: editedName,
-        color: item.props.color,
-      });
-      const i = nfi.indexOf(item);
-      nfi.splice(i, 1, copy);
-      const itemD = nfidArray[0];
-      itemD.newTitle = editedName;
-      const index = nfid.indexOf(itemD);
-      nfid.splice(index, 1, itemD);
-      setFormItems(nfi);
-      setFormItemDetails(nfid);
-      setNameEditFormItem("");
-      setEditedName("");
-    }
+  const editFormItemName = useCallback(() => {
+    const nfid = [...formItemDetails];
+    const nfidArray = nfid.filter(
+      (item) => item.id === itemToEditName.slice(1)
+    );
+    const nfi = [...formItems];
+    const nfiArray = nfi.filter((item) => item.key === itemToEditName.slice(1));
+    const item = nfiArray[0];
+    const copy = React.cloneElement(item, {
+      key: item.key,
+      id: item.props.id,
+      icon: item.props.icon,
+      title: editedName,
+      color: item.props.color,
+    });
+    const i = nfi.indexOf(item);
+    nfi.splice(i, 1, copy);
+    const itemD = nfidArray[0];
+    itemD.newTitle = editedName;
+    const index = nfid.indexOf(itemD);
+    nfid.splice(index, 1, itemD);
+    setFormItems(nfi);
+    setFormItemDetails(nfid);
+    setItemToEditName("");
+    setEditedName("");
   }, [
-    nameEditFormItem,
-    setNameEditFormItem,
+    itemToEditName,
+    setItemToEditName,
     editedName,
     setEditedName,
     formItems,
@@ -196,6 +208,11 @@ export default function CreateForm() {
     formItemDetails,
     setFormItemDetails,
   ]);
+  useEffect(() => {
+    if (itemToEditName !== "" && editedName !== "") {
+      editFormItemName();
+    }
+  }, [itemToEditName, editedName, editFormItemName]);
   const duplicateFormItem = useCallback(() => {
     const fiToCopy = formItems.filter(
       (item) => item.key === selectedFormItem.slice(1)
@@ -400,10 +417,135 @@ export default function CreateForm() {
       <div className="flex justify-between mt-4">
         <button
           className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
-          onClick={() => {
-            console.log("Save form");
-            if (formName.length === 0)
+          onClick={async () => {
+            if (formName.length === 0) {
               return toast("Form Name is Required", { type: "error" });
+            }
+            if (formItems.length === 0) {
+              return toast("Atleast one form field is Required", {
+                type: "error",
+              });
+            }
+            for (let i = 0; i < formItemDetails.length; i++) {
+              const itemD = formItemDetails[i];
+              if (itemD.title === "Input field") {
+                if (itemD.type === "") {
+                  return toast(`Type of ${itemD.newTitle} is Required`, {
+                    type: "error",
+                  });
+                }
+              } else if (itemD.title === "Date & Time") {
+                if (itemD.type === "") {
+                  return toast(`Type of ${itemD.newTitle} is Required`, {
+                    type: "error",
+                  });
+                }
+              } else if (itemD.title === "List") {
+                if (itemD.listItems!.length === 0) {
+                  return toast(
+                    `There should be atlest one list item in ${itemD.newTitle}`,
+                    {
+                      type: "error",
+                    }
+                  );
+                }
+              } else if (itemD.title === "Choice") {
+                if (itemD.listItems!.length === 0) {
+                  return toast(
+                    `There should be atlest one item to choose in ${itemD.newTitle}`,
+                    {
+                      type: "error",
+                    }
+                  );
+                }
+              } else if (itemD.title === "Photo") {
+                if (itemD.maxPicSize === 0) {
+                  return toast(
+                    `Maximum size of Photo is required in ${itemD.newTitle}`,
+                    {
+                      type: "error",
+                    }
+                  );
+                }
+                if (itemD.multiplePics) {
+                  if (itemD.maxPics === 0) {
+                    return toast(
+                      `Maximum number of Photos is required in ${itemD.newTitle}`,
+                      {
+                        type: "error",
+                      }
+                    );
+                  }
+                }
+              } else if (itemD.title === "Table") {
+                if (
+                  itemD.tableCols!.length === 0 ||
+                  (itemD.tableCols!.length === 1 &&
+                    itemD.tableCols![0] === "S.No.")
+                ) {
+                  return toast(
+                    `There should be atleast one column in ${itemD.newTitle}`,
+                    {
+                      type: "error",
+                    }
+                  );
+                }
+              } else if (itemD.title === "Image") {
+                if (itemD.imageFiles!.length === 0) {
+                  return toast(
+                    `There should be atleast one image in ${itemD.newTitle}`,
+                    {
+                      type: "error",
+                    }
+                  );
+                }
+              } else if (itemD.title === "Calculation") {
+                if (itemD.type === "") {
+                  return toast(`Type of ${itemD.newTitle} is required`, {
+                    type: "error",
+                  });
+                }
+                if (itemD.calcInput1 === "") {
+                  return toast(
+                    `Calculation input 1 is required in ${itemD.newTitle}`,
+                    {
+                      type: "error",
+                    }
+                  );
+                }
+                if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
+                  return toast(
+                    `Calculation input 2 is required in ${itemD.newTitle}`,
+                    {
+                      type: "error",
+                    }
+                  );
+                }
+              }
+            }
+            //save the form
+            console.log("Save form");
+            try {
+              const response = await axios.post("/api/saveForm", {
+                formName,
+                formItemDetails,
+                formItems,
+                formItemsLength,
+                companyName,
+              });
+              if (response.data.success) {
+                toast("Form saved Successfully", { type: "success" });
+              } else {
+                toast("Error saving the form, Please try again", {
+                  type: "error",
+                });
+              }
+            } catch (error) {
+              console.log(error);
+              toast("Error saving the form, Please try again", {
+                type: "error",
+              });
+            }
           }}
         >
           <i className="fas fa-check mr-2"></i> Save
@@ -430,6 +572,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Text Area":
@@ -439,6 +583,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Date & Time":
@@ -448,6 +594,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Check Box":
@@ -457,6 +605,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "List":
@@ -466,6 +616,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Choice":
@@ -475,6 +627,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Photo":
@@ -484,6 +638,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Voice Recorder":
@@ -493,6 +649,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Attached file":
@@ -502,6 +660,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Table":
@@ -511,6 +671,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Image":
@@ -520,6 +682,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
                 case "Calculation":
@@ -529,6 +693,8 @@ export default function CreateForm() {
                       itemD={itemD}
                       formItemDetails={formItemDetails}
                       setFormItemDetails={setFormItemDetails}
+                      setEditedName={setEditedName}
+                      setItemToEditName={setItemToEditName}
                     />
                   );
               }
