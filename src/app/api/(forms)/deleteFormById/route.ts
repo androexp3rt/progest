@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import UserModel from "@/model/user";
+import FormModel from "@/model/form";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -7,24 +7,24 @@ export async function POST(request: NextRequest) {
   await dbConnect();
   const { id } = await request.json();
   try {
-    const user = await UserModel.findById({
+    const form = await FormModel.findById({
       _id: new mongoose.Types.ObjectId(id),
     });
-    if (!user) {
+    if (!form) {
       return NextResponse.json(
-        { success: false, message: "User not found" },
+        { success: false, message: "Form not found" },
         { status: 200 }
       );
     }
-    await user.deleteOne();
+    await form.deleteOne();
     return NextResponse.json(
-      { success: true, message: "User deleted successfully" },
+      { success: true, message: "Form deleted successfully" },
       { status: 200 }
     );
   } catch (error) {
-    console.log("Error deleting User:", error);
+    console.log("Error deleting Form:", error);
     return NextResponse.json(
-      { success: false, message: "Error deleting User" },
+      { success: false, message: "Error deleting Form" },
       { status: 500 }
     );
   }

@@ -1,7 +1,9 @@
 export default function Dashboard() {
   return (
-    <div className="w-full h-[calc(100vh-theme(space.20))] flex flex-col items-center justify-center">
-      <h1 className="text-5xl">UserDashboard</h1>
-    </div>
+    <main className="w-full h-full flex items-center justify-center bg-slate-400">
+      <h1 className="w-full text-center text-3xl font-bold">
+        Welcome to User Dashboard
+      </h1>
+    </main>
   );
 }

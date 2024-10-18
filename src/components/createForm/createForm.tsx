@@ -1,5 +1,4 @@
 import React, { ReactElement, useCallback, useEffect, useState } from "react";
-import "@fortawesome/fontawesome-free/css/all.min.css";
 import FormItem from "./formItem";
 import { toast } from "react-toastify";
 import { FormItemDetails } from "@/types/types";
@@ -293,429 +292,434 @@ export default function CreateForm({
   }, [selectedFormItem, unselectFormItem]);
 
   return (
-    <div className="w-full bg-gray-100 p-4 rounded-lg space-y-2">
-      <div className="w-full flex items-center p-4 bg-white rounded-lg">
-        <div className="w-1/2 flex justify-between">
-          <label className="text-md font-semibold text-gray-800 mr-2">
-            Form
-          </label>
-          <div className="flex-1">
-            <input
-              type="text"
-              maxLength={150}
-              placeholder="Name your form"
-              className="w-full border-b border-gray-300 focus:outline-none text-gray-500 bg-transparent"
-              onChange={(e) => {
-                setFormName(e.target.value);
-              }}
-            />
-            <p className="text-right text-gray-500 text-xs">
-              {formName.length} / 150
-            </p>
+    <>
+      <h1 className="w-full text-center text-3xl font-bold p-5">
+        {eFormName === "" ? "Create a form" : `Edit ${eFormName}`}
+      </h1>
+      <div className="w-full bg-gray-100 p-4 rounded-lg space-y-2">
+        <div className="w-full flex items-center p-4 bg-white rounded-lg">
+          <div className="w-1/2 flex justify-between">
+            <label className="text-md font-semibold text-gray-800 mr-2">
+              Form
+            </label>
+            <div className="flex-1">
+              <input
+                type="text"
+                maxLength={150}
+                placeholder="Name your form"
+                className="w-full border-b border-gray-300 focus:outline-none text-gray-500 bg-transparent"
+                onChange={(e) => {
+                  setFormName(e.target.value);
+                }}
+              />
+              <p className="text-right text-gray-500 text-xs">
+                {formName.length} / 150
+              </p>
+            </div>
+          </div>
+          <div className="w-1/2 flex items-center justify-end space-x-10 pl-20">
+            <i className="fas fa-list text-green-500"></i>
+            <i className="fas fa-users text-gray-400"></i>
+            <i className="fas fa-file-export text-gray-400"></i>
+            <i className="fas fa-share-alt text-gray-400"></i>
+            <i className="fas fa-cog text-gray-400"></i>
+            <i className="fas fa-search text-gray-400"></i>
           </div>
         </div>
-        <div className="w-1/2 flex items-center justify-end space-x-10 pl-20">
-          <i className="fas fa-list text-green-500"></i>
-          <i className="fas fa-users text-gray-400"></i>
-          <i className="fas fa-file-export text-gray-400"></i>
-          <i className="fas fa-share-alt text-gray-400"></i>
-          <i className="fas fa-cog text-gray-400"></i>
-          <i className="fas fa-search text-gray-400"></i>
-        </div>
-      </div>
-      <div className="w-full flex">
-        {/* Left Panel */}
-        <div className="w-1/2 flex flex-col">
-          <div
-            id="leftPanel"
-            className="w-full h-[300px] bg-gray-200 rounded-lg shadow space-y-1 overflow-auto"
-          >
-            {formItems.map((item, index) => (
-              <React.Fragment key={index}>{item}</React.Fragment>
-            ))}
-          </div>
-          <div className="flex justify-start space-x-2 mt-2">
-            <button
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
-              disabled={selectedFormItem === ""}
-              onClick={() => {
-                duplicateFormItem();
-              }}
+        <div className="w-full flex">
+          {/* Left Panel */}
+          <div className="w-1/2 flex flex-col">
+            <div
+              id="leftPanel"
+              className="w-full h-[300px] bg-gray-200 rounded-lg shadow space-y-1 overflow-auto"
             >
-              Duplicate
-            </button>
-            <button
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
-              disabled={selectedFormItem === ""}
-              onClick={() => {
-                setItemToDelete(selectedFormItem.slice(1));
-                document
-                  .getElementById("deleteModal")
-                  ?.classList.remove("hidden");
-              }}
-            >
-              Delete
-            </button>
-            <button
-              id="upButton"
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
-              disabled={selectedFormItem === ""}
-              onClick={() => {
-                const formItemToMove = formItems.filter(
-                  (item) => item.key === selectedFormItem.slice(1)
-                );
-                const index = formItems.indexOf(formItemToMove[0]);
-                if (index === 0) return;
-                const newFormItems = [...formItems];
-                [newFormItems[index - 1], newFormItems[index]] = [
-                  newFormItems[index],
-                  newFormItems[index - 1],
-                ];
-                setFormItems(newFormItems);
-              }}
-            >
-              <i className="fas fa-arrow-up"></i>
-            </button>
-            <button
-              id="downButton"
-              className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
-              disabled={selectedFormItem === ""}
-              onClick={() => {
-                const formItemToMove = formItems.filter(
-                  (item) => item.key === selectedFormItem.slice(1)
-                );
-                const index = formItems.indexOf(formItemToMove[0]);
-                if (index === formItemsLength - 1) return;
-                const newFormItems = [...formItems];
-                [newFormItems[index], newFormItems[index + 1]] = [
-                  newFormItems[index + 1],
-                  newFormItems[index],
-                ];
-                setFormItems(newFormItems);
-              }}
-            >
-              <i className="fas fa-arrow-down"></i>
-            </button>
-          </div>
-        </div>
-        {/* Right Panel */}
-        <div className="w-1/2 ml-4">
-          <div className="grid grid-cols-3 gap-2">
-            {fields.map((field, index) => (
+              {formItems.map((item, index) => (
+                <React.Fragment key={index}>{item}</React.Fragment>
+              ))}
+            </div>
+            <div className="flex justify-start space-x-2 mt-2">
               <button
-                key={index}
-                className="bg-gray-200 p-2 rounded-lg flex items-center justify-center"
-                onClick={() => createFormItem(field)}
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
+                disabled={selectedFormItem === ""}
+                onClick={() => {
+                  duplicateFormItem();
+                }}
               >
-                <i className={`${field.icon} ${field.color}`} />
-                <span className="ml-2">{field.label}</span>
+                Duplicate
               </button>
-            ))}
+              <button
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
+                disabled={selectedFormItem === ""}
+                onClick={() => {
+                  setItemToDelete(selectedFormItem.slice(1));
+                  document
+                    .getElementById("deleteModal")
+                    ?.classList.remove("hidden");
+                }}
+              >
+                Delete
+              </button>
+              <button
+                id="upButton"
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
+                disabled={selectedFormItem === ""}
+                onClick={() => {
+                  const formItemToMove = formItems.filter(
+                    (item) => item.key === selectedFormItem.slice(1)
+                  );
+                  const index = formItems.indexOf(formItemToMove[0]);
+                  if (index === 0) return;
+                  const newFormItems = [...formItems];
+                  [newFormItems[index - 1], newFormItems[index]] = [
+                    newFormItems[index],
+                    newFormItems[index - 1],
+                  ];
+                  setFormItems(newFormItems);
+                }}
+              >
+                <i className="fas fa-arrow-up"></i>
+              </button>
+              <button
+                id="downButton"
+                className="bg-gray-200 text-gray-700 px-4 py-2 rounded disabled:bg-gray-200 disabled:text-gray-300"
+                disabled={selectedFormItem === ""}
+                onClick={() => {
+                  const formItemToMove = formItems.filter(
+                    (item) => item.key === selectedFormItem.slice(1)
+                  );
+                  const index = formItems.indexOf(formItemToMove[0]);
+                  if (index === formItemsLength - 1) return;
+                  const newFormItems = [...formItems];
+                  [newFormItems[index], newFormItems[index + 1]] = [
+                    newFormItems[index + 1],
+                    newFormItems[index],
+                  ];
+                  setFormItems(newFormItems);
+                }}
+              >
+                <i className="fas fa-arrow-down"></i>
+              </button>
+            </div>
+          </div>
+          {/* Right Panel */}
+          <div className="w-1/2 ml-4">
+            <div className="grid grid-cols-3 gap-2">
+              {fields.map((field, index) => (
+                <button
+                  key={index}
+                  className="bg-gray-200 p-2 rounded-lg flex items-center justify-center"
+                  onClick={() => createFormItem(field)}
+                >
+                  <i className={`${field.icon} ${field.color}`} />
+                  <span className="ml-2">{field.label}</span>
+                </button>
+              ))}
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Bottom Buttons */}
-      <div className="flex justify-between mt-4">
-        <button
-          className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
-          onClick={async () => {
-            if (formName.length === 0) {
-              return toast("Form Name is Required", { type: "error" });
-            }
-            if (formItems.length === 0) {
-              return toast("Atleast one form field is Required", {
-                type: "error",
-              });
-            }
-            for (let i = 0; i < formItemDetails.length; i++) {
-              const itemD = formItemDetails[i];
-              if (itemD.title === "Input field") {
-                if (itemD.type === "") {
-                  return toast(`Type of ${itemD.newTitle} is Required`, {
-                    type: "error",
-                  });
-                }
-              } else if (itemD.title === "Date & Time") {
-                if (itemD.type === "") {
-                  return toast(`Type of ${itemD.newTitle} is Required`, {
-                    type: "error",
-                  });
-                }
-              } else if (itemD.title === "List") {
-                if (itemD.listItems!.length === 0) {
-                  return toast(
-                    `There should be atlest one list item in ${itemD.newTitle}`,
-                    {
+        {/* Bottom Buttons */}
+        <div className="flex justify-between mt-4">
+          <button
+            className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
+            onClick={async () => {
+              if (formName.length === 0) {
+                return toast("Form Name is Required", { type: "error" });
+              }
+              if (formItems.length === 0) {
+                return toast("Atleast one form field is Required", {
+                  type: "error",
+                });
+              }
+              for (let i = 0; i < formItemDetails.length; i++) {
+                const itemD = formItemDetails[i];
+                if (itemD.title === "Input field") {
+                  if (itemD.type === "") {
+                    return toast(`Type of ${itemD.newTitle} is Required`, {
                       type: "error",
-                    }
-                  );
-                }
-              } else if (itemD.title === "Choice") {
-                if (itemD.listItems!.length === 0) {
-                  return toast(
-                    `There should be atlest one item to choose in ${itemD.newTitle}`,
-                    {
+                    });
+                  }
+                } else if (itemD.title === "Date & Time") {
+                  if (itemD.type === "") {
+                    return toast(`Type of ${itemD.newTitle} is Required`, {
                       type: "error",
-                    }
-                  );
-                }
-              } else if (itemD.title === "Photo") {
-                if (itemD.maxPicSize === 0) {
-                  return toast(
-                    `Maximum size of Photo is required in ${itemD.newTitle}`,
-                    {
-                      type: "error",
-                    }
-                  );
-                }
-                if (itemD.multiplePics) {
-                  if (itemD.maxPics === 0) {
+                    });
+                  }
+                } else if (itemD.title === "List") {
+                  if (itemD.listItems!.length === 0) {
                     return toast(
-                      `Maximum number of Photos is required in ${itemD.newTitle}`,
+                      `There should be atlest one list item in ${itemD.newTitle}`,
+                      {
+                        type: "error",
+                      }
+                    );
+                  }
+                } else if (itemD.title === "Choice") {
+                  if (itemD.listItems!.length === 0) {
+                    return toast(
+                      `There should be atlest one item to choose in ${itemD.newTitle}`,
+                      {
+                        type: "error",
+                      }
+                    );
+                  }
+                } else if (itemD.title === "Photo") {
+                  if (itemD.maxPicSize === 0) {
+                    return toast(
+                      `Maximum size of Photo is required in ${itemD.newTitle}`,
+                      {
+                        type: "error",
+                      }
+                    );
+                  }
+                  if (itemD.multiplePics) {
+                    if (itemD.maxPics === 0) {
+                      return toast(
+                        `Maximum number of Photos is required in ${itemD.newTitle}`,
+                        {
+                          type: "error",
+                        }
+                      );
+                    }
+                  }
+                } else if (itemD.title === "Table") {
+                  if (
+                    itemD.tableCols!.length === 0 ||
+                    (itemD.tableCols!.length === 1 &&
+                      itemD.tableCols![0] === "S.No.")
+                  ) {
+                    return toast(
+                      `There should be atleast one column in ${itemD.newTitle}`,
+                      {
+                        type: "error",
+                      }
+                    );
+                  }
+                } else if (itemD.title === "Image") {
+                  if (itemD.imageFiles!.length === 0) {
+                    return toast(
+                      `There should be atleast one image in ${itemD.newTitle}`,
+                      {
+                        type: "error",
+                      }
+                    );
+                  }
+                } else if (itemD.title === "Calculation") {
+                  if (itemD.type === "") {
+                    return toast(`Type of ${itemD.newTitle} is required`, {
+                      type: "error",
+                    });
+                  }
+                  if (itemD.calcInput1 === "") {
+                    return toast(
+                      `Calculation input 1 is required in ${itemD.newTitle}`,
+                      {
+                        type: "error",
+                      }
+                    );
+                  }
+                  if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
+                    return toast(
+                      `Calculation input 2 is required in ${itemD.newTitle}`,
                       {
                         type: "error",
                       }
                     );
                   }
                 }
-              } else if (itemD.title === "Table") {
-                if (
-                  itemD.tableCols!.length === 0 ||
-                  (itemD.tableCols!.length === 1 &&
-                    itemD.tableCols![0] === "S.No.")
-                ) {
-                  return toast(
-                    `There should be atleast one column in ${itemD.newTitle}`,
-                    {
-                      type: "error",
-                    }
-                  );
-                }
-              } else if (itemD.title === "Image") {
-                if (itemD.imageFiles!.length === 0) {
-                  return toast(
-                    `There should be atleast one image in ${itemD.newTitle}`,
-                    {
-                      type: "error",
-                    }
-                  );
-                }
-              } else if (itemD.title === "Calculation") {
-                if (itemD.type === "") {
-                  return toast(`Type of ${itemD.newTitle} is required`, {
+              }
+              //save the form
+              setIsSavingForm(true);
+              try {
+                const response = await axios.post("/api/saveForm", {
+                  formName,
+                  formItemDetails,
+                  formItems,
+                  formItemsLength,
+                  companyName,
+                });
+                if (response.data.success) {
+                  toast("Form saved Successfully", { type: "success" });
+                } else {
+                  toast("Error saving the form, Please try again", {
                     type: "error",
                   });
                 }
-                if (itemD.calcInput1 === "") {
-                  return toast(
-                    `Calculation input 1 is required in ${itemD.newTitle}`,
-                    {
-                      type: "error",
-                    }
-                  );
-                }
-                if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
-                  return toast(
-                    `Calculation input 2 is required in ${itemD.newTitle}`,
-                    {
-                      type: "error",
-                    }
-                  );
-                }
-              }
-            }
-            //save the form
-            setIsSavingForm(true);
-            try {
-              const response = await axios.post("/api/saveForm", {
-                formName,
-                formItemDetails,
-                formItems,
-                formItemsLength,
-                companyName,
-              });
-              if (response.data.success) {
-                toast("Form saved Successfully", { type: "success" });
-              } else {
+              } catch (error) {
+                console.log(error);
                 toast("Error saving the form, Please try again", {
                   type: "error",
                 });
+              } finally {
+                setIsSavingForm(false);
               }
-            } catch (error) {
-              console.log(error);
-              toast("Error saving the form, Please try again", {
-                type: "error",
-              });
-            } finally {
-              setIsSavingForm(false);
-            }
-          }}
+            }}
+          >
+            {isSavingForm ? (
+              <div className="flex items-center justify-center space-x-2 text-white">
+                <Loader2 className="animate-spin" />
+                <span>Loading...</span>
+              </div>
+            ) : (
+              <div className="flex items-center justify-center space-x-2 text-white">
+                <i className="fas fa-check mr-2" />
+                <span>Save</span>
+              </div>
+            )}
+          </button>
+          <button className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center">
+            <i className="fas fa-sign-out-alt mr-2"></i> Quit
+          </button>
+        </div>
+        {/* Delete Modal */}
+        <DeleteModal deleteFormItem={deleteFormItem} />
+        {/* edit Modal */}
+        <div
+          id="editModal"
+          className="fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden overflow-auto"
         >
-          {isSavingForm ? (
-            <div className="flex items-center justify-center space-x-2 text-white">
-              <Loader2 className="animate-spin" />
-              <span>Loading...</span>
-            </div>
-          ) : (
-            <div className="flex items-center justify-center space-x-2 text-white">
-              <i className="fas fa-check mr-2" />
-              <span>Save</span>
-            </div>
-          )}
-        </button>
-        <button className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center">
-          <i className="fas fa-sign-out-alt mr-2"></i> Quit
-        </button>
-      </div>
-      {/* Delete Modal */}
-      <DeleteModal deleteFormItem={deleteFormItem} />
-      {/* edit Modal */}
-      <div
-        id="editModal"
-        className="fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex items-center justify-center hidden overflow-auto"
-      >
-        <div className="bg-white shadow-lg rounded-lg w-full max-w-lg max-w-4xl p-3">
-          {formItemDetails.map((itemD, index) => {
-            if (itemD.id === selectedFormItem.slice(1)) {
-              switch (itemD.title) {
-                case "Input field":
-                  return (
-                    <EditInputField
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Text Area":
-                  return (
-                    <EditTextArea
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Date & Time":
-                  return (
-                    <EditDateTime
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Check Box":
-                  return (
-                    <EditCheckBox
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "List":
-                  return (
-                    <EditList
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Choice":
-                  return (
-                    <EditChoice
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Photo":
-                  return (
-                    <EditPhoto
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Voice Recorder":
-                  return (
-                    <EditVoiceRecorder
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Attached file":
-                  return (
-                    <EditAttachedFile
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Table":
-                  return (
-                    <EditTable
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Image":
-                  return (
-                    <EditImage
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
-                case "Calculation":
-                  return (
-                    <EditCalculation
-                      key={index}
-                      itemD={itemD}
-                      formItemDetails={formItemDetails}
-                      setFormItemDetails={setFormItemDetails}
-                      setEditedName={setEditedName}
-                      setItemToEditName={setItemToEditName}
-                    />
-                  );
+          <div className="bg-white shadow-lg rounded-lg w-full max-w-lg max-w-4xl p-3">
+            {formItemDetails.map((itemD, index) => {
+              if (itemD.id === selectedFormItem.slice(1)) {
+                switch (itemD.title) {
+                  case "Input field":
+                    return (
+                      <EditInputField
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Text Area":
+                    return (
+                      <EditTextArea
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Date & Time":
+                    return (
+                      <EditDateTime
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Check Box":
+                    return (
+                      <EditCheckBox
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "List":
+                    return (
+                      <EditList
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Choice":
+                    return (
+                      <EditChoice
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Photo":
+                    return (
+                      <EditPhoto
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Voice Recorder":
+                    return (
+                      <EditVoiceRecorder
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Attached file":
+                    return (
+                      <EditAttachedFile
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Table":
+                    return (
+                      <EditTable
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Image":
+                    return (
+                      <EditImage
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                  case "Calculation":
+                    return (
+                      <EditCalculation
+                        key={index}
+                        itemD={itemD}
+                        formItemDetails={formItemDetails}
+                        setFormItemDetails={setFormItemDetails}
+                        setEditedName={setEditedName}
+                        setItemToEditName={setItemToEditName}
+                      />
+                    );
+                }
               }
-            }
-          })}
+            })}
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
