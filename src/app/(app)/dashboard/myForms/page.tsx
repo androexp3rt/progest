@@ -3,8 +3,8 @@ import { Form } from "@/model/form";
 import { useSession } from "next-auth/react";
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { toast } from "react-toastify";
-import "react-toastify/dist/ReactToastify.css";
+// import { toast } from "react-toastify";
+// import "react-toastify/dist/ReactToastify.css";
 // import BoxIcon from "@/components/boxIcon";
 import { Loader2 } from "lucide-react";
 
@@ -14,22 +14,22 @@ export default function Forms() {
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
 
-  const getForms = async () => {
-    setLoadingForms(true);
-    try {
-      const response = await axios.get(`/api/getFormsByCompany/${companyName}`);
-      if (response.data.success) {
-        setForms(response.data.forms);
-      } else {
-        setForms([]);
-      }
-    } catch (error) {
-      console.log(error);
-      setForms([]);
-    } finally {
-      setLoadingForms(false);
-    }
-  };
+  // const getForms = async () => {
+  //   setLoadingForms(true);
+  //   try {
+  //     const response = await axios.get(`/api/getFormsByCompany/${companyName}`);
+  //     if (response.data.success) {
+  //       setForms(response.data.forms);
+  //     } else {
+  //       setForms([]);
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     setForms([]);
+  //   } finally {
+  //     setLoadingForms(false);
+  //   }
+  // };
   useEffect(() => {
     const getCompanyForms = async () => {
       setLoadingForms(true);
