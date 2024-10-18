@@ -5,7 +5,7 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BoxIcon from "@/components/boxIcon";
+// import BoxIcon from "@/components/boxIcon";
 import { Loader2 } from "lucide-react";
 
 export default function Forms() {
@@ -49,20 +49,20 @@ export default function Forms() {
     getCompanyForms();
   }, [session, companyName]);
 
-  const deleteForm = async (id: unknown) => {
-    try {
-      const res = await axios.post("/api/deleteFormById", { id });
-      if (res.data.success) {
-        toast(res.data.message, { type: "success" });
-        getForms();
-      } else {
-        toast(res.data.message, { type: "error" });
-      }
-    } catch (error) {
-      console.log(error);
-      toast("Error deleting Form", { type: "error" });
-    }
-  };
+  // const deleteForm = async (id: unknown) => {
+  //   try {
+  //     const res = await axios.post("/api/deleteFormById", { id });
+  //     if (res.data.success) {
+  //       toast(res.data.message, { type: "success" });
+  //       getForms();
+  //     } else {
+  //       toast(res.data.message, { type: "error" });
+  //     }
+  //   } catch (error) {
+  //     console.log(error);
+  //     toast("Error deleting Form", { type: "error" });
+  //   }
+  // };
 
   return (
     <div className="w-full h-full flex flex-col space-y-5 p-5 bg-slate-400 overflow-auto">
