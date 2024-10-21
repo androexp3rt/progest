@@ -14,7 +14,7 @@ export default function RenderCalculation({
   formState,
   setFormState,
 }: Props) {
-  let calcInput1 = formState[itemD.calcInput1!] ?? "";
+  const calcInput1 = formState[itemD.calcInput1!] ?? "";
   const calcInput2 = formState[itemD.calcInput2!] ?? "";
   const calculateResult = useCallback(() => {
     if (!formState[itemD.calcInput1!]) {
