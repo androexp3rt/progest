@@ -140,6 +140,7 @@ export default function Forms() {
         )}
       </div>
       <FillForm
+        companyName={companyName}
         showFillFormModal={showFillFormModal}
         setShowFillFormModal={setShowFillFormModal}
         formItemDetails={formTofill}

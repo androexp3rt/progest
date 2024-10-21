@@ -13,9 +13,9 @@ export async function middleware(req: NextRequest) {
   }
   if (token && req.nextUrl.pathname.startsWith("/dashboard")) {
     if (token.role === "admin") {
-      return NextResponse.rewrite(new URL("/adminDashboard", req.url));
+      return NextResponse.redirect(new URL("/adminDashboard", req.url));
     } else if (token.role === "manager") {
-      return NextResponse.rewrite(new URL("/managerDashboard", req.url));
+      return NextResponse.redirect(new URL("/managerDashboard", req.url));
     }
   }
   if (token && req.nextUrl.pathname.startsWith("/adminDashboard")) {
@@ -32,5 +32,10 @@ export async function middleware(req: NextRequest) {
   }
 }
 export const config = {
-  matcher: ["/signin", "/adminDashboard", "/dashboard", "/managerDashboard"],
+  matcher: [
+    "/signin",
+    "/adminDashboard/:path*",
+    "/dashboard/:path*",
+    "/managerDashboard/:path*",
+  ],
 };

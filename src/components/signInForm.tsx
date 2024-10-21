@@ -3,18 +3,28 @@ import { useState } from "react";
 import { signIn } from "next-auth/react";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next/navigation";
 
 export default function SignInForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const router = useRouter();
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const result = await signIn("credentials", {
-      identifier: email,
-      password: password,
-    });
-    if (result?.error) {
-      toast(result.error, { type: "error" });
+    try {
+      const result = await signIn("credentials", {
+        redirect: false,
+        identifier: email,
+        password: password,
+      });
+      if (result?.error) {
+        toast(result.error, { type: "error" });
+      } else {
+        router.refresh();
+      }
+    } catch (error) {
+      console.error("Error during sign in:", error);
+      toast("An error occurred. Please try again.", { type: "error" });
     }
   };
 

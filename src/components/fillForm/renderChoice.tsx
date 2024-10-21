@@ -41,7 +41,7 @@ export default function RenderChoice({
           >
             <input
               type="radio"
-              defaultChecked={(formState[itemD.newTitle] as string) === li}
+              checked={(formState[itemD.newTitle] as string) === li}
               name={itemD.newTitle}
               id={`s${li}`}
               value={li}

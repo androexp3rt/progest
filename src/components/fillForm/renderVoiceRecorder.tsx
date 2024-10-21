@@ -24,7 +24,7 @@ export default function RenderVoiceRecorder({
       (formState[itemD.newTitle] as Blob[]).length > 0
     ) {
       setRecordedChunks(formState[itemD.newTitle] as Blob[]);
-      const blob = new Blob(recordedChunks, { type: "audio/webm" });
+      const blob = new Blob(recordedChunks, { type: "audio/webm;codecs=opus" });
       const audioUrl = URL.createObjectURL(blob);
       setAudioUrl(audioUrl);
     }
@@ -36,7 +36,7 @@ export default function RenderVoiceRecorder({
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       mediaRecorderRef.current = new MediaRecorder(stream, {
-        mimeType: "audio/webm",
+        mimeType: "audio/webm;codecs=opus",
       });
       setIsRecording(true);
       mediaRecorderRef.current.start(1000);

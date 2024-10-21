@@ -102,6 +102,12 @@ export default function RenderTable({ itemD, formState, setFormState }: Props) {
             );
           }
           setRowCount(rowCount + 1);
+          setFormState((prev) => {
+            return {
+              ...prev,
+              [`${itemD.newTitle}RowCount`]: String(rowCount + 1),
+            };
+          });
         }}
       >
         Add Row

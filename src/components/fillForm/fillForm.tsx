@@ -13,12 +13,15 @@ import RenderInputField from "./renderInputField";
 import RenderTextArea from "./renderTextArea";
 import RenderDateTime from "./renderDate&Time";
 import RenderCheckbox from "./renderCheckbox";
+import axios from "axios";
+import { Loader2 } from "lucide-react";
 
 export interface FormState {
   [key: string]: string | boolean | string[] | File[] | Blob[] | string[][];
 }
 
 type Props = {
+  companyName: string;
   showFillFormModal: boolean;
   setShowFillFormModal: (showFillFormModal: boolean) => void;
   formItemDetails: FormItemDetails[];
@@ -27,6 +30,7 @@ type Props = {
   setFormToFillTitle: (formToFillTitle: string) => void;
 };
 export default function FillForm({
+  companyName,
   showFillFormModal,
   setShowFillFormModal,
   formItemDetails,
@@ -35,6 +39,7 @@ export default function FillForm({
   setFormToFillTitle,
 }: Props) {
   const [formState, setFormState] = useState<FormState>({});
+  const [isSavingForm, setIsSavingForm] = useState(false);
   useEffect(() => {
     const initState: FormState = {};
     formItemDetails.map((itemD) => {
@@ -81,12 +86,16 @@ export default function FillForm({
       } else if (itemD.title === "Table") {
         const emptyArray = Array.from(
           { length: itemD.tableMaxRows! },
-          (i: number) => [i + 1, ...new Array(4).fill("")]
+          (i: number) => [
+            i + 1,
+            ...new Array(itemD.tableCols!.length - 1).fill(""),
+          ]
         );
         emptyArray.forEach((row, index) => {
           row[0] = index + 1;
         });
         initState[itemD.newTitle] = emptyArray;
+        initState[`${itemD.newTitle}RowCount`] = "1";
       } else {
         initState[itemD.newTitle] = "";
       }
@@ -223,24 +232,89 @@ export default function FillForm({
           <button
             type="submit"
             className="bg-green-500 p-2 rounded-lg cursor-pointer"
-            onClick={(e) => {
+            onClick={async (e) => {
               e.preventDefault();
               console.log(formState);
+              setIsSavingForm(true);
               const errors: string[] = [];
               formItemDetails.map((itemD) => {
                 if (itemD.required) {
-                  if (formState[itemD.newTitle] === "") {
+                  if (itemD.title === "Table") {
+                    let flag = 0;
+                    (formState[itemD.newTitle] as string[][]).map((row) => {
+                      row.map((colItem) => {
+                        if (
+                          parseInt(row[0]) <=
+                          parseInt(
+                            formState[`${itemD.newTitle}RowCount`] as string
+                          )
+                        ) {
+                          if (colItem === "") {
+                            flag = 1;
+                          }
+                        }
+                      });
+                    });
+                    if (flag === 1) {
+                      errors.push(
+                        `Every field in ${itemD.newTitle} is required`
+                      );
+                    }
+                  }
+                  if (
+                    formState[itemD.newTitle] === "" ||
+                    formState[itemD.newTitle] === null ||
+                    formState[itemD.newTitle] === undefined ||
+                    (formState[itemD.newTitle] as string[]).length === 0 ||
+                    (formState[itemD.newTitle] as File[]).length === 0 ||
+                    (formState[itemD.newTitle] as Blob[]).length === 0 ||
+                    (formState[itemD.newTitle] as string[][]).length === 0
+                  ) {
                     errors.push(`${itemD.newTitle} is required`);
                   }
                 }
               });
               if (errors.length > 0) {
                 toast(errors.join(",\n"), { type: "error" });
+                setIsSavingForm(false);
                 return;
+              }
+              // save the form
+              try {
+                const response = await axios.post("/api/saveFilledForm", {
+                  title: formToFillTitle,
+                  formItemDetails,
+                  formState,
+                  companyName,
+                });
+                if (response.data.success) {
+                  toast("Form saved Successfully", { type: "success" });
+                  setFormToFillTitle("");
+                  setFormItemDetails([]);
+                  setShowFillFormModal(false);
+                } else {
+                  toast("Error saving the form, Please try again", {
+                    type: "error",
+                  });
+                }
+              } catch (error) {
+                console.log(error);
+                toast("Error saving the form, Please try again", {
+                  type: "error",
+                });
+              } finally {
+                setIsSavingForm(false);
               }
             }}
           >
-            Save
+            {isSavingForm ? (
+              <>
+                <Loader2 className="animate-spin" />
+                <span>Loading...</span>
+              </>
+            ) : (
+              "Save"
+            )}
           </button>
           <button
             type="button"

@@ -31,72 +31,76 @@ export default function RenderList({ itemD, formState, setFormState }: Props) {
         } text-${itemD.newColor}`}
       >
         {itemD.listMultipleSelection
-          ? itemD.listItems!.map((li, index) => (
-              <li
-                key={index}
-                className="w-full flex items-center justify-start space-x-2"
-              >
-                <input
-                  type="checkbox"
-                  defaultChecked={(
-                    formState[itemD.newTitle] as string[]
-                  )?.includes(li)}
-                  name={itemD.newTitle}
-                  id={li}
-                  value={li}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      const mulDefaultValues = [
-                        ...(formState[itemD.newTitle] as string[]),
-                      ];
-                      mulDefaultValues.splice(index, 1, li);
-                      setFormState({
-                        ...formState,
-                        [itemD.newTitle]: mulDefaultValues,
-                      });
-                    } else {
-                      const mulDefaultValues = [
-                        ...(formState[itemD.newTitle] as string[]),
-                      ];
-                      mulDefaultValues.splice(index, 1, "");
-                      setFormState({
-                        ...formState,
-                        [itemD.newTitle]: mulDefaultValues,
-                      });
-                    }
-                  }}
-                />
-                <label htmlFor={li}>{li}</label>
-              </li>
-            ))
-          : itemD.listItems!.map((li, index) => (
-              <li
-                key={index}
-                className="w-full flex items-center justify-start space-x-2"
-              >
-                <input
-                  type="radio"
-                  defaultChecked={formState[itemD.newTitle] !== ""}
-                  name={itemD.newTitle}
-                  id={li}
-                  value={li}
-                  onChange={(e) => {
-                    if (e.target.checked) {
-                      setFormState({
-                        ...formState,
-                        [itemD.newTitle]: li,
-                      });
-                    } else {
-                      setFormState({
-                        ...formState,
-                        [itemD.newTitle]: "",
-                      });
-                    }
-                  }}
-                />
-                <label htmlFor={li}>{li}</label>
-              </li>
-            ))}
+          ? itemD.listItems!.map((li, index) => {
+              return (
+                <li
+                  key={index}
+                  className="w-full flex items-center justify-start space-x-2"
+                >
+                  <input
+                    type="checkbox"
+                    defaultChecked={(
+                      formState[itemD.newTitle] as string[]
+                    )?.includes(li)}
+                    name={itemD.newTitle}
+                    id={li}
+                    value={li}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        const mulDefaultValues = [
+                          ...(formState[itemD.newTitle] as string[]),
+                        ];
+                        mulDefaultValues.splice(index, 1, li);
+                        setFormState({
+                          ...formState,
+                          [itemD.newTitle]: mulDefaultValues,
+                        });
+                      } else {
+                        const mulDefaultValues = [
+                          ...(formState[itemD.newTitle] as string[]),
+                        ];
+                        mulDefaultValues.splice(index, 1, "");
+                        setFormState({
+                          ...formState,
+                          [itemD.newTitle]: mulDefaultValues,
+                        });
+                      }
+                    }}
+                  />
+                  <label htmlFor={li}>{li}</label>
+                </li>
+              );
+            })
+          : itemD.listItems!.map((li, index) => {
+              return (
+                <li
+                  key={index}
+                  className="w-full flex items-center justify-start space-x-2"
+                >
+                  <input
+                    type="radio"
+                    checked={(formState[itemD.newTitle!] as string) === li}
+                    name={itemD.newTitle}
+                    id={li}
+                    value={li}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setFormState({
+                          ...formState,
+                          [itemD.newTitle]: li,
+                        });
+                      } else {
+                        setFormState({
+                          ...formState,
+                          [itemD.newTitle]: "",
+                        });
+                      }
+                    }}
+                  />
+                  <label htmlFor={li}>{li}</label>
+                </li>
+              );
+            })}
       </ul>
     </div>
   );
