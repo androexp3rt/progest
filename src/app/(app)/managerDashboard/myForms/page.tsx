@@ -7,10 +7,15 @@ import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import BoxIcon from "@/components/boxIcon";
 import { Loader2 } from "lucide-react";
+import { FormItemDetails } from "@/types/types";
+import FillForm from "@/components/fillForm/fillForm";
 
 export default function Forms() {
   const [forms, setForms] = useState<Form[]>([]);
   const [loadingForms, setLoadingForms] = useState(false);
+  const [showFillFormModal, setShowFillFormModal] = useState(false);
+  const [formTofill, setFormToFill] = useState<FormItemDetails[]>([]);
+  const [formToFillTitle, setFormToFillTitle] = useState("");
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
 
@@ -63,7 +68,18 @@ export default function Forms() {
       toast("Error deleting Form", { type: "error" });
     }
   };
-
+  const displayFormToFill = ({
+    title,
+    fid,
+  }: {
+    title: string;
+    fid: FormItemDetails[];
+  }) => {
+    setFormToFillTitle(title);
+    setFormToFill(fid);
+    setShowFillFormModal(true);
+  };
+  const modifyForm = () => {};
   return (
     <div className="w-full h-full flex flex-col space-y-5 p-5 bg-slate-400 overflow-auto">
       <h1 className="w-full text-center text-3xl font-bold">Forms</h1>
@@ -96,6 +112,17 @@ export default function Forms() {
                     {form.formItems.length}
                   </span>
                   <div className="w-1/3 flex justify-center items-center gap-2">
+                    <button
+                      className="p-2 bg-white/50 rounded-lg"
+                      onClick={() =>
+                        displayFormToFill({
+                          title: form.title,
+                          fid: form.formItemDetails,
+                        })
+                      }
+                    >
+                      Fill Form
+                    </button>
                     <span onClick={() => deleteForm(form._id)}>
                       <BoxIcon name="bx-trash" />
                     </span>
@@ -106,6 +133,14 @@ export default function Forms() {
           </div>
         )}
       </div>
+      <FillForm
+        showFillFormModal={showFillFormModal}
+        setShowFillFormModal={setShowFillFormModal}
+        formItemDetails={formTofill}
+        setFormItemDetails={setFormToFill}
+        formToFillTitle={formToFillTitle}
+        setFormToFillTitle={setFormToFillTitle}
+      />
     </div>
   );
 }
