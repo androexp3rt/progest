@@ -1,6 +1,6 @@
 import { FormItemDetails } from "@/types/types";
 import { FormState } from "./fillForm";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect } from "react";
 
 type Props = {
   itemD: FormItemDetails;
@@ -11,10 +11,11 @@ type Props = {
 
 export default function RenderCalculation({
   itemD,
-  formItemDetails,
   formState,
   setFormState,
 }: Props) {
+  let calcInput1 = formState[itemD.calcInput1!] ?? "";
+  const calcInput2 = formState[itemD.calcInput2!] ?? "";
   const calculateResult = useCallback(() => {
     if (!formState[itemD.calcInput1!]) {
       return null;
@@ -46,8 +47,8 @@ export default function RenderCalculation({
       let cal2Year = 0;
       if (itemD.typeOfI1 === "datetime-local") {
         cal1arr = cal1.split("T");
-        let cal1DateArr = cal1arr[0].split("-");
-        let cal1TimeArr = cal1arr[1].split(":");
+        const cal1DateArr = cal1arr[0].split("-");
+        const cal1TimeArr = cal1arr[1].split(":");
         cal1Date = parseInt(cal1DateArr[2]);
         cal1Month = parseInt(cal1DateArr[1]);
         cal1Year = parseInt(cal1DateArr[0]);
@@ -281,7 +282,14 @@ export default function RenderCalculation({
     } else {
       return String((cal1 * cal2) / 100);
     }
-  }, [formState[itemD.calcInput1!], formState[itemD.calcInput2!]]);
+  }, [
+    calcInput1,
+    calcInput2,
+    itemD.calcInput1,
+    itemD.calcInput2,
+    itemD.type,
+    itemD.typeOfI1,
+  ]);
 
   useEffect(() => {
     const result = calculateResult();
@@ -290,7 +298,7 @@ export default function RenderCalculation({
         return { ...prevFormState, [itemD.newTitle]: result };
       });
     }
-  }, [calculateResult]);
+  }, [calculateResult, itemD.newTitle, setFormState]);
   return (
     <div className="w-full flex items-center justify-start space-x-2">
       <p

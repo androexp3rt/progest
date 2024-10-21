@@ -28,7 +28,7 @@ export default function RenderVoiceRecorder({
       const audioUrl = URL.createObjectURL(blob);
       setAudioUrl(audioUrl);
     }
-  }, [formState]);
+  }, [formState, itemD.newTitle]);
   useEffect(() => {
     setRecordedChunks([]);
   }, [audioUrl]);

@@ -49,18 +49,20 @@ export default function RenderPhoto({ itemD, formState, setFormState }: Props) {
           new File([blob], newName, { type: file.type })
         );
       });
-      itemD.multiplePics
-        ? setFormState({
-            ...formState,
-            [itemD.newTitle]: [
-              ...(formState[itemD.newTitle] as File[]),
-              ...newFiles,
-            ],
-          })
-        : setFormState({
-            ...formState,
-            [itemD.newTitle]: [...newFiles],
-          });
+      if (itemD.multiplePics) {
+        setFormState({
+          ...formState,
+          [itemD.newTitle]: [
+            ...(formState[itemD.newTitle] as File[]),
+            ...newFiles,
+          ],
+        });
+      } else {
+        setFormState({
+          ...formState,
+          [itemD.newTitle]: [...newFiles],
+        });
+      }
     }
     return;
   };

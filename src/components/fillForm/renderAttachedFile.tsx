@@ -53,18 +53,20 @@ export default function RenderAttachedFile({
           new File([blob], newName, { type: file.type })
         );
       });
-      itemD.multipleAttachments
-        ? setFormState({
-            ...formState,
-            [itemD.newTitle]: [
-              ...(formState[itemD.newTitle] as File[]),
-              ...newFiles,
-            ],
-          })
-        : setFormState({
-            ...formState,
-            [itemD.newTitle]: [...newFiles],
-          });
+      if (itemD.multipleAttachments) {
+        setFormState({
+          ...formState,
+          [itemD.newTitle]: [
+            ...(formState[itemD.newTitle] as File[]),
+            ...newFiles,
+          ],
+        });
+      } else {
+        setFormState({
+          ...formState,
+          [itemD.newTitle]: [...newFiles],
+        });
+      }
     }
   };
   const handleMFIC = (e: React.ChangeEvent<HTMLInputElement>) => {
