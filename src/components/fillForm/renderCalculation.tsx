@@ -155,12 +155,14 @@ export default function RenderCalculation({
           const time = resultArr[1];
           const resultDate = date.split("/");
           const resultTime = time.split(":");
-          resultTime[2].includes("PM")
-            ? (resultTime[0] = String(parseInt(resultTime[0]) + 12).padStart(
-                2,
-                "0"
-              ))
-            : (resultTime[0] = resultTime[0].padStart(2, "0"));
+          if (resultTime[2].includes("PM")) {
+            resultTime[0] = String(parseInt(resultTime[0]) + 12).padStart(
+              2,
+              "0"
+            );
+          } else {
+            resultTime[0] = resultTime[0].padStart(2, "0");
+          }
           resultTime[1] = resultTime[1].padStart(2, "0");
           return `${resultDate[2]}-${resultDate[0].padStart(
             2,
