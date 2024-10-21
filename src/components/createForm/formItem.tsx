@@ -1,8 +1,12 @@
+import { FormItemDetails } from "@/types/types";
+import { toast } from "react-toastify";
+
 type Props = {
   icon: string;
   title: string;
   color: string;
   id: string;
+  formItemDetails: FormItemDetails[];
   setItemToCopy: (id: string) => void;
   setItemToDelete: (id: string) => void;
   setSelectedFormItem: (id: string) => void;
@@ -15,6 +19,7 @@ export default function FormItem({
   color,
   icon,
   id,
+  formItemDetails,
   setItemToCopy,
   setItemToDelete,
   setSelectedFormItem,
@@ -50,7 +55,39 @@ export default function FormItem({
           }`}
           autoFocus
           defaultValue={`${title}`}
+          onChange={(e) => {
+            let error = "";
+            formItemDetails.map((itemD) => {
+              if (itemD.id !== id) {
+                if (itemD.newTitle === e.target.value) {
+                  error =
+                    "There is already a feild with this title, Please choose a different title";
+                }
+              }
+            });
+            if (error !== "") {
+              toast(error, { type: "error" });
+              return;
+            }
+          }}
           onBlur={(e) => {
+            let error = "";
+            if (e.target.value === "") {
+              error = "Title is required";
+            }
+            formItemDetails.map((itemD) => {
+              if (itemD.id !== id) {
+                if (itemD.newTitle === e.target.value) {
+                  error =
+                    "There is already a feild with this title, Please choose a different title";
+                }
+              }
+            });
+            if (error !== "") {
+              toast(error, { type: "error" });
+              e.target.focus();
+              return;
+            }
             e.target.classList.add("hidden");
             document.getElementById(`${id}spanElement`)!.innerHTML =
               e.target.value;

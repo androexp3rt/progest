@@ -1,7 +1,7 @@
 import { FormItemDetails } from "@/types/types";
 import React, { useState } from "react";
 import { toast } from "react-toastify";
-import FileUpload from "./dragDropFileUpload";
+import FileUpload from "../dragDropFileUpload";
 
 type Props = {
   itemD: FormItemDetails;
@@ -45,7 +45,7 @@ export default function EditImage({
         onChange={(e) => setTitle(e.target.value)}
       />
       <p className="text-lg font-bold">Fixed Image (Max Size 2MB) :</p>
-      <FileUpload onFilesUploaded={setImgFiles} imageFiles={imgFiles} />
+      <FileUpload setImgFiles={setImgFiles} imageFiles={imgFiles} />
       <p className="mt-2 text-lg font-bold">Size of the item :</p>
       <select
         value={itemSize}

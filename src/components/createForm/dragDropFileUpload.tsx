@@ -4,13 +4,10 @@ import { toast } from "react-toastify";
 
 interface FileUploadProps {
   imageFiles: File[];
-  onFilesUploaded: (files: File[]) => void;
+  setImgFiles: (imageFiles: File[]) => void;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({
-  imageFiles,
-  onFilesUploaded,
-}) => {
+const FileUpload: React.FC<FileUploadProps> = ({ imageFiles, setImgFiles }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [files, setFiles] = useState<File[]>(imageFiles);
 
@@ -18,49 +15,46 @@ const FileUpload: React.FC<FileUploadProps> = ({
     e.preventDefault();
     e.stopPropagation();
   };
-
   const handleDragEnter = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
-
   const handleDragLeave = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
   };
-
+  const handleClick = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.click();
+    }
+  };
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
     const droppedFiles = Array.from(e.dataTransfer.files);
     const newFiles = [...droppedFiles];
-    droppedFiles.forEach((file, index) => {
+    droppedFiles.forEach(async (file, index) => {
       const newName = `Uploaded Image ${files.length + index + 1}`;
       const blob = new Blob([file], { type: file.type });
       newFiles.splice(index, 1, new File([blob], newName, { type: file.type }));
     });
     if (validateFiles(newFiles)) {
       setFiles([...files, ...newFiles]);
-      onFilesUploaded([...imageFiles, ...newFiles]);
+      setImgFiles([...imageFiles, ...newFiles]);
     }
   };
 
   const handleFileInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const droppedFiles = Array.from(e.target.files!);
     const newFiles = [...droppedFiles];
-    droppedFiles.forEach((file, index) => {
+    droppedFiles.forEach(async (file, index) => {
       const newName = `Uploaded Image ${files.length + index + 1}`;
       const blob = new Blob([file], { type: file.type });
       newFiles.splice(index, 1, new File([blob], newName, { type: file.type }));
     });
     if (validateFiles(newFiles)) {
       setFiles([...files, ...newFiles]);
-      onFilesUploaded([...imageFiles, ...newFiles]);
-    }
-  };
-  const handleClick = () => {
-    if (fileInputRef.current) {
-      fileInputRef.current.click();
+      setImgFiles([...imageFiles, ...newFiles]);
     }
   };
   const validateFiles = (files: File[]) => {

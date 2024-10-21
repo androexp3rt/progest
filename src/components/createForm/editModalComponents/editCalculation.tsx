@@ -20,6 +20,7 @@ export default function EditCalculation({
   const [title, setTitle] = useState(itemD.newTitle!);
   const [calcType, setCalcType] = useState(itemD.type!);
   const [input1, setInput1] = useState(itemD.calcInput1!);
+  const [typeOfI1, setTypeOfI1] = useState(itemD.typeOfI1!);
   const [input2, setInput2] = useState(itemD.calcInput2!);
   const [itemSize, setItemSize] = useState(itemD.size!);
   const [itemColor, setItemColor] = useState(itemD.newColor!);
@@ -37,8 +38,8 @@ export default function EditCalculation({
     return (
       item.title === "Input field" ||
       item.title === "Text Area" ||
-      item.title === "Date & Time" ||
-      (item.title === "Calculation" && item.id !== itemD.id)
+      item.title === "Date & Time"
+      // (item.title === "Calculation" && item.id !== itemD.id)
     );
   });
 
@@ -52,13 +53,32 @@ export default function EditCalculation({
         className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
         type="text"
         defaultValue={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => {
+          let error = "";
+          formItemDetails.map((item) => {
+            if (itemD.id !== item.id) {
+              if (item.newTitle === e.target.value) {
+                error =
+                  "There is already a feild with this title, Please choose a different title";
+              }
+            }
+          });
+          if (error !== "") {
+            toast(error, { type: "error" });
+            return;
+          }
+          setTitle(e.target.value);
+        }}
       />
       <p className="mt-2 text-lg font-bold">Type :</p>
       <select
         className="bg-gray-100 p-2 rounded-lg outline-none mr-2"
         value={calcType}
-        onChange={(e) => setCalcType(e.target.value)}
+        onChange={(e) => {
+          setCalcType(e.target.value);
+          setInput1("");
+          setTypeOfI1("");
+        }}
       >
         <option value="add">Addition</option>
         <option value="sub">Subtraction</option>
@@ -70,17 +90,35 @@ export default function EditCalculation({
       <select
         className="bg-gray-100 p-2 rounded-lg outline-none mr-2"
         value={input1}
-        onChange={(e) => setInput1(e.target.value)}
+        onChange={(e) => {
+          setInput1(e.target.value);
+          if (e.target.value === "") {
+            setTypeOfI1("");
+            return;
+          }
+          calcItemDetails.map((item) => {
+            if (item.newTitle === e.target.value) {
+              setTypeOfI1(item.type ?? "");
+            }
+          });
+        }}
       >
         {calcItemDetails.length > 0 ? (
           <>
             <option value="">No field</option>
             {calcItemDetails.map((item, index) => {
-              return (
-                <option key={index} value={item.newTitle}>
-                  {item.newTitle}
-                </option>
-              );
+              if (
+                item.title === "Date & Time" &&
+                (calcType === "mul" || calcType === "div" || calcType === "per")
+              ) {
+                return null;
+              } else {
+                return (
+                  <option key={index} value={item.newTitle}>
+                    {item.newTitle}
+                  </option>
+                );
+              }
             })}
           </>
         ) : (
@@ -88,39 +126,69 @@ export default function EditCalculation({
         )}
       </select>
       {calcType !== "per" ? (
-        <div className="p-2 rounded-lg outline-none mr-2 border border-black flex flex-col">
-          <p className="mt-2 text-lg font-bold">Calculation Input 2 :</p>
-          <select
-            className="bg-gray-100 p-2 rounded-lg outline-none"
-            value={Number.isNaN(parseFloat(input2)) ? input2 : ""}
-            onChange={(e) => setInput2(e.target.value)}
-          >
-            {calcItemDetails.length > 0 ? (
-              <>
-                <option value="">No Field</option>
-                {calcItemDetails.map((item, index) => {
-                  return (
-                    <option key={index} value={item.newTitle}>
-                      {item.newTitle}
-                    </option>
-                  );
-                })}
-              </>
-            ) : (
-              <option value="">No fields in form to perform Calculation</option>
-            )}
-          </select>
-          <span className="mt-2 text-sm font-bold text-center">OR</span>
-          <p className="mt-2 text-sm font-bold">
-            Calculation Input 2 custom value :
-          </p>
-          <input
-            className="bg-gray-100 p-2 rounded-lg outline-none"
-            type="number"
-            defaultValue={Number.isNaN(parseFloat(input2)) ? "0" : input2}
-            onChange={(e) => setInput2(e.target.value)}
-          />
-        </div>
+        (calcType === "add" || calcType === "sub") &&
+        (typeOfI1 === "datetime-local" ||
+          typeOfI1 === "date" ||
+          typeOfI1 === "time") ? (
+          <>
+            <p className="mt-2 text-lg font-bold">
+              Calculation Input 2 custom value :
+            </p>
+            <p className="mt-2 text-sm text-green-500">
+              Please specify the number with its unit. (eg. 2 days | 1 month | 1
+              year | 2 hours| 05:30 hours | 5 mins)
+            </p>
+            <input
+              className="bg-gray-100 p-2 rounded-lg outline-none"
+              type="text"
+              defaultValue={
+                Number.isNaN(parseFloat(input2)) ? "0 days" : input2
+              }
+              onChange={(e) => setInput2(e.target.value)}
+            />
+          </>
+        ) : (
+          <div className="p-2 rounded-lg outline-none mr-2 border border-black flex flex-col">
+            <p className="mt-2 text-lg font-bold">Calculation Input 2 :</p>
+            <select
+              className="bg-gray-100 p-2 rounded-lg outline-none"
+              value={Number.isNaN(parseFloat(input2)) ? input2 : ""}
+              onChange={(e) => setInput2(e.target.value)}
+            >
+              {calcItemDetails.length > 0 ? (
+                <>
+                  <option value="">No Field</option>
+                  {calcItemDetails.map((item, index) => {
+                    if (item.title === "Date & Time") {
+                      return null;
+                    } else {
+                      return (
+                        <option key={index} value={item.newTitle}>
+                          {item.newTitle}
+                        </option>
+                      );
+                    }
+                  })}
+                </>
+              ) : (
+                <option value="">
+                  No fields in form to perform Calculation
+                </option>
+              )}
+            </select>
+            <span className="mt-2 text-sm font-bold text-center">OR</span>
+            <p className="mt-2 text-sm font-bold">
+              Calculation Input 2 custom value :
+            </p>
+            <input
+              className="bg-gray-100 p-2 rounded-lg outline-none"
+              type="text"
+              value={Number.isNaN(parseFloat(input2)) ? "0" : input2}
+              onFocus={(e) => e.target.select()}
+              onChange={(e) => setInput2(e.target.value)}
+            />
+          </div>
+        )
       ) : (
         <>
           <p className="mt-2 text-lg font-bold">Percentage Value :</p>
@@ -181,6 +249,7 @@ export default function EditCalculation({
             setTitle(itemD.newTitle!);
             setCalcType(itemD.type!);
             setInput1(itemD.calcInput1!);
+            setTypeOfI1(itemD.typeOfI1!);
             setInput2(itemD.calcInput2!);
             setItemSize(itemD.size!);
             setItemColor(itemD.newColor!);
@@ -202,7 +271,7 @@ export default function EditCalculation({
               toast("Calculation Input 1 is Required", { type: "error" });
               return;
             }
-            if (input2 === "" || input2 === "0") {
+            if (input2 === "" || input2 === "0" || parseFloat(input2) === 0) {
               toast("Calculation Input 2 is Required", { type: "error" });
               return;
             }
@@ -211,6 +280,7 @@ export default function EditCalculation({
               newTitle: title,
               type: calcType,
               calcInput1: input1,
+              typeOfI1: typeOfI1,
               calcInput2: input2,
               size: itemSize,
               newColor: itemColor,

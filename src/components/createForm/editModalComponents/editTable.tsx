@@ -20,6 +20,7 @@ export default function EditTable({
   const [title, setTitle] = useState(itemD.newTitle!);
   const [tableCols, setTableCols] = useState(itemD.tableCols!);
   const [required, setRequired] = useState(itemD.required!);
+  const [tableMaxRows, setTableMaxRows] = useState(itemD.tableMaxRows!);
   const [itemSize, setItemSize] = useState(itemD.size!);
   const [itemColor, setItemColor] = useState(itemD.newColor!);
   const [arrowUp, setArrowUp] = useState(false);
@@ -42,7 +43,22 @@ export default function EditTable({
         className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
         type="text"
         defaultValue={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => {
+          let error = "";
+          formItemDetails.map((item) => {
+            if (itemD.id !== item.id) {
+              if (item.newTitle === e.target.value) {
+                error =
+                  "There is already a feild with this title, Please choose a different title";
+              }
+            }
+          });
+          if (error !== "") {
+            toast(error, { type: "error" });
+            return;
+          }
+          setTitle(e.target.value);
+        }}
       />
       <div className="mt-2 flex items-center justify-start space-x-2 text-lg">
         <input
@@ -64,7 +80,6 @@ export default function EditTable({
         :
       </p>
       <input
-        id="tableColsInput"
         className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
         type="text"
         defaultValue={`"${tableCols?.join('","')}"`}
@@ -79,6 +94,13 @@ export default function EditTable({
             setTableCols([]);
           }
         }}
+      />
+      <p className="mt-2 text-lg font-bold">Maximum No. of Rows</p>
+      <input
+        className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
+        type="number"
+        defaultValue={tableMaxRows}
+        onChange={(e) => setTableMaxRows(parseInt(e.target.value))}
       />
       <p className="mt-2 text-lg font-bold">Size of the item :</p>
       <select
@@ -129,6 +151,7 @@ export default function EditTable({
             setTitle(itemD.newTitle!);
             setTableCols(itemD.tableCols!);
             setRequired(itemD.required!);
+            setTableMaxRows(itemD.tableMaxRows!);
             setItemSize(itemD.size!);
             setItemColor(itemD.newColor!);
             document.getElementById("editModal")!.classList.add("hidden");

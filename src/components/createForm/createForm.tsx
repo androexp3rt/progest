@@ -1,7 +1,11 @@
 import React, { ReactElement, useCallback, useEffect, useState } from "react";
-import FormItem from "./formItem";
+import axios from "axios";
 import { toast } from "react-toastify";
 import { FormItemDetails } from "@/types/types";
+import { Loader2 } from "lucide-react";
+import { uploadImagesToCloudinary } from "@/lib/upload";
+import { useRouter } from "next/navigation";
+import FormItem from "./formItem";
 import EditInputField from "./editModalComponents/editInputField";
 import EditCalculation from "./editModalComponents/editCalculation";
 import EditImage from "./editModalComponents/editImage";
@@ -15,8 +19,6 @@ import EditCheckBox from "./editModalComponents/editCheckBox";
 import EditDateTime from "./editModalComponents/editDate&Time";
 import EditTextArea from "./editModalComponents/editTextArea";
 import DeleteModal from "./deleteModal";
-import axios from "axios";
-import { Loader2 } from "lucide-react";
 
 type Props = {
   eFormItemDetails: FormItemDetails[];
@@ -33,6 +35,19 @@ export default function CreateForm({
   eFormName,
   companyName,
 }: Props) {
+  const router = useRouter();
+  const [formItemDetails, setFormItemDetails] =
+    useState<FormItemDetails[]>(eFormItemDetails);
+  const [formItems, setFormItems] = useState<ReactElement[]>(eFormItems);
+  const [formItemsLength, setFormItemsLength] = useState(eFormItemsLength);
+  const [formName, setFormName] = useState(eFormName);
+  const [selectedFormItem, setSelectedFormItem] = useState("");
+  const [itemToDelete, setItemToDelete] = useState("");
+  const [itemToCopy, setItemToCopy] = useState("");
+  const [itemToEditName, setItemToEditName] = useState("");
+  const [editedName, setEditedName] = useState("");
+  const [isSavingForm, setIsSavingForm] = useState(false);
+
   const fields = [
     { icon: "fas fa-font", label: "Input field", color: "text-teal-500" },
     { icon: "fas fa-align-left", label: "Text Area", color: "text-teal-500" },
@@ -59,30 +74,22 @@ export default function CreateForm({
     { icon: "fas fa-image", label: "Image", color: "text-gray-500" },
     { icon: "fas fa-calculator", label: "Calculation", color: "text-red-500" },
   ];
-  const [formItemDetails, setFormItemDetails] =
-    useState<FormItemDetails[]>(eFormItemDetails);
-  const [formItems, setFormItems] = useState<ReactElement[]>(eFormItems);
-  const [formItemsLength, setFormItemsLength] = useState(eFormItemsLength);
-  const [formName, setFormName] = useState(eFormName);
-  const [selectedFormItem, setSelectedFormItem] = useState("");
-  const [itemToDelete, setItemToDelete] = useState("");
-  const [itemToCopy, setItemToCopy] = useState("");
-  const [itemToEditName, setItemToEditName] = useState("");
-  const [editedName, setEditedName] = useState("");
-  const [isSavingForm, setIsSavingForm] = useState(false);
 
-  const createFormItem = (f: {
-    icon: string;
-    label: string;
-    color: string;
-  }) => {
+  const createFormItem = (icon: string, label: string, color: string) => {
+    const title = label;
+    formItemDetails.map((itemD) => {
+      if (itemD.newTitle === label) {
+        label = label + 1;
+      }
+    });
     const newFormItem = (
       <FormItem
         key={formItemsLength}
         id={formItemsLength.toString()}
-        title={f.label}
-        color={f.color}
-        icon={f.icon}
+        title={label}
+        color={color}
+        icon={icon}
+        formItemDetails={formItemDetails}
         setItemToCopy={setItemToCopy}
         setItemToDelete={setItemToDelete}
         setSelectedFormItem={setSelectedFormItem}
@@ -91,22 +98,28 @@ export default function CreateForm({
       />
     );
     let newFormItemDetail: FormItemDetails = {
-      title: f.label,
-      newTitle: f.label,
+      title: title,
+      newTitle: label,
       id: formItemsLength.toString(),
       size: "normal",
-      color: f.color,
+      color: color,
       newColor: "white",
-      icon: f.icon,
+      icon: icon,
     };
-    if (f.label === "Input field") {
+    if (label.includes("Input field")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         type: "text",
         required: true,
         placeholder: "Default Text",
       };
-    } else if (f.label === "Date & Time") {
+    } else if (label.includes("Text Area")) {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        required: true,
+        placeholder: "Default Text",
+      };
+    } else if (label.includes("Date & Time")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         type: "datetime-local",
@@ -114,13 +127,13 @@ export default function CreateForm({
         defaultTime: "",
         required: true,
       };
-    } else if (f.label === "Check Box") {
+    } else if (label.includes("Check Box")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         checkBoxDefaultValue: false,
-        required: false,
+        required: true,
       };
-    } else if (f.label === "List") {
+    } else if (label.includes("List")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         required: true,
@@ -129,14 +142,14 @@ export default function CreateForm({
         listMulDefaultValue: [],
         listDefaultValue: "",
       };
-    } else if (f.label === "Choice") {
+    } else if (label.includes("Choice")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         required: true,
         listItems: [],
         listDefaultValue: "",
       };
-    } else if (f.label === "Photo") {
+    } else if (label.includes("Photo")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         required: true,
@@ -145,29 +158,38 @@ export default function CreateForm({
         maxPics: 1,
         maxPicSize: 2,
       };
-    } else if (f.label === "Attached file") {
+    } else if (label.includes("Voice Recorder")) {
+      newFormItemDetail = {
+        ...newFormItemDetail,
+        required: true,
+      };
+    } else if (label.includes("Attached file")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         required: true,
         multipleAttachments: false,
       };
-    } else if (f.label === "Table") {
+    } else if (label.includes("Table")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         required: true,
         tableCols: ["S.No."],
+        tableMaxRows: 5,
       };
-    } else if (f.label === "Image") {
+    } else if (label.includes("Image")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         imageFiles: [],
+        imageFileNames: [],
+        imageFileURLs: [],
       };
-    } else if (f.label === "Calculation") {
+    } else if (label.includes("Calculation")) {
       newFormItemDetail = {
         ...newFormItemDetail,
         type: "add",
         calcInput1: "",
         calcInput2: "",
+        typeOfI1: "",
       };
     }
     setFormItems([...formItems, newFormItem]);
@@ -225,6 +247,7 @@ export default function CreateForm({
       icon: fiToCopy[0].props.icon,
       title: `(copy) ${fiToCopy[0].props.title}`,
       color: fiToCopy[0].props.color,
+      formItemDetails: formItemDetails,
     });
     const newFormItems = [...formItems];
     newFormItems.splice(index + 1, 0, ficopy);
@@ -404,14 +427,14 @@ export default function CreateForm({
           {/* Right Panel */}
           <div className="w-1/2 ml-4">
             <div className="grid grid-cols-3 gap-2">
-              {fields.map((field, index) => (
+              {fields.map((f, index) => (
                 <button
                   key={index}
                   className="bg-gray-200 p-2 rounded-lg flex items-center justify-center"
-                  onClick={() => createFormItem(field)}
+                  onClick={() => createFormItem(f.icon, f.label, f.color)}
                 >
-                  <i className={`${field.icon} ${field.color}`} />
-                  <span className="ml-2">{field.label}</span>
+                  <i className={`${f.icon} ${f.color}`} />
+                  <span className="ml-2">{f.label}</span>
                 </button>
               ))}
             </div>
@@ -423,113 +446,111 @@ export default function CreateForm({
           <button
             className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
             onClick={async () => {
+              setIsSavingForm(true);
               if (formName.length === 0) {
-                return toast("Form Name is Required", { type: "error" });
+                toast("Form Name is Required", { type: "error" });
+                return setIsSavingForm(false);
               }
               if (formItems.length === 0) {
-                return toast("Atleast one form field is Required", {
+                toast("Atleast one form field is Required", {
                   type: "error",
                 });
+                return setIsSavingForm(false);
               }
-              for (let i = 0; i < formItemDetails.length; i++) {
-                const itemD = formItemDetails[i];
-                if (itemD.title === "Input field") {
-                  if (itemD.type === "") {
-                    return toast(`Type of ${itemD.newTitle} is Required`, {
-                      type: "error",
+              const validationErrors: string[] = [];
+              await Promise.all(
+                formItemDetails.map(async (itemD) => {
+                  if (itemD.title === "Input field") {
+                    if (itemD.type === "") {
+                      validationErrors.push(
+                        `Type of ${itemD.newTitle} is Required`
+                      );
+                    }
+                  } else if (itemD.title === "Date & Time") {
+                    if (itemD.type === "") {
+                      validationErrors.push(
+                        `Type of ${itemD.newTitle} is Required`
+                      );
+                    }
+                  } else if (itemD.title === "List") {
+                    if (itemD.listItems!.length === 0) {
+                      validationErrors.push(
+                        `There should be atlest one list item in ${itemD.newTitle}`
+                      );
+                    }
+                  } else if (itemD.title === "Choice") {
+                    if (itemD.listItems!.length === 0) {
+                      validationErrors.push(
+                        `There should be atlest one item to choose in ${itemD.newTitle}`
+                      );
+                    }
+                  } else if (itemD.title === "Photo") {
+                    if (itemD.maxPicSize === 0) {
+                      validationErrors.push(
+                        `Maximum size of Photo is required in ${itemD.newTitle}`
+                      );
+                    }
+                    if (itemD.multiplePics) {
+                      if (itemD.maxPics === 0) {
+                        validationErrors.push(
+                          `Maximum number of Photos is required in ${itemD.newTitle}`
+                        );
+                      }
+                    }
+                  } else if (itemD.title === "Table") {
+                    if (
+                      itemD.tableCols!.length === 0 ||
+                      (itemD.tableCols!.length === 1 &&
+                        itemD.tableCols![0] === "S.No.")
+                    ) {
+                      validationErrors.push(
+                        `There should be atleast one column in ${itemD.newTitle}`
+                      );
+                    }
+                  } else if (itemD.title === "Image") {
+                    if (itemD.imageFiles!.length === 0) {
+                      validationErrors.push(
+                        `There should be atleast one image in ${itemD.newTitle}`
+                      );
+                    }
+                    const imageFormData = new FormData();
+                    itemD.imageFiles!.forEach((file, index) => {
+                      imageFormData.append(`file${index}`, file);
+                      itemD.imageFileNames!.splice(index, 1, `file${index}`);
                     });
-                  }
-                } else if (itemD.title === "Date & Time") {
-                  if (itemD.type === "") {
-                    return toast(`Type of ${itemD.newTitle} is Required`, {
-                      type: "error",
+                    const imgUrls = await uploadImagesToCloudinary(
+                      imageFormData,
+                      itemD.imageFileNames!
+                    );
+                    imgUrls.forEach((url, index) => {
+                      itemD.imageFileNames!.splice(index, 1, url);
+                      itemD.imageFiles!.splice(0, 1);
                     });
-                  }
-                } else if (itemD.title === "List") {
-                  if (itemD.listItems!.length === 0) {
-                    return toast(
-                      `There should be atlest one list item in ${itemD.newTitle}`,
-                      {
-                        type: "error",
-                      }
-                    );
-                  }
-                } else if (itemD.title === "Choice") {
-                  if (itemD.listItems!.length === 0) {
-                    return toast(
-                      `There should be atlest one item to choose in ${itemD.newTitle}`,
-                      {
-                        type: "error",
-                      }
-                    );
-                  }
-                } else if (itemD.title === "Photo") {
-                  if (itemD.maxPicSize === 0) {
-                    return toast(
-                      `Maximum size of Photo is required in ${itemD.newTitle}`,
-                      {
-                        type: "error",
-                      }
-                    );
-                  }
-                  if (itemD.multiplePics) {
-                    if (itemD.maxPics === 0) {
-                      return toast(
-                        `Maximum number of Photos is required in ${itemD.newTitle}`,
-                        {
-                          type: "error",
-                        }
+                  } else if (itemD.title === "Calculation") {
+                    if (itemD.type === "") {
+                      validationErrors.push(
+                        `Type of ${itemD.newTitle} is required`
+                      );
+                    }
+                    if (itemD.calcInput1 === "") {
+                      validationErrors.push(
+                        `Calculation input 1 is required in ${itemD.newTitle}`
+                      );
+                    }
+                    if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
+                      validationErrors.push(
+                        `Calculation input 2 is required in ${itemD.newTitle}`
                       );
                     }
                   }
-                } else if (itemD.title === "Table") {
-                  if (
-                    itemD.tableCols!.length === 0 ||
-                    (itemD.tableCols!.length === 1 &&
-                      itemD.tableCols![0] === "S.No.")
-                  ) {
-                    return toast(
-                      `There should be atleast one column in ${itemD.newTitle}`,
-                      {
-                        type: "error",
-                      }
-                    );
-                  }
-                } else if (itemD.title === "Image") {
-                  if (itemD.imageFiles!.length === 0) {
-                    return toast(
-                      `There should be atleast one image in ${itemD.newTitle}`,
-                      {
-                        type: "error",
-                      }
-                    );
-                  }
-                } else if (itemD.title === "Calculation") {
-                  if (itemD.type === "") {
-                    return toast(`Type of ${itemD.newTitle} is required`, {
-                      type: "error",
-                    });
-                  }
-                  if (itemD.calcInput1 === "") {
-                    return toast(
-                      `Calculation input 1 is required in ${itemD.newTitle}`,
-                      {
-                        type: "error",
-                      }
-                    );
-                  }
-                  if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
-                    return toast(
-                      `Calculation input 2 is required in ${itemD.newTitle}`,
-                      {
-                        type: "error",
-                      }
-                    );
-                  }
-                }
+                })
+              );
+              if (validationErrors.length > 0) {
+                toast(validationErrors.join(",\n"), { type: "error" });
+                setIsSavingForm(false);
+                return;
               }
-              //save the form
-              setIsSavingForm(true);
+              // save the form
               try {
                 const response = await axios.post("/api/saveForm", {
                   formName,
@@ -540,6 +561,7 @@ export default function CreateForm({
                 });
                 if (response.data.success) {
                   toast("Form saved Successfully", { type: "success" });
+                  router.push("/managerDashboard/myForms");
                 } else {
                   toast("Error saving the form, Please try again", {
                     type: "error",

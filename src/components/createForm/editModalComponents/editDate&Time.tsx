@@ -60,7 +60,22 @@ export default function EditDateTime({
         className="bg-gray-100 outline-none p-2 rounded-lg mr-2"
         type="text"
         defaultValue={title}
-        onChange={(e) => setTitle(e.target.value)}
+        onChange={(e) => {
+          let error = "";
+          formItemDetails.map((item) => {
+            if (itemD.id !== item.id) {
+              if (item.newTitle === e.target.value) {
+                error =
+                  "There is already a feild with this title, Please choose a different title";
+              }
+            }
+          });
+          if (error !== "") {
+            toast(error, { type: "error" });
+            return;
+          }
+          setTitle(e.target.value);
+        }}
       />
       <p className="mt-2 text-lg font-bold">Type :</p>
       <select

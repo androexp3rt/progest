@@ -22,7 +22,11 @@ export type FormItemDetails = {
   maxPicSize?: number;
   multipleAttachments?: boolean;
   tableCols?: string[];
+  tableMaxRows?: number;
+  imageFileNames?: string[];
   imageFiles?: File[];
+  imageFileURLs?: string[];
   calcInput1?: string;
+  typeOfI1?: string;
   calcInput2?: string;
 };
