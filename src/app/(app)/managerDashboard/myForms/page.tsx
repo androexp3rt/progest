@@ -114,6 +114,12 @@ export default function Forms() {
                   <div className="w-1/3 flex justify-center items-center gap-2">
                     <button
                       className="p-2 bg-white/50 rounded-lg"
+                      onClick={modifyForm}
+                    >
+                      Modify
+                    </button>
+                    <button
+                      className="p-2 bg-white/50 rounded-lg"
                       onClick={() =>
                         displayFormToFill({
                           title: form.title,
