@@ -151,7 +151,23 @@ export default function Forms() {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
     saveAs(blob, `${recordName}.xlsx`);
-    console.log(blob);
+  };
+  const exportAllRecordsToExcel = (formName: string) => {
+    const exportArr: FormState[] = [];
+    filledForms[formName]?.map((record) => {
+      exportArr.push(record.formState);
+    });
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(exportArr);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, `${formName}.xlsx`);
   };
   useEffect(() => {
     if (!showFillFormModal && formToFillTitle !== "") {
@@ -228,8 +244,8 @@ export default function Forms() {
                           formNameToShowRecords === form.title &&
                           filledForms[form.title] &&
                           filledForms[form.title]!.length > 0
-                            ? "Hide Records"
-                            : "Show Records"}
+                            ? "Records"
+                            : "Records"}
                         </span>
                         <i
                           className={`fa fa-chevron-down transform ${
@@ -241,6 +257,12 @@ export default function Forms() {
                               : ""
                           }`}
                         />
+                      </button>
+                      <button
+                        className="p-2 bg-white/50 rounded-lg"
+                        onClick={() => exportAllRecordsToExcel(form.title)}
+                      >
+                        Export
                       </button>
                       <button
                         className="p-2 bg-white/50 rounded-lg"

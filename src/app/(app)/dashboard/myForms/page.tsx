@@ -157,6 +157,23 @@ export default function Forms() {
     saveAs(blob, `${recordName}.xlsx`);
     console.log(blob);
   };
+  const exportAllRecordsToExcel = (formName: string) => {
+    const exportArr: FormState[] = [];
+    filledForms[formName]?.map((record) => {
+      exportArr.push(record.formState);
+    });
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet(exportArr);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, `${formName}.xlsx`);
+  };
   useEffect(() => {
     if (!showFillFormModal && formToFillTitle !== "") {
       getFilledForms(formToFillTitle);
@@ -200,7 +217,7 @@ export default function Forms() {
                         filledForms[form.title]?.length ?? 0
                       )}
                     </span>
-                    <div className="flex-1 flex justify-center items-center gap-2">
+                    <div className="flex-1 flex flex-wrap justify-center items-center gap-2">
                       <button
                         disabled={
                           !filledForms[form.title] ||
@@ -241,6 +258,12 @@ export default function Forms() {
                               : ""
                           }`}
                         />
+                      </button>
+                      <button
+                        className="p-2 bg-white/50 rounded-lg"
+                        onClick={() => exportAllRecordsToExcel(form.title)}
+                      >
+                        Export
                       </button>
                       <button
                         className="p-2 bg-white/50 rounded-lg"
