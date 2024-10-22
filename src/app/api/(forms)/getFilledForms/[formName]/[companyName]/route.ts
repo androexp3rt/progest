@@ -11,7 +11,12 @@ export async function GET(request: NextRequest, context: { params: Params }) {
   const formName = context.params.formName;
   const companyName = context.params.companyName;
   try {
-    const forms = await FilledFormModel.find({ title: formName, companyName });
+    let forms;
+    if (companyName === "ProGest") {
+      forms = await FilledFormModel.find({ title: formName });
+    } else {
+      forms = await FilledFormModel.find({ title: formName, companyName });
+    }
     if (!forms || forms.length === 0) {
       return NextResponse.json(
         { success: false, message: "No Forms found" },
