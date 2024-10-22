@@ -5,13 +5,12 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BoxIcon from "@/components/boxIcon";
 import { Loader2 } from "lucide-react";
 import { FormItemDetails } from "@/types/types";
 import FillForm from "@/components/fillForm/fillForm";
 import { FilledForm } from "@/model/filledForm";
 
-interface FilledFormsMap {
+export interface FilledFormsMap {
   [formName: string]: FilledForm[] | undefined;
 }
 
@@ -240,9 +239,12 @@ export default function Forms() {
                           }`}
                         />
                       </button>
-                      <span onClick={() => deleteForm(form._id)}>
-                        <BoxIcon name="bx-trash" />
-                      </span>
+                      <button
+                        className="p-2 flex items-center justify-center space-x-2 bg-white/50 rounded-lg disabled:text-gray-200"
+                        onClick={() => deleteForm(form._id)}
+                      >
+                        <i className="fa fa-trash" />
+                      </button>
                     </div>
                   </div>
                   <div
