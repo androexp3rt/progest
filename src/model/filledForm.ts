@@ -6,6 +6,7 @@ export interface FilledForm extends Document {
   title: string;
   formItemDetails: FormItemDetails[];
   formState: FormState;
+  filledBy: string;
   createdAt: Date;
   companyName: string;
 }
@@ -23,6 +24,7 @@ export const FilledFormSchema: Schema<FilledForm> = new mongoose.Schema({
     type: {},
     required: true,
   },
+  filledBy: { type: String, required: true },
   createdAt: {
     type: Date,
     required: true,

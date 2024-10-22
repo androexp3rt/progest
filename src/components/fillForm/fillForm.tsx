@@ -21,6 +21,7 @@ export interface FormState {
 }
 
 type Props = {
+  email: string;
   companyName: string;
   showFillFormModal: boolean;
   setShowFillFormModal: (showFillFormModal: boolean) => void;
@@ -30,6 +31,7 @@ type Props = {
   setFormToFillTitle: (formToFillTitle: string) => void;
 };
 export default function FillForm({
+  email,
   companyName,
   showFillFormModal,
   setShowFillFormModal,
@@ -283,13 +285,13 @@ export default function FillForm({
               try {
                 const response = await axios.post("/api/saveFilledForm", {
                   title: formToFillTitle,
+                  filledBy: email,
                   formItemDetails,
                   formState,
                   companyName,
                 });
                 if (response.data.success) {
-                  toast("Form saved Successfully", { type: "success" });
-                  setFormToFillTitle("");
+                  toast("Record saved Successfully", { type: "success" });
                   setFormItemDetails([]);
                   setShowFillFormModal(false);
                 } else {
@@ -308,10 +310,10 @@ export default function FillForm({
             }}
           >
             {isSavingForm ? (
-              <>
+              <div className="flex items-center justify-center space-x-2">
                 <Loader2 className="animate-spin" />
                 <span>Loading...</span>
-              </>
+              </div>
             ) : (
               "Save"
             )}

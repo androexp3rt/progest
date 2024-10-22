@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   await dbConnect();
-  const { title, formItemDetails, formState, companyName } =
+  const { title, formItemDetails, formState, companyName, filledBy } =
     await request.json();
   try {
     const newForm = new FilledFormModel({
@@ -12,6 +12,7 @@ export async function POST(request: NextRequest) {
       title,
       formState,
       formItemDetails,
+      filledBy,
     });
     await newForm.save();
     return NextResponse.json(
