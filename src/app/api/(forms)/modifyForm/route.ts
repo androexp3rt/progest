@@ -1,6 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
 import FormModel from "@/model/form";
-import FilledFormModel from "@/model/filledForm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {

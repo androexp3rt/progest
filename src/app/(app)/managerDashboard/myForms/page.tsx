@@ -1,7 +1,7 @@
 "use client";
 import { Form } from "@/model/form";
 import { useSession } from "next-auth/react";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { ReactElement, useCallback, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,7 +35,7 @@ export default function Forms() {
   const email: string = session?.user.email;
   const role: string = session?.user.role;
 
-  const getFilledForms = async (formName: string) => {
+  const getFilledForms = useCallback(async (formName: string) => {
     setLoadingFilledForms(true);
     try {
       const response = await axios.get(
@@ -61,7 +61,7 @@ export default function Forms() {
     } finally {
       setLoadingFilledForms(false);
     }
-  };
+  }, []);
 
   const getForms = async () => {
     setLoadingForms(true);
@@ -102,7 +102,7 @@ export default function Forms() {
       }
     };
     getCompanyForms();
-  }, [session, companyName]);
+  }, [session, companyName, getFilledForms]);
 
   const deleteForm = async (id: unknown) => {
     try {
