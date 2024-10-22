@@ -109,122 +109,124 @@ export default function Users() {
   };
 
   return (
-    <div className="w-full h-full flex flex-col space-y-5 p-5 bg-slate-400 overflow-auto">
-      <h1 className="w-full text-center text-3xl font-bold">Users</h1>
-      <div className="flex flex-col items-center bg-white/30 backdrop-blur-sm rounded-lg p-2 space-y-5">
-        <Button className="max-w-md" onClick={showCreateUserForm}>
-          Create a new User
-        </Button>
-        <Form {...form}>
-          <form
-            id="createUserForm"
-            onSubmit={form.handleSubmit(onSubmit)}
-            className="flex flex-col items-center hidden gap-2"
-          >
-            <div className="w-full flex items-center justify-between font-bold p-2 gap-2 bg-[#FFEEAD] rounded-lg">
-              <FormField
-                name="name"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Input
-                      {...field}
-                      type="text"
-                      name="name"
-                      placeholder="Name"
-                      className="bg-white"
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="email"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Input
-                      {...field}
-                      type="text"
-                      name="email"
-                      placeholder="Email"
-                      className="bg-white"
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                name="password"
-                control={form.control}
-                render={({ field }) => (
-                  <FormItem>
-                    <Input
-                      {...field}
-                      type="password"
-                      name="password"
-                      placeholder="Password"
-                      className="bg-white"
-                    />
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <div className="flex items-center justify-center gap-2">
-              <Button className="max-w-md" type="submit">
-                Submit
-              </Button>
-              <span
-                className="max-w-md inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 px-4 py-2"
-                onClick={hideCreateUserForm}
-              >
-                Discard
-              </span>
-            </div>
-          </form>
-        </Form>
-        {loadingUsers ? (
-          <Loader2 className="animate-spin" />
-        ) : users.length === 0 ? (
-          <div className="w-full flex flex-col space-y-2">
-            <p className="text-center text-xl font-bold">
-              No Users Found, Please Create a User
-            </p>
-          </div>
-        ) : (
-          <div className="w-full flex flex-col space-y-2">
-            <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 bg-slate-500 rounded-lg">
-              <span className="w-1/4">Name</span>
-              <span className="w-1/4">Email</span>
-              <span className="w-1/4">Password</span>
-              <span className="w-1/4">Actions</span>
-            </div>
-            {users?.map((user, index) => {
-              return (
-                <div
-                  key={index}
-                  className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 border border-black rounded-lg"
+    <div className="w-full h-full flex flex-col bg-background bg-auto bg-no-repeat bg-center">
+      <div className="w-full h-full flex flex-col space-y-5 p-5 bg-gradient-to-br from-blue-600/50 to-blue-200/50 overflow-auto">
+        <h1 className="w-full text-center text-3xl font-bold">Users</h1>
+        <div className="flex flex-col items-center bg-white/30 backdrop-blur-sm rounded-lg p-2 space-y-5">
+          <Button className="max-w-md" onClick={showCreateUserForm}>
+            Create a new User
+          </Button>
+          <Form {...form}>
+            <form
+              id="createUserForm"
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="flex flex-col items-center hidden gap-2"
+            >
+              <div className="w-full flex items-center justify-between font-bold p-2 gap-2 bg-[#FFEEAD] rounded-lg">
+                <FormField
+                  name="name"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Input
+                        {...field}
+                        type="text"
+                        name="name"
+                        placeholder="Name"
+                        className="bg-white"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="email"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Input
+                        {...field}
+                        type="text"
+                        name="email"
+                        placeholder="Email"
+                        className="bg-white"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  name="password"
+                  control={form.control}
+                  render={({ field }) => (
+                    <FormItem>
+                      <Input
+                        {...field}
+                        type="password"
+                        name="password"
+                        placeholder="Password"
+                        className="bg-white"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+              <div className="flex items-center justify-center gap-2">
+                <Button className="max-w-md" type="submit">
+                  Submit
+                </Button>
+                <span
+                  className="max-w-md inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 px-4 py-2"
+                  onClick={hideCreateUserForm}
                 >
-                  <span className="w-1/4 text-ellipsis whitespace-nowrap overflow-hidden">
-                    {user.name}
-                  </span>
-                  <span className="w-1/4  text-ellipsis whitespace-nowrap overflow-hidden">
-                    {user.email}
-                  </span>
-                  <span className="w-1/4 text-ellipsis whitespace-nowrap overflow-hidden">
-                    {user.password}
-                  </span>
-                  <div className="w-1/4 flex justify-center items-center gap-2">
-                    <span onClick={() => deleteUser(user._id)}>
-                      <BoxIcon name="bx-trash" />
+                  Discard
+                </span>
+              </div>
+            </form>
+          </Form>
+          {loadingUsers ? (
+            <Loader2 className="animate-spin" />
+          ) : users.length === 0 ? (
+            <div className="w-full flex flex-col space-y-2">
+              <p className="text-center text-xl font-bold">
+                No Users Found, Please Create a User
+              </p>
+            </div>
+          ) : (
+            <div className="w-full flex flex-col space-y-2">
+              <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 bg-amber-200 rounded-lg">
+                <span className="w-1/4">Name</span>
+                <span className="w-1/4">Email</span>
+                <span className="w-1/4">Password</span>
+                <span className="w-1/4">Actions</span>
+              </div>
+              {users?.map((user, index) => {
+                return (
+                  <div
+                    key={index}
+                    className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 border border-black rounded-lg"
+                  >
+                    <span className="w-1/4 text-ellipsis whitespace-nowrap overflow-hidden">
+                      {user.name}
                     </span>
+                    <span className="w-1/4  text-ellipsis whitespace-nowrap overflow-hidden">
+                      {user.email}
+                    </span>
+                    <span className="w-1/4 text-ellipsis whitespace-nowrap overflow-hidden">
+                      {user.password}
+                    </span>
+                    <div className="w-1/4 flex justify-center items-center gap-2">
+                      <span onClick={() => deleteUser(user._id)}>
+                        <BoxIcon name="bx-trash" />
+                      </span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
+                );
+              })}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
