@@ -1,14 +1,17 @@
 "use client";
 import { Form } from "@/model/form";
-import React, { useEffect, useState } from "react";
+import React, { ReactElement, useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
-import { FormItemDetails } from "@/types/types";
+import { FormItemDetails, FormState } from "@/types/types";
 import FillForm from "@/components/fillForm/fillForm";
-import { FilledFormsMap } from "../../managerDashboard/myForms/page";
+import { FilledFormsMap } from "@/types/types";
+import CreateForm from "@/components/createForm/createForm";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 export default function Forms() {
   const [forms, setForms] = useState<Form[]>([]);
@@ -20,9 +23,19 @@ export default function Forms() {
   const [formToFillTitle, setFormToFillTitle] = useState("");
   const [showRecords, setshowRecords] = useState(false);
   const [formNameToShowRecords, setFormNameToShowRecords] = useState("");
+  const [eFormItemDetails, setEFormItemDetails] = useState<FormItemDetails[]>(
+    []
+  );
+  const [eFormItems, setEFormItems] = useState<ReactElement[]>([]);
+  const [eFormItemsLength, setEFormItemsLength] = useState(0);
+  const [eFormName, setEFormName] = useState("");
+  const [showModifyFormModal, setShowModifyFormModal] = useState(false);
+  const [eCompanyName, setECompanyName] = useState("");
+
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
   const email: string = session?.user.email;
+  const role: string = session?.user.role;
 
   const getFilledForms = async (formName: string) => {
     setLoadingFilledForms(true);
@@ -112,7 +125,6 @@ export default function Forms() {
     setFormToFill(fid);
     setShowFillFormModal(true);
   };
-  const modifyForm = () => {};
   const deleteFilledForm = async (id: unknown, formName: string) => {
     try {
       const res = await axios.post("/api/deleteFilledFormById", { id });
@@ -127,6 +139,26 @@ export default function Forms() {
       toast("Error deleting Form", { type: "error" });
     }
   };
+  const exportToExcel = (recordState: FormState, recordName: string) => {
+    const workbook = XLSX.utils.book_new();
+    const worksheet = XLSX.utils.json_to_sheet([recordState]);
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Sheet1");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    const blob = new Blob([excelBuffer], {
+      type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    });
+    saveAs(blob, `${recordName}.xlsx`);
+    console.log(blob);
+  };
+  useEffect(() => {
+    if (!showFillFormModal && formToFillTitle !== "") {
+      getFilledForms(formToFillTitle);
+      setFormToFillTitle("");
+    }
+  }, [showFillFormModal, formToFillTitle, getFilledForms]);
   return (
     <div className="w-full h-full flex flex-col space-y-5 p-5 bg-slate-400 overflow-auto">
       <h1 className="w-full text-center text-3xl font-bold">Forms</h1>
@@ -142,15 +174,19 @@ export default function Forms() {
         ) : (
           <div className="w-full flex flex-col space-y-2">
             <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 bg-slate-500 rounded-lg">
-              <span className="w-1/4">Company Name</span>
-              <span className="w-1/4">Name</span>
-              <span className="w-1/4"># of Fields</span>
-              <span className="w-1/4">Actions</span>
+              <span className="w-[20%]">Company Name</span>
+              <span className="w-[30%]">Name</span>
+              <span className="w-[10%]"># of Fields</span>
+              <span className="w-[10%]"># of Records</span>
+              <span className="flex-1">Actions</span>
             </div>
             {forms?.map((form, index) => {
               return (
                 <div key={index}>
                   <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 border border-black rounded-lg">
+                    <span className="w-[20%] text-ellipsis whitespace-nowrap overflow-hidden">
+                      {form.companyName}
+                    </span>
                     <span className="w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
                       {form.title}
                     </span>
@@ -164,24 +200,7 @@ export default function Forms() {
                         filledForms[form.title]?.length ?? 0
                       )}
                     </span>
-                    <div className="flex-1 flex justify-center items-center gap-2">
-                      <button
-                        className="p-2 bg-white/50 rounded-lg"
-                        onClick={modifyForm}
-                      >
-                        Modify
-                      </button>
-                      <button
-                        className="p-2 bg-white/50 rounded-lg"
-                        onClick={() =>
-                          displayFormToFill({
-                            title: form.title,
-                            fid: form.formItemDetails,
-                          })
-                        }
-                      >
-                        Fill Form
-                      </button>
+                    <div className="flex-1 flex flex-wrap justify-center gap-2 overflow-hidden">
                       <button
                         disabled={
                           !filledForms[form.title] ||
@@ -224,6 +243,30 @@ export default function Forms() {
                         />
                       </button>
                       <button
+                        className="p-2 bg-white/50 rounded-lg"
+                        onClick={() =>
+                          displayFormToFill({
+                            title: form.title,
+                            fid: form.formItemDetails,
+                          })
+                        }
+                      >
+                        Fill Form
+                      </button>
+                      <button
+                        className="p-2 bg-white/50 rounded-lg"
+                        onClick={() => {
+                          setEFormItemDetails(form.formItemDetails);
+                          setEFormItems(form.formItems);
+                          setEFormItemsLength(form.formItemsLength);
+                          setEFormName(form.title);
+                          setECompanyName(form.companyName);
+                          setShowModifyFormModal(true);
+                        }}
+                      >
+                        <i className="fa fa-edit" />
+                      </button>
+                      <button
                         className="p-2 flex items-center justify-center space-x-2 bg-white/50 rounded-lg disabled:text-gray-200"
                         onClick={() => deleteForm(form._id)}
                       >
@@ -261,14 +304,23 @@ export default function Forms() {
                         <span className="w-[22%] text-ellipsis whitespace-nowrap overflow-hidden">
                           {record.createdAt.toString()}
                         </span>
-                        <span className="w-[50%] flex items-center justify-center">
-                          <span
+                        <span className="w-[50%] flex items-center justify-center space-x-2">
+                          <button
+                            className="p-2 bg-white/50 rounded-lg"
+                            onClick={() =>
+                              exportToExcel(record.formState, record.title)
+                            }
+                          >
+                            Export to Excel
+                          </button>
+                          <button
+                            className="p-2 bg-white/50 rounded-lg"
                             onClick={() =>
                               deleteFilledForm(record._id, record.title)
                             }
                           >
                             <i className="fa fa-trash" />
-                          </span>
+                          </button>
                         </span>
                       </div>
                     ))}
@@ -289,6 +341,21 @@ export default function Forms() {
         formToFillTitle={formToFillTitle}
         setFormToFillTitle={setFormToFillTitle}
       />
+      <div
+        className={`${
+          showModifyFormModal ? "" : "hidden"
+        } fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex flex-col items-start justify-center overflow-scroll px-5 space-y-2`}
+      >
+        <CreateForm
+          eFormItemDetails={eFormItemDetails}
+          eFormItems={eFormItems}
+          eFormItemsLength={eFormItemsLength}
+          eFormName={eFormName}
+          eCompanyName={eCompanyName}
+          setShowModifyFormModal={setShowModifyFormModal}
+          role={role}
+        />
+      </div>
     </div>
   );
 }

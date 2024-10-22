@@ -236,7 +236,6 @@ export default function FillForm({
             className="bg-green-500 p-2 rounded-lg cursor-pointer"
             onClick={async (e) => {
               e.preventDefault();
-              console.log(formState);
               setIsSavingForm(true);
               const errors: string[] = [];
               formItemDetails.map((itemD) => {

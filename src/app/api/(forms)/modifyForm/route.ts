@@ -1,5 +1,6 @@
 import dbConnect from "@/lib/dbConnect";
 import FormModel from "@/model/form";
+import FilledFormModel from "@/model/filledForm";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -13,21 +14,18 @@ export async function POST(request: NextRequest) {
     });
 
     if (!existingForm) {
-      const newForm = new FormModel({
-        companyName,
-        title: formName,
-        formItems,
-        formItemsLength,
-        formItemDetails,
-      });
-      await newForm.save();
       return NextResponse.json(
-        { success: true, message: "Form Saved successfully" },
+        { success: false, message: "Form not found" },
         { status: 200 }
       );
     }
+    existingForm.title = formName;
+    existingForm.formItems = formItems;
+    existingForm.formItemsLength = formItemsLength;
+    existingForm.formItemDetails = formItemDetails;
+    await existingForm.save();
     return NextResponse.json(
-      { success: false, message: "Form name already exists" },
+      { success: true, message: "Form Saved successfully" },
       { status: 200 }
     );
   } catch (error) {

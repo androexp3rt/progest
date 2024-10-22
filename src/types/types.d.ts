@@ -1,3 +1,9 @@
+export interface FormState {
+  [key: string]: string | boolean | string[] | File[] | Blob[] | string[][];
+}
+export interface FilledFormsMap {
+  [formName: string]: FilledForm[] | undefined;
+}
 export type FormItemDetails = {
   id: string;
   title: string;

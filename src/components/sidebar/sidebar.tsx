@@ -50,7 +50,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
         >
           <Link
             href="/dashboard"
-            className="flex items-center justify-start space-x-3 p-2 "
+            className="w-full flex items-center justify-start space-x-3 p-2 "
           >
             <i className="fas fa-home text-lg" />
             <span className={`text-lg ${isSidebarOpen ? "" : "hidden"}`}>
@@ -66,7 +66,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
         >
           <Link
             href={`/${role}Dashboard/users`}
-            className="flex items-center justify-start space-x-3 p-2 "
+            className="w-full flex items-center justify-start space-x-3 p-2 "
           >
             <i className="fas fa-user text-lg" />
             <span className={`text-lg ${isSidebarOpen ? "" : "hidden"}`}>
@@ -114,7 +114,12 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
               }
               `}
             >
-              <Link href={`/${role}Dashboard/createForm`}>Create a form</Link>
+              <Link
+                href={`/${role}Dashboard/createForm`}
+                className="w-full flex items-center justify-start"
+              >
+                Create a form
+              </Link>
             </li>
             <li
               className={`p-2 rounded-lg cursor-pointer whitespace-nowrap overflow-hidden text-ellipsis ${
@@ -130,6 +135,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
                     ? "/dashboard/myForms"
                     : `/${role}Dashboard/myForms`
                 }
+                className="w-full flex items-center justify-start"
               >
                 My forms
               </Link>

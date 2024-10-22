@@ -25,7 +25,9 @@ type Props = {
   eFormItems: ReactElement[];
   eFormItemsLength: number;
   eFormName: string;
-  companyName: string;
+  eCompanyName: string;
+  role: string;
+  setShowModifyFormModal: React.Dispatch<React.SetStateAction<boolean>> | null;
 };
 
 export default function CreateForm({
@@ -33,20 +35,47 @@ export default function CreateForm({
   eFormItems,
   eFormItemsLength,
   eFormName,
-  companyName,
+  eCompanyName,
+  role,
+  setShowModifyFormModal,
 }: Props) {
   const router = useRouter();
-  const [formItemDetails, setFormItemDetails] =
-    useState<FormItemDetails[]>(eFormItemDetails);
-  const [formItems, setFormItems] = useState<ReactElement[]>(eFormItems);
-  const [formItemsLength, setFormItemsLength] = useState(eFormItemsLength);
-  const [formName, setFormName] = useState(eFormName);
+  const [formItemDetails, setFormItemDetails] = useState<FormItemDetails[]>([]);
+  const [formItems, setFormItems] = useState<ReactElement[]>([]);
+  const [formItemsLength, setFormItemsLength] = useState(0);
+  const [formName, setFormName] = useState("");
   const [selectedFormItem, setSelectedFormItem] = useState("");
   const [itemToDelete, setItemToDelete] = useState("");
   const [itemToCopy, setItemToCopy] = useState("");
   const [itemToEditName, setItemToEditName] = useState("");
   const [editedName, setEditedName] = useState("");
   const [isSavingForm, setIsSavingForm] = useState(false);
+
+  useEffect(() => {
+    setFormItemDetails(eFormItemDetails);
+    const newFormItems: ReactElement[] = [];
+    eFormItems.forEach((item) => {
+      const newItem = (
+        <FormItem
+          key={item.key}
+          id={item.props.id}
+          title={item.props.title}
+          color={item.props.color}
+          icon={item.props.icon}
+          formItemDetails={eFormItemDetails}
+          setItemToCopy={setItemToCopy}
+          setItemToDelete={setItemToDelete}
+          setSelectedFormItem={setSelectedFormItem}
+          setItemToEditName={setItemToEditName}
+          setEditedName={setEditedName}
+        />
+      );
+      newFormItems.push(newItem);
+    });
+    setFormItems(newFormItems);
+    setFormItemsLength(eFormItemsLength);
+    setFormName(eFormName);
+  }, [eFormItemDetails, eFormItems, eFormItemsLength, eFormName, eCompanyName]);
 
   const fields = [
     { icon: "fas fa-font", label: "Input field", color: "text-teal-500" },
@@ -313,10 +342,158 @@ export default function CreateForm({
       document.addEventListener("click", unselectFormItem);
     }
   }, [selectedFormItem, unselectFormItem]);
-
+  const saveFormToDatabase = async () => {
+    setIsSavingForm(true);
+    if (setShowModifyFormModal && formName !== eFormName) {
+      toast("Form Name can't be modified", { type: "error" });
+      return setIsSavingForm(false);
+    }
+    if (formName.length === 0) {
+      toast("Form Name is Required", { type: "error" });
+      return setIsSavingForm(false);
+    }
+    if (formItems.length === 0) {
+      toast("Atleast one form field is Required", {
+        type: "error",
+      });
+      return setIsSavingForm(false);
+    }
+    const validationErrors: string[] = [];
+    await Promise.all(
+      formItemDetails.map(async (itemD) => {
+        if (itemD.title === "Input field") {
+          if (itemD.type === "") {
+            validationErrors.push(`Type of ${itemD.newTitle} is Required`);
+          }
+        } else if (itemD.title === "Date & Time") {
+          if (itemD.type === "") {
+            validationErrors.push(`Type of ${itemD.newTitle} is Required`);
+          }
+        } else if (itemD.title === "List") {
+          if (itemD.listItems!.length === 0) {
+            validationErrors.push(
+              `There should be atlest one list item in ${itemD.newTitle}`
+            );
+          }
+        } else if (itemD.title === "Choice") {
+          if (itemD.listItems!.length === 0) {
+            validationErrors.push(
+              `There should be atlest one item to choose in ${itemD.newTitle}`
+            );
+          }
+        } else if (itemD.title === "Photo") {
+          if (itemD.maxPicSize === 0) {
+            validationErrors.push(
+              `Maximum size of Photo is required in ${itemD.newTitle}`
+            );
+          }
+          if (itemD.multiplePics) {
+            if (itemD.maxPics === 0) {
+              validationErrors.push(
+                `Maximum number of Photos is required in ${itemD.newTitle}`
+              );
+            }
+          }
+        } else if (itemD.title === "Table") {
+          if (
+            itemD.tableCols!.length === 0 ||
+            (itemD.tableCols!.length === 1 && itemD.tableCols![0] === "S.No.")
+          ) {
+            validationErrors.push(
+              `There should be atleast one column in ${itemD.newTitle}`
+            );
+          }
+        } else if (itemD.title === "Image") {
+          if (itemD.imageFiles!.length === 0) {
+            validationErrors.push(
+              `There should be atleast one image in ${itemD.newTitle}`
+            );
+          }
+          const imageFormData = new FormData();
+          itemD.imageFiles!.forEach((file, index) => {
+            imageFormData.append(`file${index}`, file);
+            itemD.imageFileNames!.splice(index, 1, `file${index}`);
+          });
+          const imgUrls = await uploadImagesToCloudinary(
+            imageFormData,
+            itemD.imageFileNames!
+          );
+          imgUrls.forEach((url, index) => {
+            itemD.imageFileNames!.splice(index, 1, url);
+            itemD.imageFiles!.splice(0, 1);
+          });
+        } else if (itemD.title === "Calculation") {
+          if (itemD.type === "") {
+            validationErrors.push(`Type of ${itemD.newTitle} is required`);
+          }
+          if (itemD.calcInput1 === "") {
+            validationErrors.push(
+              `Calculation input 1 is required in ${itemD.newTitle}`
+            );
+          }
+          if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
+            validationErrors.push(
+              `Calculation input 2 is required in ${itemD.newTitle}`
+            );
+          }
+        }
+      })
+    );
+    if (validationErrors.length > 0) {
+      toast(validationErrors.join(",\n"), { type: "error" });
+      setIsSavingForm(false);
+      return;
+    }
+    // save the form
+    try {
+      let response;
+      if (!setShowModifyFormModal) {
+        response = await axios.post("/api/saveForm", {
+          formName,
+          formItemDetails,
+          formItems,
+          formItemsLength,
+          companyName: eCompanyName,
+        });
+      } else {
+        response = await axios.post("/api/modifyForm", {
+          formName,
+          formItemDetails,
+          formItems,
+          formItemsLength,
+          companyName: eCompanyName,
+        });
+      }
+      if (response.data.success) {
+        toast(response.data.message, { type: "success" });
+        if (!setShowModifyFormModal) {
+          if (role === "user") {
+            router.push(`/dashboard/myForms`);
+          } else {
+            router.push(`/${role}Dashboard/myForms`);
+          }
+        } else {
+          setShowModifyFormModal(false);
+        }
+      } else {
+        toast(response.data.message, { type: "error" });
+      }
+    } catch (error) {
+      console.log(error);
+      toast("Error saving the form, Please try again", {
+        type: "error",
+      });
+    } finally {
+      setIsSavingForm(false);
+    }
+  };
   return (
     <>
-      <h1 className="w-full text-center text-3xl font-bold p-5">
+      <h1
+        className={`w-full ${
+          eFormName === "" ? "text-black" : "text-white"
+        } text-center text-3xl font-bold p-5`}
+      >
         {eFormName === "" ? "Create a form" : `Edit ${eFormName}`}
       </h1>
       <div className="w-full bg-gray-100 p-4 rounded-lg space-y-2">
@@ -331,6 +508,7 @@ export default function CreateForm({
                 maxLength={150}
                 placeholder="Name your form"
                 className="w-full border-b border-gray-300 focus:outline-none text-gray-500 bg-transparent"
+                defaultValue={formName}
                 onChange={(e) => {
                   setFormName(e.target.value);
                 }}
@@ -356,9 +534,9 @@ export default function CreateForm({
               id="leftPanel"
               className="w-full h-[300px] bg-gray-200 rounded-lg shadow space-y-1 overflow-auto"
             >
-              {formItems.map((item, index) => (
-                <React.Fragment key={index}>{item}</React.Fragment>
-              ))}
+              {formItems.map((item, index) => {
+                return <React.Fragment key={index}>{item}</React.Fragment>;
+              })}
             </div>
             <div className="flex justify-start space-x-2 mt-2">
               <button
@@ -445,137 +623,7 @@ export default function CreateForm({
         <div className="flex justify-between mt-4">
           <button
             className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
-            onClick={async () => {
-              setIsSavingForm(true);
-              if (formName.length === 0) {
-                toast("Form Name is Required", { type: "error" });
-                return setIsSavingForm(false);
-              }
-              if (formItems.length === 0) {
-                toast("Atleast one form field is Required", {
-                  type: "error",
-                });
-                return setIsSavingForm(false);
-              }
-              const validationErrors: string[] = [];
-              await Promise.all(
-                formItemDetails.map(async (itemD) => {
-                  if (itemD.title === "Input field") {
-                    if (itemD.type === "") {
-                      validationErrors.push(
-                        `Type of ${itemD.newTitle} is Required`
-                      );
-                    }
-                  } else if (itemD.title === "Date & Time") {
-                    if (itemD.type === "") {
-                      validationErrors.push(
-                        `Type of ${itemD.newTitle} is Required`
-                      );
-                    }
-                  } else if (itemD.title === "List") {
-                    if (itemD.listItems!.length === 0) {
-                      validationErrors.push(
-                        `There should be atlest one list item in ${itemD.newTitle}`
-                      );
-                    }
-                  } else if (itemD.title === "Choice") {
-                    if (itemD.listItems!.length === 0) {
-                      validationErrors.push(
-                        `There should be atlest one item to choose in ${itemD.newTitle}`
-                      );
-                    }
-                  } else if (itemD.title === "Photo") {
-                    if (itemD.maxPicSize === 0) {
-                      validationErrors.push(
-                        `Maximum size of Photo is required in ${itemD.newTitle}`
-                      );
-                    }
-                    if (itemD.multiplePics) {
-                      if (itemD.maxPics === 0) {
-                        validationErrors.push(
-                          `Maximum number of Photos is required in ${itemD.newTitle}`
-                        );
-                      }
-                    }
-                  } else if (itemD.title === "Table") {
-                    if (
-                      itemD.tableCols!.length === 0 ||
-                      (itemD.tableCols!.length === 1 &&
-                        itemD.tableCols![0] === "S.No.")
-                    ) {
-                      validationErrors.push(
-                        `There should be atleast one column in ${itemD.newTitle}`
-                      );
-                    }
-                  } else if (itemD.title === "Image") {
-                    if (itemD.imageFiles!.length === 0) {
-                      validationErrors.push(
-                        `There should be atleast one image in ${itemD.newTitle}`
-                      );
-                    }
-                    const imageFormData = new FormData();
-                    itemD.imageFiles!.forEach((file, index) => {
-                      imageFormData.append(`file${index}`, file);
-                      itemD.imageFileNames!.splice(index, 1, `file${index}`);
-                    });
-                    const imgUrls = await uploadImagesToCloudinary(
-                      imageFormData,
-                      itemD.imageFileNames!
-                    );
-                    imgUrls.forEach((url, index) => {
-                      itemD.imageFileNames!.splice(index, 1, url);
-                      itemD.imageFiles!.splice(0, 1);
-                    });
-                  } else if (itemD.title === "Calculation") {
-                    if (itemD.type === "") {
-                      validationErrors.push(
-                        `Type of ${itemD.newTitle} is required`
-                      );
-                    }
-                    if (itemD.calcInput1 === "") {
-                      validationErrors.push(
-                        `Calculation input 1 is required in ${itemD.newTitle}`
-                      );
-                    }
-                    if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
-                      validationErrors.push(
-                        `Calculation input 2 is required in ${itemD.newTitle}`
-                      );
-                    }
-                  }
-                })
-              );
-              if (validationErrors.length > 0) {
-                toast(validationErrors.join(",\n"), { type: "error" });
-                setIsSavingForm(false);
-                return;
-              }
-              // save the form
-              try {
-                const response = await axios.post("/api/saveForm", {
-                  formName,
-                  formItemDetails,
-                  formItems,
-                  formItemsLength,
-                  companyName,
-                });
-                if (response.data.success) {
-                  toast("Form saved Successfully", { type: "success" });
-                  router.push("/managerDashboard/myForms");
-                } else {
-                  toast("Error saving the form, Please try again", {
-                    type: "error",
-                  });
-                }
-              } catch (error) {
-                console.log(error);
-                toast("Error saving the form, Please try again", {
-                  type: "error",
-                });
-              } finally {
-                setIsSavingForm(false);
-              }
-            }}
+            onClick={async () => saveFormToDatabase()}
           >
             {isSavingForm ? (
               <div className="flex items-center justify-center space-x-2 text-white">
@@ -589,7 +637,22 @@ export default function CreateForm({
               </div>
             )}
           </button>
-          <button className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center">
+          <button
+            className="bg-orange-500 text-white px-4 py-2 rounded-lg flex items-center"
+            onClick={() => {
+              if (!setShowModifyFormModal) {
+                setFormItemDetails([]);
+                setFormItems([]);
+                if (role === "user") {
+                  router.push(`/dashboard/myForms`);
+                } else {
+                  router.push(`/${role}Dashboard/myForms`);
+                }
+              } else {
+                setShowModifyFormModal?.(false);
+              }
+            }}
+          >
             <i className="fas fa-sign-out-alt mr-2"></i> Quit
           </button>
         </div>
