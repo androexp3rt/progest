@@ -1,6 +1,6 @@
 "use server";
 
-import { uploadOnCloudinary } from "./cloudinary";
+import { uploadStreamOnCloudinary } from "./cloudinary";
 import { UploadApiResponse } from "cloudinary";
 
 export const uploadImagesToCloudinary = async (
@@ -13,9 +13,8 @@ export const uploadImagesToCloudinary = async (
       const file = formData.get(name) as File;
       const arrayBuffer = await file.arrayBuffer();
       const buffer = new Uint8Array(arrayBuffer);
-      const result: UploadApiResponse | undefined = await uploadOnCloudinary(
-        buffer
-      );
+      const result: UploadApiResponse | undefined =
+        await uploadStreamOnCloudinary(buffer);
       if (result) {
         imgUrls.push(result.secure_url);
       }

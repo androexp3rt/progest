@@ -1,11 +1,12 @@
 import { FormItemDetails } from "@/types/types";
-import { FormState } from "./fillForm";
+import { FormState } from "@/types/types";
 import { useCallback, useEffect } from "react";
 
 type Props = {
   itemD: FormItemDetails;
   formItemDetails: FormItemDetails[];
   formState: FormState;
+  preview?: boolean;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 };
 
@@ -13,6 +14,7 @@ export default function RenderCalculation({
   itemD,
   formState,
   setFormState,
+  preview,
 }: Props) {
   const calcInput1 = formState[itemD.calcInput1!] ?? "";
   const calcInput2 = formState[itemD.calcInput2!] ?? "";

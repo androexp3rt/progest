@@ -1,5 +1,5 @@
 import { FormItemDetails } from "@/types/types";
-import { FormState } from "./fillForm";
+import { FormState } from "@/types/types";
 import { useRef } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
@@ -7,10 +7,16 @@ import { toast } from "react-toastify";
 type Props = {
   itemD: FormItemDetails;
   formState: FormState;
+  preview?: boolean;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 };
 
-export default function RenderPhoto({ itemD, formState, setFormState }: Props) {
+export default function RenderPhoto({
+  itemD,
+  formState,
+  setFormState,
+  preview,
+}: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -160,91 +166,107 @@ export default function RenderPhoto({ itemD, formState, setFormState }: Props) {
       >
         {itemD.newTitle} :
       </p>
-      <div className="file-upload space-y-2">
-        {itemD.multiplePics ? (
-          <input
-            name="MultiplePhotoUpload"
-            type="file"
-            multiple
-            onChange={handleMFIC}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-          />
-        ) : (
-          <input
-            name="singlePhotoUpload"
-            type="file"
-            onChange={handleSFIC}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-          />
-        )}
-        <div
-          className="drop-zone w-full h-40 bg-gray-100 p-2 rounded-lg overflow-scroll"
-          onClick={handleClick}
-          onDragOver={handleDragOver}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          {(formState[itemD.newTitle] as File[]) ? (
-            <div>
-              <span>Drag and drop files here, or click to select files</span>
-              <div className="flex items-center justify-center flex-wrap gap-5 p-2">
-                {(formState[itemD.newTitle] as File[]).map((file, index) => {
-                  return (
-                    <Image
-                      key={index}
-                      src={URL.createObjectURL(file)}
-                      alt={file.name}
-                      width={100}
-                      height={100}
-                      className="w-[150px] h-auto"
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <span>Drag and drop files here, or click to select files</span>
-          )}
-        </div>
-        <ul className="space-y-1">
-          {(formState[itemD.newTitle] as File[])?.map((file, index) => (
-            <li
-              key={index}
-              className="flex items-center justify-between border border-green-500 rounded-lg p-1"
-            >
-              <span>
-                {file.name} ({(file.size / 1024).toFixed(2)} KB)
-              </span>
-              <i
-                className="fa fa-trash"
-                onClick={() => {
-                  const i = (formState[itemD.newTitle] as File[])?.indexOf(
-                    file
-                  );
-                  const newFiles = [...(formState[itemD.newTitle] as File[])];
-                  newFiles.splice(i, 1);
-                  newFiles.forEach((file, ind) => {
-                    const newName = `Uploaded File ${ind + 1}`;
-                    const blob = new Blob([file], { type: file.type });
-                    newFiles.splice(
-                      ind,
-                      1,
-                      new File([blob], newName, { type: file.type })
-                    );
-                  });
-                  setFormState({
-                    ...formState,
-                    [itemD.newTitle]: [...newFiles],
-                  });
-                }}
+      {preview ? (
+        <div className="w-full bg-white rounded-lg p-2 flex flex-wrap justify-center gap-5">
+          {(formState[itemD.newTitle] as string[])?.map((url, index) => {
+            return (
+              <Image
+                key={index}
+                src={url}
+                alt={`Uploaded Photo ${index + 1}`}
+                width={400}
+                height={400}
               />
-            </li>
-          ))}
-        </ul>
-      </div>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="file-upload space-y-2">
+          {itemD.multiplePics ? (
+            <input
+              name="MultiplePhotoUpload"
+              type="file"
+              multiple
+              onChange={handleMFIC}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+          ) : (
+            <input
+              name="singlePhotoUpload"
+              type="file"
+              onChange={handleSFIC}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+          )}
+          <div
+            className="drop-zone w-full h-40 bg-gray-100 p-2 rounded-lg overflow-scroll"
+            onClick={handleClick}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            {(formState[itemD.newTitle] as File[]) ? (
+              <div>
+                <span>Drag and drop files here, or click to select files</span>
+                <div className="flex items-center justify-center flex-wrap gap-5 p-2">
+                  {(formState[itemD.newTitle] as File[]).map((file, index) => {
+                    return (
+                      <Image
+                        key={index}
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        width={100}
+                        height={100}
+                        className="w-[150px] h-auto"
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <span>Drag and drop files here, or click to select files</span>
+            )}
+          </div>
+          <ul className="space-y-1">
+            {(formState[itemD.newTitle] as File[])?.map((file, index) => (
+              <li
+                key={index}
+                className="flex items-center justify-between border border-green-500 rounded-lg p-1"
+              >
+                <span>
+                  {file.name} ({(file.size / 1024).toFixed(2)} KB)
+                </span>
+                <i
+                  className="fa fa-trash"
+                  onClick={() => {
+                    const i = (formState[itemD.newTitle] as File[])?.indexOf(
+                      file
+                    );
+                    const newFiles = [...(formState[itemD.newTitle] as File[])];
+                    newFiles.splice(i, 1);
+                    newFiles.forEach((file, ind) => {
+                      const newName = `Uploaded File ${ind + 1}`;
+                      const blob = new Blob([file], { type: file.type });
+                      newFiles.splice(
+                        ind,
+                        1,
+                        new File([blob], newName, { type: file.type })
+                      );
+                    });
+                    setFormState({
+                      ...formState,
+                      [itemD.newTitle]: [...newFiles],
+                    });
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

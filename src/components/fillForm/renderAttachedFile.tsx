@@ -1,11 +1,13 @@
 import { FormItemDetails } from "@/types/types";
-import { FormState } from "./fillForm";
-import { useRef } from "react";
+import { FormState } from "@/types/types";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
+import Link from "next/link";
 
 type Props = {
   itemD: FormItemDetails;
+  preview?: boolean;
   formState: FormState;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 };
@@ -14,6 +16,7 @@ export default function RenderAttachedFile({
   itemD,
   formState,
   setFormState,
+  preview,
 }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const handleDragOver = (e: React.DragEvent) => {
@@ -108,24 +111,19 @@ export default function RenderAttachedFile({
     }
   };
   const validateFiles = (files: File[]): boolean => {
-    // const maxSize = 2 * 1024 * 1024; // 2 MB in bytes
-    // const allowedTypes = ["image/jpeg", "image/png", "image/gif"];
+    const maxSize = 2 * 1024 * 1024; // 2 MB in bytes
     if (!itemD.multipleAttachments && files.length > 1) {
       toast("Only 1 file upload is allowed", { type: "error" });
       return false;
     }
-    // for (const file of files) {
-    // if (file.size > maxSize) {
-    //   toast(`File ${file.name} is too large. Maximum size is 2MB.`, {
-    //     type: "error",
-    //   });
-    //   return false;
-    // }
-    // if (!allowedTypes.includes(file.type)) {
-    //   toast(`File ${file.name} is not an image.`, { type: "error" });
-    //   return false;
-    // }
-    // }
+    for (const file of files) {
+      if (file.size > maxSize) {
+        toast(`File ${file.name} is too large. Maximum size is 2MB.`, {
+          type: "error",
+        });
+        return false;
+      }
+    }
     return true;
   };
   return (
@@ -141,91 +139,110 @@ export default function RenderAttachedFile({
       >
         {itemD.newTitle} :
       </p>
-      <div className="file-upload space-y-2">
-        {itemD.multipleAttachments ? (
-          <input
-            name="MultipleAttachedFileUpload"
-            type="file"
-            multiple
-            onChange={handleMFIC}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-          />
-        ) : (
-          <input
-            name="singleAttachedFileUpload"
-            type="file"
-            onChange={handleSFIC}
-            ref={fileInputRef}
-            style={{ display: "none" }}
-          />
-        )}
-        <div
-          className="drop-zone w-full h-40 bg-gray-100 p-2 rounded-lg overflow-scroll"
-          onClick={handleClick}
-          onDragOver={handleDragOver}
-          onDragEnter={handleDragEnter}
-          onDragLeave={handleDragLeave}
-          onDrop={handleDrop}
-        >
-          {(formState[itemD.newTitle] as File[]) ? (
-            <div>
-              <span>Drag and drop files here, or click to select files</span>
-              <div className="flex items-center justify-center flex-wrap gap-5 p-2">
-                {(formState[itemD.newTitle] as File[]).map((file, index) => {
-                  return (
-                    <Image
-                      key={index}
-                      src={URL.createObjectURL(file)}
-                      alt={file.name}
-                      width={100}
-                      height={100}
-                      className="w-[150px] h-auto"
-                    />
-                  );
-                })}
-              </div>
-            </div>
-          ) : (
-            <span>Drag and drop files here, or click to select files</span>
-          )}
-        </div>
-        <ul className="space-y-1">
-          {(formState[itemD.newTitle] as File[])?.map((file, index) => (
-            <li
-              key={index}
-              className="flex items-center justify-between border border-green-500 rounded-lg p-1"
-            >
-              <span>
-                {file.name} ({(file.size / 1024).toFixed(2)} KB)
-              </span>
-              <i
-                className="fa fa-trash"
-                onClick={() => {
-                  const i = (formState[itemD.newTitle] as File[])?.indexOf(
-                    file
-                  );
-                  const newFiles = [...(formState[itemD.newTitle] as File[])];
-                  newFiles.splice(i, 1);
-                  newFiles.forEach((file, ind) => {
-                    const newName = `Uploaded File ${ind + 1}`;
-                    const blob = new Blob([file], { type: file.type });
-                    newFiles.splice(
-                      ind,
-                      1,
-                      new File([blob], newName, { type: file.type })
-                    );
-                  });
-                  setFormState({
-                    ...formState,
-                    [itemD.newTitle]: [...newFiles],
-                  });
-                }}
-              />
-            </li>
-          ))}
+      {preview ? (
+        <ul className="w-full bg-white rounded-lg p-2 flex flex-col space-y-1">
+          {(formState[itemD.newTitle] as string[])?.map((url, index) => {
+            return (
+              <li
+                key={index}
+                className="w-full flex items-center justify-between border border-black rounded-lg p-1"
+              >
+                <Link href={url} target="_blank">
+                  <span>{`Uploaded file ${index + 1}`}</span>
+                </Link>
+              </li>
+            );
+          })}
         </ul>
-      </div>
+      ) : (
+        <div className="file-upload space-y-2">
+          {itemD.multipleAttachments ? (
+            <input
+              name="MultipleAttachedFileUpload"
+              type="file"
+              multiple
+              onChange={handleMFIC}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+          ) : (
+            <input
+              name="singleAttachedFileUpload"
+              type="file"
+              onChange={handleSFIC}
+              ref={fileInputRef}
+              style={{ display: "none" }}
+            />
+          )}
+          <div
+            className="drop-zone w-full h-40 bg-gray-100 p-2 rounded-lg overflow-scroll"
+            onClick={handleClick}
+            onDragOver={handleDragOver}
+            onDragEnter={handleDragEnter}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+          >
+            {(formState[itemD.newTitle] as File[]) ? (
+              <div>
+                <span>Drag and drop files here, or click to select files</span>
+                <div className="flex items-center justify-center flex-wrap gap-5 p-2">
+                  {(formState[itemD.newTitle] as File[]).map((file, index) => {
+                    return (
+                      <Image
+                        key={index}
+                        src={URL.createObjectURL(file)}
+                        alt={file.name}
+                        width={100}
+                        height={100}
+                        className="w-[150px] h-auto"
+                      />
+                    );
+                  })}
+                </div>
+              </div>
+            ) : (
+              <span>Drag and drop files here, or click to select files</span>
+            )}
+          </div>
+          <ul className="space-y-1">
+            {(formState[itemD.newTitle] as File[])?.map((file, index) => (
+              <li
+                key={index}
+                className="flex items-center justify-between border border-black rounded-lg p-1"
+              >
+                <span>
+                  {`${file.name}.${file.type} (${(file.size / 1024).toFixed(
+                    2
+                  )} KB)`}
+                </span>
+                <i
+                  className="fa fa-trash"
+                  onClick={() => {
+                    const i = (formState[itemD.newTitle] as File[])?.indexOf(
+                      file
+                    );
+                    const newFiles = [...(formState[itemD.newTitle] as File[])];
+                    newFiles.splice(i, 1);
+                    newFiles.forEach((file, ind) => {
+                      const newName = `Uploaded File ${ind + 1}`;
+                      const blob = new Blob([file], { type: file.type });
+                      newFiles.splice(
+                        ind,
+                        1,
+                        new File([blob], newName, { type: file.type })
+                      );
+                    });
+                    setFormState({
+                      ...formState,
+                      [itemD.newTitle]: [...newFiles],
+                    });
+                  }}
+                />
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
     </div>
   );
 }

@@ -31,12 +31,16 @@ export default function AdminDashboard() {
     },
   });
 
-  const getUsers = async () => {
+  const getAllUsers = async () => {
     setLoadingUsers(true);
     try {
-      const response = await axios.get("/api/getAllUsers");
-      if (response.data.success) {
-        setUsers(response.data.users);
+      const responseStream = await fetch("/api/getAllUsers", {
+        cache: "no-store",
+      });
+      const response = await responseStream.json();
+      if (response.success) {
+        const fetchedUsers: User[] = response.users;
+        setUsers(fetchedUsers);
       } else {
         setUsers([]);
       }
@@ -47,26 +51,6 @@ export default function AdminDashboard() {
       setLoadingUsers(false);
     }
   };
-  useEffect(() => {
-    const getAllUsers = async () => {
-      setLoadingUsers(true);
-      try {
-        const response = await axios.get("/api/getAllUsers");
-        if (response.data.success) {
-          setUsers(response.data.users);
-        } else {
-          setUsers([]);
-        }
-      } catch (error) {
-        console.log(error);
-        setUsers([]);
-      } finally {
-        setLoadingUsers(false);
-      }
-    };
-    getAllUsers();
-  }, [session]);
-
   const showCreateUserForm = () => {
     const newUserForm = document.getElementById("createUserForm")!;
     newUserForm.classList.remove("hidden");
@@ -83,7 +67,7 @@ export default function AdminDashboard() {
       if (response.data.success) {
         toast(response.data.message, { type: "success" });
         hideCreateUserForm();
-        getUsers();
+        getAllUsers();
       } else {
         toast(response.data.message, { type: "error" });
       }
@@ -97,7 +81,7 @@ export default function AdminDashboard() {
       const res = await axios.post("/api/deleteUserById", { id });
       if (res.data.success) {
         toast(res.data.message, { type: "success" });
-        getUsers();
+        getAllUsers();
       } else {
         toast(res.data.message, { type: "error" });
       }
@@ -106,6 +90,30 @@ export default function AdminDashboard() {
       toast("Error deleting User", { type: "error" });
     }
   };
+  useEffect(() => {
+    const getAUsers = async () => {
+      setLoadingUsers(true);
+      try {
+        const responseStream = await fetch("/api/getAllUsers", {
+          cache: "no-store",
+        });
+        const response = await responseStream.json();
+        if (response.success) {
+          const fetchedUsers: User[] = response.users;
+          setUsers(fetchedUsers);
+        } else {
+          setUsers([]);
+        }
+      } catch (error) {
+        console.log(error);
+        setUsers([]);
+      } finally {
+        setLoadingUsers(false);
+      }
+    };
+    getAUsers();
+  }, [session]);
+
   return (
     <div className="w-full h-full flex flex-col bg-background bg-auto bg-no-repeat bg-center">
       <div className="w-full h-full flex flex-col space-y-10 p-5 overflow-auto bg-gradient-to-br from-blue-600/50 to-blue-200/50">

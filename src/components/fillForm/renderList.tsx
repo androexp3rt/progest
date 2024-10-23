@@ -1,13 +1,19 @@
 import { FormItemDetails } from "@/types/types";
-import { FormState } from "./fillForm";
+import { FormState } from "@/types/types";
 
 type Props = {
   itemD: FormItemDetails;
   formState: FormState;
+  preview?: boolean;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 };
 
-export default function RenderList({ itemD, formState, setFormState }: Props) {
+export default function RenderList({
+  itemD,
+  formState,
+  setFormState,
+  preview,
+}: Props) {
   return (
     <div className="w-full flex flex-col items-start justify-start space-y-2">
       <p
@@ -28,7 +34,7 @@ export default function RenderList({ itemD, formState, setFormState }: Props) {
             : itemD.size === "normal"
             ? "text-lg"
             : "text-xl"
-        } text-${itemD.newColor}`}
+        } text-${itemD.newColor} space-y-2`}
       >
         {itemD.listMultipleSelection
           ? itemD.listItems!.map((li, index) => {
@@ -39,6 +45,14 @@ export default function RenderList({ itemD, formState, setFormState }: Props) {
                 >
                   <input
                     type="checkbox"
+                    className={`bg-gray-200 rounded-lg ${
+                      itemD.size === "smaller"
+                        ? "w-4 h-4"
+                        : itemD.size === "normal"
+                        ? "w-6 h-6"
+                        : "w-8 h-8"
+                    }`}
+                    disabled={preview}
                     defaultChecked={(
                       formState[itemD.newTitle] as string[]
                     )?.includes(li)}
@@ -67,7 +81,18 @@ export default function RenderList({ itemD, formState, setFormState }: Props) {
                       }
                     }}
                   />
-                  <label htmlFor={li}>{li}</label>
+                  <label
+                    htmlFor={li}
+                    className={`${
+                      itemD.size === "smaller"
+                        ? "text-md"
+                        : itemD.size === "normal"
+                        ? "text-lg"
+                        : "text-xl"
+                    } text-${itemD.newColor}`}
+                  >
+                    {li}
+                  </label>
                 </li>
               );
             })
@@ -79,6 +104,14 @@ export default function RenderList({ itemD, formState, setFormState }: Props) {
                 >
                   <input
                     type="radio"
+                    className={`${
+                      itemD.size === "smaller"
+                        ? "w-4 h-4"
+                        : itemD.size === "normal"
+                        ? "w-5 h-5"
+                        : "w-6 h-6"
+                    } text-blue-600 bg-gray-100`}
+                    disabled={preview}
                     checked={(formState[itemD.newTitle!] as string) === li}
                     name={itemD.newTitle}
                     id={li}
@@ -97,7 +130,18 @@ export default function RenderList({ itemD, formState, setFormState }: Props) {
                       }
                     }}
                   />
-                  <label htmlFor={li}>{li}</label>
+                  <label
+                    htmlFor={li}
+                    className={`${
+                      itemD.size === "smaller"
+                        ? "text-md"
+                        : itemD.size === "normal"
+                        ? "text-lg"
+                        : "text-xl"
+                    } text-${itemD.newColor}`}
+                  >
+                    {li}
+                  </label>
                 </li>
               );
             })}

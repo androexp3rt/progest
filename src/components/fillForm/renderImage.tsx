@@ -3,9 +3,10 @@ import Image from "next/image";
 
 type Props = {
   itemD: FormItemDetails;
+  preview?: boolean;
 };
 
-export default function RenderImage({ itemD }: Props) {
+export default function RenderImage({ itemD, preview }: Props) {
   return (
     <div className="w-full flex flex-col items-start justify-start space-y-2">
       <p

@@ -33,9 +33,15 @@ export default function Users() {
   const getUsers = async () => {
     setLoadingUsers(true);
     try {
-      const response = await axios.get(`/api/getUsersByCompany/${companyName}`);
-      if (response.data.success) {
-        setUsers(response.data.users);
+      const responseStream = await fetch(
+        `/api/getUsersByCompany/${companyName}`,
+        {
+          cache: "no-store",
+        }
+      );
+      const response = await responseStream.json();
+      if (response.success) {
+        setUsers(response.users);
       } else {
         setUsers([]);
       }
@@ -47,14 +53,18 @@ export default function Users() {
     }
   };
   useEffect(() => {
-    const getCompanyUsers = async () => {
+    const getAllUsers = async () => {
       setLoadingUsers(true);
       try {
-        const response = await axios.get(
-          `/api/getUsersByCompany/${companyName}`
+        const responseStream = await fetch(
+          `/api/getUsersByCompany/${companyName}`,
+          {
+            cache: "no-store",
+          }
         );
-        if (response.data.success) {
-          setUsers(response.data.users);
+        const response = await responseStream.json();
+        if (response.success) {
+          setUsers(response.users);
         } else {
           setUsers([]);
         }
@@ -65,7 +75,7 @@ export default function Users() {
         setLoadingUsers(false);
       }
     };
-    getCompanyUsers();
+    getAllUsers();
   }, [session, companyName]);
 
   const showCreateUserForm = () => {

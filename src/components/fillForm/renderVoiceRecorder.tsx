@@ -1,10 +1,11 @@
 import { FormItemDetails } from "@/types/types";
 import { useEffect, useRef, useState } from "react";
-import { FormState } from "./fillForm";
+import { FormState } from "@/types/types";
 
 type Props = {
   itemD: FormItemDetails;
   formState: FormState;
+  preview?: boolean;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 };
 
@@ -12,6 +13,7 @@ export default function RenderVoiceRecorder({
   itemD,
   formState,
   setFormState,
+  preview,
 }: Props) {
   const [recordedChunks, setRecordedChunks] = useState<Blob[]>([]);
   const [audioUrl, setAudioUrl] = useState("");
@@ -20,6 +22,7 @@ export default function RenderVoiceRecorder({
   const audioRef = useRef<HTMLAudioElement | null>(null);
   useEffect(() => {
     if (
+      !preview &&
       (formState[itemD.newTitle] as Blob[]) &&
       (formState[itemD.newTitle] as Blob[]).length > 0
     ) {
@@ -28,7 +31,7 @@ export default function RenderVoiceRecorder({
       const audioUrl = URL.createObjectURL(blob);
       setAudioUrl(audioUrl);
     }
-  }, [formState, itemD.newTitle]);
+  }, [formState, itemD.newTitle, preview]);
   useEffect(() => {
     setRecordedChunks([]);
   }, [audioUrl]);
@@ -69,25 +72,33 @@ export default function RenderVoiceRecorder({
       >
         {itemD.newTitle} :
       </p>
-      <div className="w-full flex items-center justify-start space-x-2">
-        <button
-          type="button"
-          onClick={startRecording}
-          disabled={isRecording}
-          className={`p-2 rounded-lg text-white bg-green-500 disabled:bg-green-200`}
-        >
-          Record
-        </button>
-        <button
-          type="button"
-          onClick={stopRecording}
-          disabled={!isRecording}
-          className={`p-2 rounded-lg text-white bg-red-500 disabled:bg-red-200`}
-        >
-          Stop
-        </button>
-        {audioUrl && <audio ref={audioRef} src={audioUrl} controls />}
-      </div>
+      {preview ? (
+        <div>
+          {formState[itemD.newTitle] && (
+            <audio src={formState[itemD.newTitle] as string} controls />
+          )}
+        </div>
+      ) : (
+        <div className="w-full flex items-center justify-start space-x-2">
+          <button
+            type="button"
+            onClick={startRecording}
+            disabled={isRecording}
+            className={`p-2 rounded-lg text-white bg-green-500 disabled:bg-green-200`}
+          >
+            Record
+          </button>
+          <button
+            type="button"
+            onClick={stopRecording}
+            disabled={!isRecording}
+            className={`p-2 rounded-lg text-white bg-red-500 disabled:bg-red-200`}
+          >
+            Stop
+          </button>
+          {audioUrl && <audio ref={audioRef} src={audioUrl} controls />}
+        </div>
+      )}
     </div>
   );
 }

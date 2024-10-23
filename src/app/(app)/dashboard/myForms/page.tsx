@@ -12,6 +12,7 @@ import CreateForm from "@/components/createForm/createForm";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { FilledForm } from "@/model/filledForm";
+import PreviewFilledForm from "@/components/previewFilledForm";
 
 export default function Forms() {
   const [forms, setForms] = useState<Form[]>([]);
@@ -31,19 +32,27 @@ export default function Forms() {
   const [eFormName, setEFormName] = useState("");
   const [showModifyFormModal, setShowModifyFormModal] = useState(false);
   const [eCompanyName, setECompanyName] = useState("");
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [recordToPreview, setRecordToPreview] = useState<FormItemDetails[]>([]);
+  const [recordState, setRecordState] = useState<FormState>({});
+  const [recordTitle, setRecordTitle] = useState("");
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
   const email: string = session?.user.email;
   const role: string = session?.user.role;
 
-  const getFilledForms = useCallback(async (formName: string) => {
+  const getFilledForms = async (formName: string) => {
     setLoadingFilledForms(true);
     try {
-      const response = await axios.get(
-        `/api/getFilledForms/${formName}/${companyName}`
+      const responseStream = await fetch(
+        `/api/getFilledForms/${formName}/${companyName}`,
+        {
+          cache: "no-store",
+        }
       );
-      if (response.data.success) {
-        const userForms = response.data.forms.filter(
+      const response = await responseStream.json();
+      if (response.success) {
+        const userForms = response.forms.filter(
           (f: FilledForm) => f.filledBy === email
         );
         setFilledForms((prevFilledForms) => ({
@@ -65,33 +74,22 @@ export default function Forms() {
     } finally {
       setLoadingFilledForms(false);
     }
-  }, []);
-  // const getForms = async () => {
-  //   setLoadingForms(true);
-  //   try {
-  //     const response = await axios.get(`/api/getFormsByCompany/${companyName}`);
-  //     if (response.data.success) {
-  //       setForms(response.data.forms);
-  //     } else {
-  //       setForms([]);
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     setForms([]);
-  //   } finally {
-  //     setLoadingForms(false);
-  //   }
-  // };
+  };
+
   useEffect(() => {
     const getCompanyForms = async () => {
       setLoadingForms(true);
       try {
-        const response = await axios.get(
-          `/api/getFormsByCompany/${companyName}`
+        const responseStream = await fetch(
+          `/api/getFormsByCompany/${companyName}`,
+          {
+            cache: "no-store",
+          }
         );
-        if (response.data.success) {
-          setForms(response.data.forms);
-          response.data.forms.map((form: Form) => {
+        const response = await responseStream.json();
+        if (response.success) {
+          setForms(response.forms);
+          response.forms.map((form: Form) => {
             getFilledForms(form.title);
           });
         }
@@ -104,20 +102,6 @@ export default function Forms() {
     getCompanyForms();
   }, [session, companyName, getFilledForms]);
 
-  // const deleteForm = async (id: unknown) => {
-  //   try {
-  //     const res = await axios.post("/api/deleteFormById", { id });
-  //     if (res.data.success) {
-  //       toast(res.data.message, { type: "success" });
-  //       getForms();
-  //     } else {
-  //       toast(res.data.message, { type: "error" });
-  //     }
-  //   } catch (error) {
-  //     console.log(error);
-  //     toast("Error deleting Form", { type: "error" });
-  //   }
-  // };
   const displayFormToFill = ({
     title,
     fid,
@@ -128,6 +112,12 @@ export default function Forms() {
     setFormToFillTitle(title);
     setFormToFill(fid);
     setShowFillFormModal(true);
+  };
+  const previewRecord = (record: FilledForm) => {
+    setRecordState(record.formState);
+    setRecordTitle(record.title);
+    setRecordToPreview(record.formItemDetails);
+    setShowPreviewModal(true);
   };
   const deleteFilledForm = async (id: unknown, formName: string) => {
     try {
@@ -225,7 +215,7 @@ export default function Forms() {
                             (filledForms[form.title] &&
                               filledForms[form.title]!.length === 0)
                           }
-                          className="p-2 flex items-center justify-center space-x-2 bg-white/50 rounded-lg disabled:text-gray-200"
+                          className="p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
                           onClick={() => {
                             if (
                               showRecords &&
@@ -261,13 +251,13 @@ export default function Forms() {
                           />
                         </button>
                         <button
-                          className="p-2 bg-white/50 rounded-lg"
+                          className="p-2 bg-white rounded-lg"
                           onClick={() => exportAllRecordsToExcel(form.title)}
                         >
                           Export
                         </button>
                         <button
-                          className="p-2 bg-white/50 rounded-lg"
+                          className="p-2 bg-white rounded-lg"
                           onClick={() =>
                             displayFormToFill({
                               title: form.title,
@@ -278,7 +268,7 @@ export default function Forms() {
                           Fill Form
                         </button>
                         <button
-                          className="p-2 bg-white/50 rounded-lg"
+                          className="p-2 bg-white rounded-lg"
                           onClick={() => {
                             setEFormItemDetails(form.formItemDetails);
                             setEFormItems(form.formItems);
@@ -291,7 +281,7 @@ export default function Forms() {
                           <i className="fa fa-edit" />
                         </button>
                         {/* <button
-                        className="p-2 flex items-center justify-center space-x-2 bg-white/50 rounded-lg disabled:text-gray-200"
+                        className="p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
                         onClick={() => deleteForm(form._id)}
                       >
                         <i className="fa fa-trash" />
@@ -332,7 +322,13 @@ export default function Forms() {
                               </span>
                               <span className="w-[50%] flex items-center justify-center space-x-2">
                                 <button
-                                  className="p-2 bg-white/50 rounded-lg"
+                                  className="p-2 bg-white rounded-lg"
+                                  onClick={() => previewRecord(record)}
+                                >
+                                  Preview
+                                </button>
+                                <button
+                                  className="p-2 bg-white rounded-lg"
                                   onClick={() =>
                                     exportToExcel(
                                       record.formState,
@@ -343,7 +339,7 @@ export default function Forms() {
                                   Export to Excel
                                 </button>
                                 <button
-                                  className="p-2 bg-white/50 rounded-lg"
+                                  className="p-2 bg-white rounded-lg"
                                   onClick={() =>
                                     deleteFilledForm(record._id, record.title)
                                   }
@@ -373,6 +369,15 @@ export default function Forms() {
           setFormItemDetails={setFormToFill}
           formToFillTitle={formToFillTitle}
           setFormToFillTitle={setFormToFillTitle}
+        />
+        <PreviewFilledForm
+          showPreviewModal={showPreviewModal}
+          setShowPreviewModal={setShowPreviewModal}
+          formItemDetails={recordToPreview}
+          setFormItemDetails={setRecordToPreview}
+          recordState={recordState}
+          formToFillTitle={recordTitle}
+          setFormToFillTitle={setRecordTitle}
         />
         <div
           className={`${

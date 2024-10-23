@@ -1,9 +1,10 @@
 import { FormItemDetails } from "@/types/types";
-import { FormState } from "./fillForm";
+import { FormState } from "@/types/types";
 
 type Props = {
   itemD: FormItemDetails;
   formState: FormState;
+  preview?: boolean;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 };
 
@@ -11,6 +12,7 @@ export default function RenderChoice({
   itemD,
   formState,
   setFormState,
+  preview,
 }: Props) {
   return (
     <div className="w-full flex flex-col items-start justify-start space-y-2">
@@ -41,6 +43,8 @@ export default function RenderChoice({
           >
             <input
               type="radio"
+              className="w-5 h-5 text-blue-600 bg-gray-100"
+              disabled={preview}
               checked={(formState[itemD.newTitle] as string) === li}
               name={itemD.newTitle}
               id={`s${li}`}

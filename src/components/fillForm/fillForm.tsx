@@ -13,22 +13,19 @@ import RenderInputField from "./renderInputField";
 import RenderTextArea from "./renderTextArea";
 import RenderDateTime from "./renderDate&Time";
 import RenderCheckbox from "./renderCheckbox";
-import axios from "axios";
 import { Loader2 } from "lucide-react";
-
-export interface FormState {
-  [key: string]: string | boolean | string[] | File[] | Blob[] | string[][];
-}
+import { SaveFilledForm } from "@/lib/saveFilledForm";
+import { FormState } from "@/types/types";
 
 type Props = {
   email: string;
   companyName: string;
   showFillFormModal: boolean;
-  setShowFillFormModal: (showFillFormModal: boolean) => void;
+  setShowFillFormModal: React.Dispatch<React.SetStateAction<boolean>>;
   formItemDetails: FormItemDetails[];
-  setFormItemDetails: (formItemDetails: FormItemDetails[]) => void;
+  setFormItemDetails: React.Dispatch<React.SetStateAction<FormItemDetails[]>>;
   formToFillTitle: string;
-  setFormToFillTitle: (formToFillTitle: string) => void;
+  setFormToFillTitle: React.Dispatch<React.SetStateAction<string>>;
 };
 export default function FillForm({
   email,
@@ -42,6 +39,7 @@ export default function FillForm({
 }: Props) {
   const [formState, setFormState] = useState<FormState>({});
   const [isSavingForm, setIsSavingForm] = useState(false);
+
   useEffect(() => {
     const initState: FormState = {};
     formItemDetails.map((itemD) => {
@@ -108,9 +106,9 @@ export default function FillForm({
     <div
       className={`${
         showFillFormModal ? "" : "hidden"
-      } fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex items-start justify-center overflow-scroll`}
+      } fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex items-center justify-center`}
     >
-      <form className="max-w-[90vw] bg-gray-500 p-6 rounded-lg shadow-lg flex flex-col items-start justify-start space-y-5">
+      <form className="min-w-md max-w-[90vw] max-h-[90vh] bg-gradient-to-br from-blue-300 to-blue-500 p-6 rounded-lg shadow-lg flex flex-col items-start justify-start space-y-5 overflow-scroll">
         <h1 className="w-full text-center text-2xl font-bold">
           {formToFillTitle}
         </h1>
@@ -282,30 +280,108 @@ export default function FillForm({
               }
               // save the form
               try {
-                const response = await axios.post("/api/saveFilledForm", {
-                  title: formToFillTitle,
-                  filledBy: email,
-                  formItemDetails,
-                  formState,
-                  companyName,
+                const recordData = new FormData();
+                formItemDetails.map((itemD) => {
+                  if (itemD.title === "Voice Recorder") {
+                    const blob = new Blob(formState[itemD.newTitle] as Blob[], {
+                      type: "audio/mpeg",
+                    });
+                    recordData.append(`${itemD.newTitle}`, blob);
+                  } else if (
+                    itemD.title === "Photo" ||
+                    itemD.title === "Attached file"
+                  ) {
+                    (formState[itemD.newTitle] as File[]).map((file, i) => {
+                      recordData.append(`${itemD.newTitle}[${i}]`, file);
+                    });
+                  } else if (itemD.title === "List") {
+                    if (itemD.listMultipleSelection) {
+                      (formState[itemD.newTitle] as string[]).map((str, i) => {
+                        recordData.append(`${itemD.newTitle}[${i}]`, str);
+                      });
+                    } else {
+                      recordData.append(
+                        `${itemD.newTitle}`,
+                        formState[itemD.newTitle] as string
+                      );
+                    }
+                  } else if (itemD.title === "Table") {
+                    recordData.append(
+                      `${itemD.newTitle}RowCount`,
+                      formState[`${itemD.newTitle}RowCount`] as string
+                    );
+                    (formState[itemD.newTitle] as string[][]).map(
+                      (rowArr, index) => {
+                        rowArr.map((tablecol, i) => {
+                          if (
+                            index <
+                            parseInt(
+                              formState[`${itemD.newTitle}RowCount`] as string
+                            )
+                          ) {
+                            console.log(tablecol);
+                            recordData.append(
+                              `${itemD.newTitle}[${index}][${i}]`,
+                              tablecol
+                            );
+                          }
+                        });
+                      }
+                    );
+                  } else {
+                    recordData.append(
+                      `${itemD.newTitle}`,
+                      formState[itemD.newTitle] as string
+                    );
+                  }
                 });
-                if (response.data.success) {
-                  toast("Record saved Successfully", { type: "success" });
+                const response = await SaveFilledForm(
+                  companyName,
+                  formToFillTitle,
+                  recordData,
+                  formItemDetails,
+                  email
+                );
+                if (response.success) {
+                  toast(response.message, { type: "success" });
                   setFormItemDetails([]);
                   setShowFillFormModal(false);
                 } else {
-                  toast("Error saving the form, Please try again", {
-                    type: "error",
-                  });
+                  toast(response.message, { type: "error" });
                 }
               } catch (error) {
                 console.log(error);
-                toast("Error saving the form, Please try again", {
+                toast("Error saving the Record, Please try again", {
                   type: "error",
                 });
               } finally {
                 setIsSavingForm(false);
               }
+              // try {
+              //   const response = await axios.post("/api/saveFilledForm", {
+              //     title: formToFillTitle,
+              //     filledBy: email,
+              //     formItemDetails,
+              //     formState,
+              //     companyName,
+              //   });
+              //   if (response.data.success) {
+              //     toast("Record saved Successfully", { type: "success" });
+              //     setFormItemDetails([]);
+              //     setShowFillFormModal(false);
+              //   } else {
+              //     toast("Error saving the form, Please try again", {
+              //       type: "error",
+              //     });
+              //   }
+              // } catch (error) {
+              //   console.log(error);
+              //   toast("Error saving the form, Please try again", {
+              //     type: "error",
+              //   });
+              // } finally {
+              //   setIsSavingForm(false);
+              // }
             }}
           >
             {isSavingForm ? (

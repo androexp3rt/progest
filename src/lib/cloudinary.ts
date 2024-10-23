@@ -1,7 +1,7 @@
 import { v2 as cloudinary, UploadApiResponse } from "cloudinary";
 
 // Upload an image
-export const uploadOnCloudinary = async (buffer: Uint8Array) => {
+export const uploadStreamOnCloudinary = async (buffer: Uint8Array) => {
   // Configuration
   cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -11,7 +11,7 @@ export const uploadOnCloudinary = async (buffer: Uint8Array) => {
   const result = await new Promise<UploadApiResponse | undefined>(
     (resolve, reject) => {
       cloudinary.uploader
-        .upload_stream({}, (error, result) => {
+        .upload_stream({ resource_type: "auto" }, (error, result) => {
           if (error) {
             return reject(error);
           }
@@ -22,6 +22,20 @@ export const uploadOnCloudinary = async (buffer: Uint8Array) => {
   );
   return result;
 };
+// export const uploadFileOnCloudinary = async (file: File) => {
+//   // Configuration
+//   cloudinary.config({
+//     cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+//     api_key: process.env.CLOUDINARY_API_KEY,
+//     api_secret: process.env.CLOUDINARY_API_SECRET,
+//   });
+//   const url = URL.createObjectURL(file);
+//   const result = await cloudinary.uploader.upload(url).catch((error) => {
+//     console.log(error);
+//   });
+//   console.log(result);
+//   return result;
+// };
 // // Optimize delivery by resizing and applying auto-format and auto-quality
 // const optimizeUrl = cloudinary.url("shoes", {
 //   fetch_format: "auto",

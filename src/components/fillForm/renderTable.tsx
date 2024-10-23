@@ -1,15 +1,21 @@
 import { FormItemDetails } from "@/types/types";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { FormState } from "./fillForm";
+import { FormState } from "@/types/types";
 
 type Props = {
   itemD: FormItemDetails;
   formState: FormState;
+  preview?: boolean;
   setFormState: React.Dispatch<React.SetStateAction<FormState>>;
 };
 
-export default function RenderTable({ itemD, formState, setFormState }: Props) {
+export default function RenderTable({
+  itemD,
+  formState,
+  setFormState,
+  preview,
+}: Props) {
   const [rowCount, setRowCount] = useState(1);
   const rowArray = [];
   for (let i = 1; i <= rowCount; i++) {
@@ -62,26 +68,37 @@ export default function RenderTable({ itemD, formState, setFormState }: Props) {
                         key={index}
                         className={`w-1/${itemD.tableCols?.length} text-center border border-black p-2 overflow-hidden`}
                       >
-                        <input
-                          type="text"
-                          className="w-full bg-gray-200 rounded-lg outline-none p-2"
-                          id={`${col}${row}`}
-                          defaultValue={
-                            (formState[itemD.newTitle] as string[][])?.[
-                              row - 1
-                            ][index]
-                          }
-                          onChange={(e) => {
-                            const updatedTableState: string[][] = [
-                              ...(formState[itemD.newTitle] as string[][]),
-                            ];
-                            updatedTableState[row - 1][index] = e.target.value;
-                            setFormState({
-                              ...formState,
-                              [itemD.newTitle]: updatedTableState,
-                            });
-                          }}
-                        />
+                        {preview ? (
+                          <span className={`text-${itemD.newColor}`}>
+                            {
+                              (formState[itemD.newTitle] as string[][])?.[
+                                row - 1
+                              ][index]
+                            }
+                          </span>
+                        ) : (
+                          <input
+                            type="text"
+                            className="w-full bg-gray-200 rounded-lg outline-none p-2"
+                            id={`${col}${row}`}
+                            defaultValue={
+                              (formState[itemD.newTitle] as string[][])?.[
+                                row - 1
+                              ][index]
+                            }
+                            onChange={(e) => {
+                              const updatedTableState: string[][] = [
+                                ...(formState[itemD.newTitle] as string[][]),
+                              ];
+                              updatedTableState[row - 1][index] =
+                                e.target.value;
+                              setFormState({
+                                ...formState,
+                                [itemD.newTitle]: updatedTableState,
+                              });
+                            }}
+                          />
+                        )}
                       </td>
                     );
                   })}
@@ -91,27 +108,29 @@ export default function RenderTable({ itemD, formState, setFormState }: Props) {
           </tbody>
         </table>
       </div>
-      <button
-        type="button"
-        className="p-2 bg-black text-white rounded-lg"
-        onClick={() => {
-          if (rowCount === itemD.tableMaxRows) {
-            return toast(
-              `Maximum ${itemD.tableMaxRows} rows are allowed in ${itemD.newTitle}`,
-              { type: "error" }
-            );
-          }
-          setRowCount(rowCount + 1);
-          setFormState((prev) => {
-            return {
-              ...prev,
-              [`${itemD.newTitle}RowCount`]: String(rowCount + 1),
-            };
-          });
-        }}
-      >
-        Add Row
-      </button>
+      {!preview && (
+        <button
+          type="button"
+          className="p-2 bg-black text-white rounded-lg"
+          onClick={() => {
+            if (rowCount === itemD.tableMaxRows) {
+              return toast(
+                `Maximum ${itemD.tableMaxRows} rows are allowed in ${itemD.newTitle}`,
+                { type: "error" }
+              );
+            }
+            setRowCount(rowCount + 1);
+            setFormState((prev) => {
+              return {
+                ...prev,
+                [`${itemD.newTitle}RowCount`]: String(rowCount + 1),
+              };
+            });
+          }}
+        >
+          Add Row
+        </button>
+      )}
     </div>
   );
 }

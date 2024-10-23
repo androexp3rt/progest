@@ -1,4 +1,4 @@
-import { FormState } from "@/components/fillForm/fillForm";
+import { FormState } from "@/types/types";
 import { FormItemDetails } from "@/types/types";
 import mongoose, { Schema, Document } from "mongoose";
 

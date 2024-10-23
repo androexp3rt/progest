@@ -359,56 +359,80 @@ export default function CreateForm({
       return setIsSavingForm(false);
     }
     const validationErrors: string[] = [];
+    formItemDetails.map((itemD) => {
+      if (itemD.title === "Input field") {
+        if (itemD.type === "") {
+          validationErrors.push(`Type of ${itemD.newTitle} is Required`);
+        }
+      } else if (itemD.title === "Date & Time") {
+        if (itemD.type === "") {
+          validationErrors.push(`Type of ${itemD.newTitle} is Required`);
+        }
+      } else if (itemD.title === "List") {
+        if (itemD.listItems!.length === 0) {
+          validationErrors.push(
+            `There should be atlest one list item in ${itemD.newTitle}`
+          );
+        }
+      } else if (itemD.title === "Choice") {
+        if (itemD.listItems!.length === 0) {
+          validationErrors.push(
+            `There should be atlest one item to choose in ${itemD.newTitle}`
+          );
+        }
+      } else if (itemD.title === "Photo") {
+        if (itemD.maxPicSize === 0) {
+          validationErrors.push(
+            `Maximum size of Photo is required in ${itemD.newTitle}`
+          );
+        }
+        if (itemD.multiplePics) {
+          if (itemD.maxPics === 0) {
+            validationErrors.push(
+              `Maximum number of Photos is required in ${itemD.newTitle}`
+            );
+          }
+        }
+      } else if (itemD.title === "Table") {
+        if (
+          itemD.tableCols!.length === 0 ||
+          (itemD.tableCols!.length === 1 && itemD.tableCols![0] === "S.No.")
+        ) {
+          validationErrors.push(
+            `There should be atleast one column in ${itemD.newTitle}`
+          );
+        }
+      } else if (itemD.title === "Image") {
+        if (itemD.imageFiles!.length === 0) {
+          validationErrors.push(
+            `There should be atleast one image in ${itemD.newTitle}`
+          );
+        }
+      } else if (itemD.title === "Calculation") {
+        if (itemD.type === "") {
+          validationErrors.push(`Type of ${itemD.newTitle} is required`);
+        }
+        if (itemD.calcInput1 === "") {
+          validationErrors.push(
+            `Calculation input 1 is required in ${itemD.newTitle}`
+          );
+        }
+        if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
+          validationErrors.push(
+            `Calculation input 2 is required in ${itemD.newTitle}`
+          );
+        }
+      }
+    });
+    if (validationErrors.length > 0) {
+      toast(validationErrors.join(",\n"), { type: "error" });
+      setIsSavingForm(false);
+      return;
+    }
+    // save the form
     await Promise.all(
       formItemDetails.map(async (itemD) => {
-        if (itemD.title === "Input field") {
-          if (itemD.type === "") {
-            validationErrors.push(`Type of ${itemD.newTitle} is Required`);
-          }
-        } else if (itemD.title === "Date & Time") {
-          if (itemD.type === "") {
-            validationErrors.push(`Type of ${itemD.newTitle} is Required`);
-          }
-        } else if (itemD.title === "List") {
-          if (itemD.listItems!.length === 0) {
-            validationErrors.push(
-              `There should be atlest one list item in ${itemD.newTitle}`
-            );
-          }
-        } else if (itemD.title === "Choice") {
-          if (itemD.listItems!.length === 0) {
-            validationErrors.push(
-              `There should be atlest one item to choose in ${itemD.newTitle}`
-            );
-          }
-        } else if (itemD.title === "Photo") {
-          if (itemD.maxPicSize === 0) {
-            validationErrors.push(
-              `Maximum size of Photo is required in ${itemD.newTitle}`
-            );
-          }
-          if (itemD.multiplePics) {
-            if (itemD.maxPics === 0) {
-              validationErrors.push(
-                `Maximum number of Photos is required in ${itemD.newTitle}`
-              );
-            }
-          }
-        } else if (itemD.title === "Table") {
-          if (
-            itemD.tableCols!.length === 0 ||
-            (itemD.tableCols!.length === 1 && itemD.tableCols![0] === "S.No.")
-          ) {
-            validationErrors.push(
-              `There should be atleast one column in ${itemD.newTitle}`
-            );
-          }
-        } else if (itemD.title === "Image") {
-          if (itemD.imageFiles!.length === 0) {
-            validationErrors.push(
-              `There should be atleast one image in ${itemD.newTitle}`
-            );
-          }
+        if (itemD.title === "Image") {
           const imageFormData = new FormData();
           itemD.imageFiles!.forEach((file, index) => {
             imageFormData.append(`file${index}`, file);
@@ -422,29 +446,9 @@ export default function CreateForm({
             itemD.imageFileNames!.splice(index, 1, url);
             itemD.imageFiles!.splice(0, 1);
           });
-        } else if (itemD.title === "Calculation") {
-          if (itemD.type === "") {
-            validationErrors.push(`Type of ${itemD.newTitle} is required`);
-          }
-          if (itemD.calcInput1 === "") {
-            validationErrors.push(
-              `Calculation input 1 is required in ${itemD.newTitle}`
-            );
-          }
-          if (itemD.calcInput2 === "" || itemD.calcInput2 === "0") {
-            validationErrors.push(
-              `Calculation input 2 is required in ${itemD.newTitle}`
-            );
-          }
         }
       })
     );
-    if (validationErrors.length > 0) {
-      toast(validationErrors.join(",\n"), { type: "error" });
-      setIsSavingForm(false);
-      return;
-    }
-    // save the form
     try {
       let response;
       if (!setShowModifyFormModal) {
