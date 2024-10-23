@@ -1,10 +1,9 @@
 import { FormItemDetails } from "@/types/types";
 import RenderList from "./fillForm/renderList";
-import { toast } from "react-toastify";
 import { useEffect, useState } from "react";
 import RenderChoice from "./fillForm/renderChoice";
 import RenderPhoto from "./fillForm/renderPhoto";
-import VoiceRecorder from "./fillForm/renderVoiceRecorder";
+import RenderVoiceRecorder from "./fillForm/renderVoiceRecorder";
 import RenderAttachedFile from "./fillForm/renderAttachedFile";
 import RenderTable from "./fillForm/renderTable";
 import RenderImage from "./fillForm/renderImage";
@@ -13,10 +12,7 @@ import RenderInputField from "./fillForm/renderInputField";
 import RenderTextArea from "./fillForm/renderTextArea";
 import RenderDateTime from "./fillForm/renderDate&Time";
 import RenderCheckbox from "./fillForm/renderCheckbox";
-import { Loader2 } from "lucide-react";
-import { SaveFilledForm } from "@/lib/saveFilledForm";
 import { FormState } from "@/types/types";
-import RenderVoiceRecorder from "./fillForm/renderVoiceRecorder";
 
 type Props = {
   showPreviewModal: boolean;

@@ -1,6 +1,6 @@
 import { FormItemDetails } from "@/types/types";
 import { FormState } from "@/types/types";
-import { useEffect, useRef, useState } from "react";
+import { useRef } from "react";
 import Image from "next/image";
 import { toast } from "react-toastify";
 import Link from "next/link";

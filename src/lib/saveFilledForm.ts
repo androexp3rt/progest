@@ -84,7 +84,7 @@ export const SaveFilledForm = async (
         );
         recordState[itemD.newTitle] = url;
       } else if (itemD.title === "Table") {
-        let tableRowCount = parseInt(
+        const tableRowCount = parseInt(
           recordData.get(`${itemD.newTitle}RowCount`) as string
         );
         entries.forEach((entry) => {
@@ -94,7 +94,7 @@ export const SaveFilledForm = async (
         });
         const table: string[][] = [];
         for (let i = 0; i < tableRowCount; i++) {
-          let rowArr: string[] = [];
+          const rowArr: string[] = [];
           for (let j = 0; j < tableColCount; j++) {
             rowArr.push(
               recordData.get(`${itemD.newTitle}[${i}][${j}]`) as string

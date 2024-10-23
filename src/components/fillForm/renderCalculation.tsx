@@ -14,7 +14,6 @@ export default function RenderCalculation({
   itemD,
   formState,
   setFormState,
-  preview,
 }: Props) {
   const calcInput1 = formState[itemD.calcInput1!] ?? "";
   const calcInput2 = formState[itemD.calcInput2!] ?? "";
