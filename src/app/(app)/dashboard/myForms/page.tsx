@@ -100,7 +100,7 @@ export default function Forms() {
       }
     };
     getCompanyForms();
-  }, [session, companyName, getFilledForms]);
+  }, [session, companyName]);
 
   const displayFormToFill = ({
     title,

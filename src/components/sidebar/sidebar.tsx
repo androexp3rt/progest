@@ -25,19 +25,19 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
   };
 
   return (
-    <div className="relative w-full h-full flex flex-col justify-start items-center px-2 py-5 space-y-5 bg-black text-white shadow-md overflow-hidden">
-      <div className="w-full h-12 flex items-center justify-end">
-        <span
-          className="w-10 h-10 flex items-center justify-center rounded-full border border-2 border-white"
-          onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-        >
-          <i
-            className={`fa-solid fa-arrow-left text-2xl transform ${
-              isSidebarOpen ? "" : "rotate-180"
-            }`}
-          />
-        </span>
-      </div>
+    <div
+      className={`relative w-full h-full flex flex-col justify-start items-center px-2 py-5 space-y-5 bg-black text-white shadow-md`}
+    >
+      <span
+        className={`w-10 h-10 self-end flex items-center justify-center rounded-full border border-2 border-white`}
+        onClick={() => setIsSidebarOpen(!isSidebarOpen)}
+      >
+        <i
+          className={`fa-solid fa-arrow-left text-white text-2xl transform ${
+            isSidebarOpen ? "" : "rotate-180"
+          }`}
+        />
+      </span>
       <h1 className="max-sm:text-lg w-full text-2xl text-center pb-20 whitespace-nowrap overflow-hidden text-ellipsis">
         {companyName ?? "companyName"}
       </h1>

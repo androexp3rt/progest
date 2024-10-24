@@ -10,20 +10,18 @@ export default function RootLayout({
   const [isSidebarOpen, setIsSidebarOpen] = useState(true);
   return (
     <main className="w-full h-[calc(100vh-theme(space.20))] flex">
-      <div
-        className={`${isSidebarOpen ? "w-60" : "w-16"} h-full overflow-hidden`}
-      >
+      <div className={`h-full transform ${isSidebarOpen ? "w-60" : "w-16"}`}>
         <Sidebar
           isSidebarOpen={isSidebarOpen}
           setIsSidebarOpen={setIsSidebarOpen}
         />
       </div>
       <div
-        className={`${
+        className={`h-full overflow-hidden transform ${
           isSidebarOpen
             ? "w-[calc(100%-theme(space.60))]"
             : "w-[calc(100%-theme(space.16))]"
-        } h-full overflow-hidden`}
+        }`}
       >
         {children}
       </div>
