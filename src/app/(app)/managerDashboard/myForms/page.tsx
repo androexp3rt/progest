@@ -371,7 +371,7 @@ export default function Forms() {
                                 {record.filledBy}
                               </span>
                               <span className="max-sm:w-[48%] w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
-                                {record.createdAt.toString()}
+                                {record.createdAt.toString().slice(0, 16)}
                               </span>
                             </div>
                             <div className="max-sm:w-full w-[50%] flex items-center justify-center space-x-2">
