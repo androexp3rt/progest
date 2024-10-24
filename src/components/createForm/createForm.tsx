@@ -500,9 +500,9 @@ export default function CreateForm({
       >
         {eFormName === "" ? "Create a form" : `Edit ${eFormName}`}
       </h1>
-      <div className="w-full bg-gray-100 p-4 rounded-lg space-y-2">
-        <div className="w-full flex items-center p-4 bg-white rounded-lg">
-          <div className="w-1/2 flex justify-between">
+      <div className="w-full bg-gray-100 p-4 rounded-lg space-y-2 overflow-auto max-sm:text-xs max-sm:mb-5">
+        <div className="w-full flex max-sm:flex-col items-center p-4 bg-white rounded-lg">
+          <div className="max-sm:w-full w-1/2 flex justify-between">
             <label className="text-md font-semibold text-gray-800 mr-2">
               Form
             </label>
@@ -522,7 +522,7 @@ export default function CreateForm({
               </p>
             </div>
           </div>
-          <div className="w-1/2 flex items-center justify-end space-x-10 pl-20">
+          <div className="w-1/2 flex items-center justify-end space-x-10 pl-20 max-sm:hidden">
             <i className="fas fa-list text-green-500"></i>
             <i className="fas fa-users text-gray-400"></i>
             <i className="fas fa-file-export text-gray-400"></i>
@@ -531,9 +531,9 @@ export default function CreateForm({
             <i className="fas fa-search text-gray-400"></i>
           </div>
         </div>
-        <div className="w-full flex">
+        <div className="w-full flex max-sm:flex-col-reverse max-sm:gap-5">
           {/* Left Panel */}
-          <div className="w-1/2 flex flex-col">
+          <div className="max-sm:w-full sm:w-1/2 flex flex-col">
             <div
               id="leftPanel"
               className="w-full h-[300px] bg-gray-200 rounded-lg shadow space-y-1 overflow-auto"
@@ -607,7 +607,7 @@ export default function CreateForm({
             </div>
           </div>
           {/* Right Panel */}
-          <div className="w-1/2 ml-4">
+          <div className="max-sm:w-full w-1/2 sm:ml-4">
             <div className="grid grid-cols-3 gap-2">
               {fields.map((f, index) => (
                 <button

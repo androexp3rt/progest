@@ -7,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import BoxIcon from "@/components/boxIcon";
 import { Form, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import * as z from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -116,10 +115,13 @@ export default function AdminDashboard() {
 
   return (
     <div className="w-full h-full flex flex-col bg-background bg-auto bg-no-repeat bg-center">
-      <div className="w-full h-full flex flex-col space-y-10 p-5 overflow-auto bg-gradient-to-br from-blue-600/50 to-blue-200/50">
+      <div className="w-full h-full flex flex-col space-y-10 max-sm:p-2 p-5 overflow-auto bg-gradient-to-br from-blue-600/50 to-blue-200/50">
         <h1 className="w-full text-center text-3xl font-bold">Users</h1>
-        <div className="flex flex-col items-center bg-white/30 backdrop-blur-sm rounded-lg p-2 space-y-5">
-          <Button className="max-w-md" onClick={showCreateUserForm}>
+        <div className="flex flex-col items-center bg-white/30 backdrop-blur-sm rounded-lg max-sm:px-1 max-sm:py-2 p-2 space-y-5 max-sm:text-xs">
+          <Button
+            className="max-w-md max-sm:text-xs"
+            onClick={showCreateUserForm}
+          >
             Create a new User
           </Button>
           <Form {...form}>
@@ -128,7 +130,7 @@ export default function AdminDashboard() {
               onSubmit={form.handleSubmit(onSubmit)}
               className="w-full flex flex-col items-center justify-between p-2 gap-2 hidden"
             >
-              <div className="w-full flex items-start justify-between font-bold p-2 gap-2 bg-[#FFEEAD] rounded-lg">
+              <div className="w-full flex max-sm:flex-col max-sm:items-center items-start justify-between font-bold p-2 gap-2 bg-[#FFEEAD] rounded-lg">
                 <FormField
                   name="companyName"
                   control={form.control}
@@ -215,15 +217,16 @@ export default function AdminDashboard() {
                 />
               </div>
               <div className="flex items-center justify-center gap-2">
-                <Button className="max-w-md" type="submit">
+                <Button className="max-w-md max-sm:text-xs" type="submit">
                   Submit
                 </Button>
-                <span
-                  className="max-w-md inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 bg-primary text-primary-foreground shadow hover:bg-primary/90 px-4 py-2"
+                <Button
+                  type="button"
+                  className="max-w-md max-sm:text-xs"
                   onClick={hideCreateUserForm}
                 >
                   Discard
-                </span>
+                </Button>
               </div>
             </form>
           </Form>
@@ -237,39 +240,46 @@ export default function AdminDashboard() {
             </div>
           ) : (
             <div className="w-full flex flex-col space-y-2">
-              <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 bg-amber-200 rounded-lg">
-                <span className="w-1/6">Company Name</span>
-                <span className="w-1/6">Role</span>
-                <span className="w-1/6">Name</span>
-                <span className="w-1/6">Email</span>
-                <span className="w-1/6">Password</span>
-                <span className="w-1/6">Actions</span>
+              <div className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:p-1 p-2 gap-2 bg-amber-200 rounded-lg">
+                <div className="max-sm:w-full sm:w-5/6 flex items-center justify-between">
+                  <span className="max-sm:w-1/5 w-1/6">Company Name</span>
+                  <span className="max-sm:w-1/5 w-1/6">Role</span>
+                  <span className="max-sm:w-1/5 w-1/6">Name</span>
+                  <span className="max-sm:w-1/5 w-1/6">Email</span>
+                  <span className="max-sm:w-1/5 w-1/6">Password</span>
+                </div>
+                <span className="max-sm:hidden w-1/6">Actions</span>
               </div>
               {users?.map((user, index) => {
                 return (
                   <div
                     key={index}
-                    className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 border border-black rounded-lg"
+                    className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 border border-black rounded-lg"
                   >
-                    <span className="w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
-                      {user.companyName}
-                    </span>
-                    <span className="w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
-                      {user.role}
-                    </span>
-                    <span className="w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
-                      {user.name}
-                    </span>
-                    <span className="w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
-                      {user.email}
-                    </span>
-                    <span className="w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
-                      {user.password}
-                    </span>
-                    <div className="w-1/6 flex justify-center items-center gap-2">
-                      <span onClick={() => deleteUser(user._id)}>
-                        <BoxIcon name="bx-trash" />
+                    <div className="max-sm:w-full sm:w-5/6 flex items-center justify-between text-center">
+                      <span className="max-sm:w-1/5 sm:w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
+                        {user.companyName}
                       </span>
+                      <span className="max-sm:w-1/5 sm:w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
+                        {user.role}
+                      </span>
+                      <span className="max-sm:w-1/5 sm:w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
+                        {user.name}
+                      </span>
+                      <span className="max-sm:w-1/5 sm:w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
+                        {user.email}
+                      </span>
+                      <span className="max-sm:w-1/5 sm:w-1/6 text-ellipsis whitespace-nowrap overflow-hidden">
+                        {user.password}
+                      </span>
+                    </div>
+                    <div className="max-sm:w-full sm:w-1/6 flex justify-center items-center gap-2">
+                      <button
+                        className="max-sm:p-1 sm:p-2 max-sm:rounded-md sm:rounded-lg bg-white"
+                        onClick={() => deleteUser(user._id)}
+                      >
+                        <i className="fa fa-trash" />
+                      </button>
                     </div>
                   </div>
                 );

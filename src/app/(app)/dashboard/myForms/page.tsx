@@ -172,50 +172,56 @@ export default function Forms() {
   }, [showFillFormModal, formToFillTitle, getFilledForms]);
   return (
     <div className="w-full h-full flex flex-col bg-background bg-auto bg-no-repeat bg-center">
-      <div className="w-full h-full flex flex-col space-y-5 p-5 bg-gradient-to-br from-blue-600/50 to-blue-200/50 overflow-auto">
+      <div className="w-full h-full flex flex-col space-y-5 max-sm:p-2 sm:p-5 bg-gradient-to-br from-blue-600/50 to-blue-200/50 overflow-auto">
         <h1 className="w-full text-center text-3xl font-bold">Forms</h1>
-        <div className="flex flex-col items-center bg-white/50 backdrop-blur-sm rounded-lg p-2 space-y-5">
+        <div className="flex flex-col items-center bg-white/50 backdrop-blur-sm rounded-lg max-sm:px-1 p-2 space-y-5">
           {loadingForms ? (
             <Loader2 className="animate-spin" />
           ) : forms.length === 0 ? (
             <div className="w-full flex flex-col space-y-2">
-              <p className="text-center text-xl font-bold">
+              <p className="text-center max-sm:text-md text-xl font-bold">
                 No Forms Found, Please Create a Form first
               </p>
             </div>
           ) : (
-            <div className="w-full flex flex-col space-y-2">
-              <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 bg-amber-200 rounded-lg">
-                <span className="w-[30%]">Name</span>
-                <span className="w-[10%]"># of Fields</span>
-                <span className="w-[10%]"># of Records</span>
-                <span className="flex-1">Actions</span>
+            <div className="w-full max-sm:text-xs flex flex-col space-y-2">
+              <div className="w-full flex items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 bg-amber-200 rounded-lg">
+                <div className="max-sm:w-full sm:w-[50%] flex items-center justify-between gap-2">
+                  <span className="max-sm:w-[50%] sm:w-[30%]">Name</span>
+                  <span className="max-sm:w-[25%] sm:w-[10%]"># of Fields</span>
+                  <span className="max-sm:w-[25%] sm:w-[10%]">
+                    # of Records
+                  </span>
+                </div>
+                <span className="max-sm:hidden sm:w-[50%]">Actions</span>
               </div>
               {forms?.map((form, index) => {
                 return (
                   <div key={index}>
-                    <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 border border-black rounded-lg">
-                      <span className="w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
-                        {form.title}
-                      </span>
-                      <span className="w-[10%] text-ellipsis whitespace-nowrap overflow-hidden">
-                        {form.formItems.length}
-                      </span>
-                      <span className="w-[10%] flex items-center justify-center text-center text-ellipsis whitespace-nowrap overflow-hidden">
-                        {loadingFilledForms ? (
-                          <Loader2 className="animate-spin" />
-                        ) : (
-                          filledForms[form.title]?.length ?? 0
-                        )}
-                      </span>
-                      <div className="flex-1 flex flex-wrap justify-center items-center gap-2">
+                    <div className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 border border-black rounded-lg">
+                      <div className="max-sm:w-full sm:w-[50%] flex items-center justify-between">
+                        <span className="max-sm:w-[50%] sm:w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
+                          {form.title}
+                        </span>
+                        <span className="max-sm:w-[25%] sm:w-[10%] text-ellipsis whitespace-nowrap overflow-hidden">
+                          {form.formItems.length}
+                        </span>
+                        <span className="max-sm:w-[25%] sm:w-[10%] flex items-center justify-center text-center text-ellipsis whitespace-nowrap overflow-hidden">
+                          {loadingFilledForms ? (
+                            <Loader2 className="animate-spin" />
+                          ) : (
+                            filledForms[form.title]?.length ?? 0
+                          )}
+                        </span>
+                      </div>
+                      <div className="max-sm:w-full sm:w-[50%] flex flex-wrap justify-center gap-2">
                         <button
                           disabled={
                             !filledForms[form.title] ||
                             (filledForms[form.title] &&
                               filledForms[form.title]!.length === 0)
                           }
-                          className="p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
+                          className="max-sm:p-1 sm:p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
                           onClick={() => {
                             if (
                               showRecords &&
@@ -251,13 +257,13 @@ export default function Forms() {
                           />
                         </button>
                         <button
-                          className="p-2 bg-white rounded-lg"
+                          className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
                           onClick={() => exportAllRecordsToExcel(form.title)}
                         >
                           Export
                         </button>
                         <button
-                          className="p-2 bg-white rounded-lg"
+                          className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
                           onClick={() =>
                             displayFormToFill({
                               title: form.title,
@@ -268,7 +274,7 @@ export default function Forms() {
                           Fill Form
                         </button>
                         <button
-                          className="p-2 bg-white rounded-lg"
+                          className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
                           onClick={() => {
                             setEFormItemDetails(form.formItemDetails);
                             setEFormItems(form.formItems);
@@ -298,37 +304,47 @@ export default function Forms() {
                           : "hidden"
                       } flex-col`}
                     >
-                      <div className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 bg-orange-100 rounded-lg">
-                        <span className="w-[5%]">#</span>
-                        <span className="w-[22%]">FilledBy</span>
-                        <span className="w-[22%]">Created At</span>
-                        <span className="w-[50%]">Actions</span>
+                      <div className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 bg-orange-100 rounded-lg">
+                        <div className="max-sm:w-full sm:w-[65%] flex items-center justify-between">
+                          <span className="max-sm:w-[4%] w-[5%]">#</span>
+                          <span className="max-sm:w-[48%] w-[30%]">
+                            FilledBy
+                          </span>
+                          <span className="max-sm:w-[48%] w-[30%]">
+                            Created At
+                          </span>
+                        </div>
+                        <span className="max-sm:hidden sm:w-[35%]">
+                          Actions
+                        </span>
                       </div>
                       {filledForms[form.title]?.map((record, i) => {
                         if (record.filledBy === email) {
                           return (
                             <div
                               key={i}
-                              className="w-full flex items-center justify-between text-center font-bold p-2 gap-2 border border-black rounded-lg"
+                              className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 border border-black rounded-lg"
                             >
-                              <span className="w-[5%] text-ellipsis whitespace-nowrap overflow-hidden">
-                                {i + 1}
-                              </span>
-                              <span className="w-[22%] text-ellipsis whitespace-nowrap overflow-hidden">
-                                {record.filledBy}
-                              </span>
-                              <span className="w-[22%] text-ellipsis whitespace-nowrap overflow-hidden">
-                                {record.createdAt.toString()}
-                              </span>
-                              <span className="w-[50%] flex items-center justify-center space-x-2">
+                              <div className="max-sm:w-full sm:w-[65%] flex items-center justify-between text-center font-bold">
+                                <span className="max-sm:w-[4%] w-[5%] text-ellipsis whitespace-nowrap overflow-hidden">
+                                  {i + 1}
+                                </span>
+                                <span className="max-sm:w-[48%] w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
+                                  {record.filledBy}
+                                </span>
+                                <span className="max-sm:w-[48%] w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
+                                  {record.createdAt.toString()}
+                                </span>
+                              </div>
+                              <div className="max-sm:w-full w-[50%] flex items-center justify-center space-x-2">
                                 <button
-                                  className="p-2 bg-white rounded-lg"
+                                  className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
                                   onClick={() => previewRecord(record)}
                                 >
                                   Preview
                                 </button>
                                 <button
-                                  className="p-2 bg-white rounded-lg"
+                                  className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
                                   onClick={() =>
                                     exportToExcel(
                                       record.formState,
@@ -339,14 +355,14 @@ export default function Forms() {
                                   Export to Excel
                                 </button>
                                 <button
-                                  className="p-2 bg-white rounded-lg"
+                                  className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
                                   onClick={() =>
                                     deleteFilledForm(record._id, record.title)
                                   }
                                 >
                                   <i className="fa fa-trash" />
                                 </button>
-                              </span>
+                              </div>
                             </div>
                           );
                         } else {

@@ -15,6 +15,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
   const pathName = usePathname();
   const [isFormsMenuOpen, setIsFormsMenuOpen] = useState(false);
   const pages = {
+    dashboard: ["/dashboard", "/managerDashboard", "/adminDashboard"],
     users: ["/managerDashboard/users", "/adminDashboard/users"],
     createForm: ["/managerDashboard/createForm", "/adminDashboard/createForm"],
     myForms: [
@@ -26,7 +27,9 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
 
   return (
     <div
-      className={`relative w-full h-full flex flex-col justify-start items-center px-2 py-5 space-y-5 bg-black text-white shadow-md`}
+      className={`${
+        !isSidebarOpen && "max-sm:hidden"
+      } relative w-full h-full flex flex-col justify-start items-center px-2 py-5 space-y-5 bg-black text-white shadow-md`}
     >
       <span
         className={`w-10 h-10 self-end flex items-center justify-center rounded-full border border-2 border-white`}
@@ -44,7 +47,7 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
       <ul className="w-full flex flex-col space-y-2">
         <li
           className={`w-full cursor-pointer rounded-lg ${
-            pathName === "/dashboard" ? "bg-[#C4A682]" : "bg-white/10"
+            pages.dashboard.includes(pathName) ? "bg-[#C4A682]" : "bg-white/10"
           }`}
           onClick={() => setIsFormsMenuOpen(false)}
         >
