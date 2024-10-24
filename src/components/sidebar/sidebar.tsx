@@ -49,11 +49,14 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
           className={`w-full cursor-pointer rounded-lg ${
             pages.dashboard.includes(pathName) ? "bg-[#C4A682]" : "bg-white/10"
           }`}
-          onClick={() => setIsFormsMenuOpen(false)}
+          onClick={() => {
+            setIsFormsMenuOpen(false);
+            setIsSidebarOpen(false);
+          }}
         >
           <Link
             href="/dashboard"
-            className="w-full flex items-center justify-start space-x-3 p-2 "
+            className="w-full flex items-center justify-start space-x-3 p-2"
           >
             <i className="fas fa-home text-lg" />
             <span className={`text-lg ${isSidebarOpen ? "" : "hidden"}`}>
@@ -65,7 +68,10 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
           className={`w-full cursor-pointer rounded-lg ${
             pages.users.includes(pathName) ? "bg-[#C4A682]" : "bg-white/10"
           } ${role === "user" ? "hidden" : ""}`}
-          onClick={() => setIsFormsMenuOpen(false)}
+          onClick={() => {
+            setIsFormsMenuOpen(false);
+            setIsSidebarOpen(false);
+          }}
         >
           <Link
             href={`/${role}Dashboard/users`}
@@ -116,6 +122,9 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
                   : "bg-white/10"
               }
               `}
+              onClick={() => {
+                setIsSidebarOpen(false);
+              }}
             >
               <Link
                 href={`/${role}Dashboard/createForm`}
@@ -131,6 +140,9 @@ export default function Sidebar({ isSidebarOpen, setIsSidebarOpen }: Props) {
                   : "bg-white/10"
               }
               `}
+              onClick={() => {
+                setIsSidebarOpen(false);
+              }}
             >
               <Link
                 href={
