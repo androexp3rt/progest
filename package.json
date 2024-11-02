@@ -26,7 +26,7 @@
     "lucide-react": "^0.451.0",
     "mongoose": "^8.7.0",
     "next": "14.2.14",
-    "next-auth": "^4.24.8",
+    "next-auth": "^4.24.10",
     "next-cloudinary": "^6.15.0",
     "node-xlsx": "^0.24.0",
     "react": "^18",
