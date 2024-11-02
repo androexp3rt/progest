@@ -6,15 +6,17 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   await dbConnect();
   const { name, companyName, email, password } = await request.json();
+  const emailLc = email.toLowerCase();
+  const companyNameLc = companyName.toLowerCase();
   try {
-    const existingUser = await UserModel.findOne({ companyName, email });
+    const existingUser = await UserModel.findOne({ companyNameLc, emailLc });
 
     if (!existingUser) {
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new UserModel({
         name,
-        companyName,
-        email,
+        companyName: companyNameLc,
+        email: emailLc,
         password: hashedPassword,
         role: "user",
         isVerified: true,

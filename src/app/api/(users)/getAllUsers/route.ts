@@ -15,7 +15,9 @@ export async function GET() {
       users = [];
     }
     let allUsers = [...businessUsers, ...users];
-    allUsers = allUsers.filter((user) => user.companyName !== "ProGest");
+    allUsers = allUsers.filter(
+      (user) => user.companyName.toLowerCase() !== "fsalyda"
+    );
     allUsers = allUsers.toSorted((a, b) =>
       a.companyName.localeCompare(b.companyName)
     );

@@ -56,7 +56,7 @@ export default function Navbar() {
           width={2048}
           height={2048}
         />
-        <span className="text-4xl">ProGest</span>
+        <span className="text-4xl">FSALYDA</span>
       </div>
       <div className="hamburger flex items-center justify-end w-[40%]">
         <ul id="drawer" className={ulClass}>

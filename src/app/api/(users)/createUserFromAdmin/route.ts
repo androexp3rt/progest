@@ -7,16 +7,18 @@ import { NextRequest, NextResponse } from "next/server";
 export async function POST(request: NextRequest) {
   await dbConnect();
   const { name, companyName, email, password, role } = await request.json();
+  const emailLc = email.toLowerCase();
+  const companyNameLc = companyName.toLowerCase();
   try {
-    const existingUser = await UserModel.findOne({ email });
-    const existingBusinessUser = await BusinessUserModel.findOne({ email });
+    const existingUser = await UserModel.findOne({ emailLc });
+    const existingBusinessUser = await BusinessUserModel.findOne({ emailLc });
     if (!existingUser && !existingBusinessUser) {
       const hashedPassword = await bcrypt.hash(password, 10);
       if (role === "manager" || role === "admin") {
         const newUser = new BusinessUserModel({
           name,
-          companyName,
-          email,
+          companyName: companyNameLc,
+          email: emailLc,
           password: hashedPassword,
           role: role,
           isVerified: true,
@@ -27,8 +29,8 @@ export async function POST(request: NextRequest) {
       } else {
         const newUser = new UserModel({
           name,
-          companyName,
-          email,
+          companyName: companyNameLc,
+          email: emailLc,
           password: hashedPassword,
           role: role,
           isVerified: true,
@@ -39,11 +41,12 @@ export async function POST(request: NextRequest) {
         { success: true, message: "Users created successfully" },
         { status: 200 }
       );
+    } else {
+      return NextResponse.json(
+        { success: false, message: "User already exists with this email" },
+        { status: 200 }
+      );
     }
-    return NextResponse.json(
-      { success: false, message: "User already exists with this email" },
-      { status: 200 }
-    );
   } catch (error) {
     console.log("Error creating User:", error);
     return NextResponse.json(
