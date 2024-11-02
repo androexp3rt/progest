@@ -14,6 +14,7 @@ export default function CreateFormPage() {
         eFormItemsLength={0}
         eFormName=""
         eCompanyName={companyName}
+        eUsersWithAccess={[]}
         role={role}
         setShowModifyFormModal={null}
       />

@@ -15,6 +15,11 @@ import { FilledForm } from "@/model/filledForm";
 import PreviewFilledForm from "@/components/previewFilledForm";
 
 export default function Forms() {
+  const { data: session } = useSession();
+  const companyName: string = session?.user.companyName;
+  const email: string = session?.user.email;
+  const role: string = session?.user.role;
+
   const [forms, setForms] = useState<Form[]>([]);
   const [filledForms, setFilledForms] = useState<FilledFormsMap>({});
   const [loadingForms, setLoadingForms] = useState(false);
@@ -37,10 +42,6 @@ export default function Forms() {
   const [recordToPreview, setRecordToPreview] = useState<FormItemDetails[]>([]);
   const [recordState, setRecordState] = useState<FormState>({});
   const [recordTitle, setRecordTitle] = useState("");
-  const { data: session } = useSession();
-  const companyName: string = session?.user.companyName;
-  const email: string = session?.user.email;
-  const role: string = session?.user.role;
 
   const getFilledForms = async (formName: string) => {
     setLoadingFilledForms(true);
