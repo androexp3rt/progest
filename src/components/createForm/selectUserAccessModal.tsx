@@ -6,7 +6,6 @@ type Props = {
   isSavingForm: boolean;
   showSUAM: boolean;
   setShowSUAM: React.Dispatch<React.SetStateAction<boolean>>;
-  setIsSavingForm: React.Dispatch<React.SetStateAction<boolean>>;
   companyName: string;
   usersWithAccess: string[];
   setUsersWithAccess: React.Dispatch<React.SetStateAction<string[]>>;
@@ -17,7 +16,6 @@ export default function SelectUserAccessModal({
   showSUAM,
   setShowSUAM,
   isSavingForm,
-  setIsSavingForm,
   companyName,
   usersWithAccess,
   setUsersWithAccess,

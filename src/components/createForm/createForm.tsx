@@ -681,7 +681,6 @@ export default function CreateForm({
           showSUAM={showSUAM}
           setShowSUAM={setShowSUAM}
           isSavingForm={isSavingForm}
-          setIsSavingForm={setIsSavingForm}
           companyName={eCompanyName}
           usersWithAccess={usersWithAccess}
           setUsersWithAccess={setUsersWithAccess}
