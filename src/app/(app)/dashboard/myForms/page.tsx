@@ -1,14 +1,14 @@
 "use client";
 import { Form } from "@/model/form";
 import { useSession } from "next-auth/react";
-import React, { ReactElement, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { Loader2 } from "lucide-react";
 import FillForm from "@/components/fillForm/fillForm";
 import { FormItemDetails, FormState } from "@/types/types";
 import { FilledFormsMap } from "@/types/types";
-import CreateForm from "@/components/createForm/createForm";
+// import CreateForm from "@/components/createForm/createForm";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { FilledForm } from "@/model/filledForm";
@@ -18,7 +18,7 @@ export default function Forms() {
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
   const email: string = session?.user.email;
-  const role: string = session?.user.role;
+  // const role: string = session?.user.role;
 
   const [forms, setForms] = useState<Form[]>([]);
   const [filledForms, setFilledForms] = useState<FilledFormsMap>({});
@@ -29,15 +29,15 @@ export default function Forms() {
   const [formToFillTitle, setFormToFillTitle] = useState("");
   const [showRecords, setshowRecords] = useState(false);
   const [formNameToShowRecords, setFormNameToShowRecords] = useState("");
-  const [eFormItemDetails, setEFormItemDetails] = useState<FormItemDetails[]>(
-    []
-  );
-  const [eFormItems, setEFormItems] = useState<ReactElement[]>([]);
-  const [eFormItemsLength, setEFormItemsLength] = useState(0);
-  const [eFormName, setEFormName] = useState("");
-  const [eCompanyName, setECompanyName] = useState("");
-  const [eUsersWithAccess, setEUsersWithAccess] = useState<string[]>([]);
-  const [showModifyFormModal, setShowModifyFormModal] = useState(false);
+  // const [eFormItemDetails, setEFormItemDetails] = useState<FormItemDetails[]>(
+  //   []
+  // );
+  // const [eFormItems, setEFormItems] = useState<ReactElement[]>([]);
+  // const [eFormItemsLength, setEFormItemsLength] = useState(0);
+  // const [eFormName, setEFormName] = useState("");
+  // const [eCompanyName, setECompanyName] = useState("");
+  // const [eUsersWithAccess, setEUsersWithAccess] = useState<string[]>([]);
+  // const [showModifyFormModal, setShowModifyFormModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [recordToPreview, setRecordToPreview] = useState<FormItemDetails[]>([]);
   const [recordState, setRecordState] = useState<FormState>({});
@@ -198,183 +198,191 @@ export default function Forms() {
                 <span className="max-sm:hidden sm:w-[50%]">Actions</span>
               </div>
               {forms?.map((form, index) => {
-                return (
-                  <div key={index}>
-                    <div className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 border border-black rounded-lg">
-                      <div className="max-sm:w-full sm:w-[50%] flex items-center justify-between">
-                        <span className="max-sm:w-[50%] sm:w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
-                          {form.title}
-                        </span>
-                        <span className="max-sm:w-[25%] sm:w-[10%] text-ellipsis whitespace-nowrap overflow-hidden">
-                          {form.formItems.length}
-                        </span>
-                        <span className="max-sm:w-[25%] sm:w-[10%] flex items-center justify-center text-center text-ellipsis whitespace-nowrap overflow-hidden">
-                          {loadingFilledForms ? (
-                            <Loader2 className="animate-spin" />
-                          ) : (
-                            filledForms[form.title]?.length ?? 0
-                          )}
-                        </span>
-                      </div>
-                      <div className="max-sm:w-full sm:w-[50%] flex flex-wrap justify-center gap-2">
-                        <button
-                          disabled={
-                            !filledForms[form.title] ||
-                            (filledForms[form.title] &&
-                              filledForms[form.title]!.length === 0)
-                          }
-                          className="max-sm:p-1 sm:p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
-                          onClick={() => {
-                            if (
-                              showRecords &&
-                              formNameToShowRecords === form.title &&
-                              filledForms[form.title] &&
-                              filledForms[form.title]!.length > 0
-                            ) {
-                              setshowRecords(false);
-                              setFormNameToShowRecords("");
-                            } else {
-                              setshowRecords(true);
-                              setFormNameToShowRecords(form.title);
-                            }
-                          }}
-                        >
-                          <span>
-                            {showRecords &&
-                            formNameToShowRecords === form.title &&
-                            filledForms[form.title] &&
-                            filledForms[form.title]!.length > 0
-                              ? "Hide Records"
-                              : "Show Records"}
+                if (form.usersWithAccess.includes(email)) {
+                  return (
+                    <div key={index}>
+                      <div className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 border border-black rounded-lg">
+                        <div className="max-sm:w-full sm:w-[50%] flex items-center justify-between">
+                          <span className="max-sm:w-[50%] sm:w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
+                            {form.title}
                           </span>
-                          <i
-                            className={`fa fa-chevron-down transform ${
-                              showRecords &&
+                          <span className="max-sm:w-[25%] sm:w-[10%] text-ellipsis whitespace-nowrap overflow-hidden">
+                            {form.formItems.length}
+                          </span>
+                          <span className="max-sm:w-[25%] sm:w-[10%] flex items-center justify-center text-center text-ellipsis whitespace-nowrap overflow-hidden">
+                            {loadingFilledForms ? (
+                              <Loader2 className="animate-spin" />
+                            ) : (
+                              filledForms[form.title]?.length ?? 0
+                            )}
+                          </span>
+                        </div>
+                        <div className="max-sm:w-full sm:w-[50%] flex flex-wrap justify-center gap-2">
+                          <button
+                            disabled={
+                              !filledForms[form.title] ||
+                              (filledForms[form.title] &&
+                                filledForms[form.title]!.length === 0)
+                            }
+                            className="max-sm:p-1 sm:p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
+                            onClick={() => {
+                              if (
+                                showRecords &&
+                                formNameToShowRecords === form.title &&
+                                filledForms[form.title] &&
+                                filledForms[form.title]!.length > 0
+                              ) {
+                                setshowRecords(false);
+                                setFormNameToShowRecords("");
+                              } else {
+                                setshowRecords(true);
+                                setFormNameToShowRecords(form.title);
+                              }
+                            }}
+                          >
+                            <span>
+                              {showRecords &&
                               formNameToShowRecords === form.title &&
                               filledForms[form.title] &&
                               filledForms[form.title]!.length > 0
-                                ? "rotate-180"
-                                : ""
-                            }`}
-                          />
-                        </button>
-                        <button
-                          className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
-                          onClick={() => exportAllRecordsToExcel(form.title)}
-                        >
-                          Export
-                        </button>
-                        <button
-                          className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
-                          onClick={() =>
-                            displayFormToFill({
-                              title: form.title,
-                              fid: form.formItemDetails,
-                            })
-                          }
-                        >
-                          Fill Form
-                        </button>
-                        <button
-                          className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
-                          onClick={() => {
-                            setEFormItemDetails(form.formItemDetails);
-                            setEFormItems(form.formItems);
-                            setEFormItemsLength(form.formItemsLength);
-                            setEFormName(form.title);
-                            setECompanyName(form.companyName);
-                            setEUsersWithAccess(form.usersWithAccess);
-                            setShowModifyFormModal(true);
-                          }}
-                        >
-                          <i className="fa fa-edit" />
-                        </button>
-                        {/* <button
+                                ? "Hide Records"
+                                : "Show Records"}
+                            </span>
+                            <i
+                              className={`fa fa-chevron-down transform ${
+                                showRecords &&
+                                formNameToShowRecords === form.title &&
+                                filledForms[form.title] &&
+                                filledForms[form.title]!.length > 0
+                                  ? "rotate-180"
+                                  : ""
+                              }`}
+                            />
+                          </button>
+                          <button
+                            className="max-sm:p-1 sm:p-2 bg-white rounded-lg disabled:text-gray-200"
+                            onClick={() => exportAllRecordsToExcel(form.title)}
+                            disabled={
+                              !filledForms[form.title] ||
+                              filledForms[form.title]!.length === 0
+                            }
+                          >
+                            Export
+                          </button>
+                          <button
+                            className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
+                            onClick={() =>
+                              displayFormToFill({
+                                title: form.title,
+                                fid: form.formItemDetails,
+                              })
+                            }
+                          >
+                            Fill Form
+                          </button>
+                          {/* <button
+                            className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
+                            onClick={() => {
+                              setEFormItemDetails(form.formItemDetails);
+                              setEFormItems(form.formItems);
+                              setEFormItemsLength(form.formItemsLength);
+                              setEFormName(form.title);
+                              setECompanyName(form.companyName);
+                              setEUsersWithAccess(form.usersWithAccess);
+                              setShowModifyFormModal(true);
+                            }}
+                          >
+                            <i className="fa fa-edit" />
+                          </button> */}
+                          {/* <button
                         className="p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
                         onClick={() => deleteForm(form._id)}
                       >
                         <i className="fa fa-trash" />
                       </button> */}
+                        </div>
                       </div>
-                    </div>
-                    <div
-                      className={`${
-                        showRecords &&
-                        formNameToShowRecords === form.title &&
-                        filledForms[form.title] &&
-                        filledForms[form.title]!.length > 0
-                          ? "flex"
-                          : "hidden"
-                      } flex-col`}
-                    >
-                      <div className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 bg-orange-100 rounded-lg">
-                        <div className="max-sm:w-full sm:w-[65%] flex items-center justify-between">
-                          <span className="max-sm:w-[4%] w-[5%]">#</span>
-                          <span className="max-sm:w-[48%] w-[30%]">
-                            FilledBy
-                          </span>
-                          <span className="max-sm:w-[48%] w-[30%]">
-                            Created At
+                      <div
+                        className={`${
+                          showRecords &&
+                          formNameToShowRecords === form.title &&
+                          filledForms[form.title] &&
+                          filledForms[form.title]!.length > 0
+                            ? "flex"
+                            : "hidden"
+                        } flex-col`}
+                      >
+                        <div className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 bg-orange-100 rounded-lg">
+                          <div className="max-sm:w-full sm:w-[65%] flex items-center justify-between">
+                            <span className="max-sm:w-[4%] w-[5%]">#</span>
+                            <span className="max-sm:w-[48%] w-[30%]">
+                              FilledBy
+                            </span>
+                            <span className="max-sm:w-[48%] w-[30%]">
+                              Created At
+                            </span>
+                          </div>
+                          <span className="max-sm:hidden sm:w-[35%]">
+                            Actions
                           </span>
                         </div>
-                        <span className="max-sm:hidden sm:w-[35%]">
-                          Actions
-                        </span>
+                        {filledForms[form.title]?.map((record, i) => {
+                          if (record.filledBy === email) {
+                            return (
+                              <div
+                                key={i}
+                                className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 border border-black rounded-lg"
+                              >
+                                <div className="max-sm:w-full sm:w-[65%] flex items-center justify-between text-center font-bold">
+                                  <span className="max-sm:w-[4%] w-[5%] text-ellipsis whitespace-nowrap overflow-hidden">
+                                    {i + 1}
+                                  </span>
+                                  <span className="max-sm:w-[48%] w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
+                                    {record.filledBy}
+                                  </span>
+                                  <span className="max-sm:w-[48%] w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
+                                    {record.createdAt.toString().slice(0, 16)}
+                                  </span>
+                                </div>
+                                <div className="max-sm:w-full w-[50%] flex items-center justify-center space-x-2">
+                                  <button
+                                    className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
+                                    onClick={() => previewRecord(record)}
+                                  >
+                                    Preview
+                                  </button>
+                                  <button
+                                    className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
+                                    onClick={() =>
+                                      exportToExcel(
+                                        record.formState,
+                                        record.title
+                                      )
+                                    }
+                                  >
+                                    Export to Excel
+                                  </button>
+                                  <button
+                                    className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
+                                    onClick={() =>
+                                      deleteFilledForm(record._id, record.title)
+                                    }
+                                  >
+                                    <i className="fa fa-trash" />
+                                  </button>
+                                </div>
+                              </div>
+                            );
+                          } else {
+                            return null;
+                          }
+                        })}
                       </div>
-                      {filledForms[form.title]?.map((record, i) => {
-                        if (record.filledBy === email) {
-                          return (
-                            <div
-                              key={i}
-                              className="w-full flex max-sm:flex-col items-center justify-between text-center font-bold max-sm:px-1 p-2 gap-2 border border-black rounded-lg"
-                            >
-                              <div className="max-sm:w-full sm:w-[65%] flex items-center justify-between text-center font-bold">
-                                <span className="max-sm:w-[4%] w-[5%] text-ellipsis whitespace-nowrap overflow-hidden">
-                                  {i + 1}
-                                </span>
-                                <span className="max-sm:w-[48%] w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
-                                  {record.filledBy}
-                                </span>
-                                <span className="max-sm:w-[48%] w-[30%] text-ellipsis whitespace-nowrap overflow-hidden">
-                                  {record.createdAt.toString().slice(0, 16)}
-                                </span>
-                              </div>
-                              <div className="max-sm:w-full w-[50%] flex items-center justify-center space-x-2">
-                                <button
-                                  className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
-                                  onClick={() => previewRecord(record)}
-                                >
-                                  Preview
-                                </button>
-                                <button
-                                  className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
-                                  onClick={() =>
-                                    exportToExcel(
-                                      record.formState,
-                                      record.title
-                                    )
-                                  }
-                                >
-                                  Export to Excel
-                                </button>
-                                <button
-                                  className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
-                                  onClick={() =>
-                                    deleteFilledForm(record._id, record.title)
-                                  }
-                                >
-                                  <i className="fa fa-trash" />
-                                </button>
-                              </div>
-                            </div>
-                          );
-                        } else {
-                          return null;
-                        }
-                      })}
                     </div>
-                  </div>
-                );
+                  );
+                } else {
+                  return null;
+                }
               })}
             </div>
           )}
@@ -398,7 +406,7 @@ export default function Forms() {
           formToFillTitle={recordTitle}
           setFormToFillTitle={setRecordTitle}
         />
-        <div
+        {/* <div
           className={`${
             showModifyFormModal ? "" : "hidden"
           } fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex flex-col items-start justify-center overflow-scroll px-5 space-y-2`}
@@ -413,7 +421,7 @@ export default function Forms() {
             setShowModifyFormModal={setShowModifyFormModal}
             role={role}
           />
-        </div>
+        </div> */}
       </div>
     </div>
   );
