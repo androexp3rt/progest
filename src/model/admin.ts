@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from "mongoose";
 
-export interface BusinessUser extends Document {
+export interface Admin extends Document {
   name: string;
   companyName: string;
   email: string;
@@ -12,7 +12,7 @@ export interface BusinessUser extends Document {
 }
 
 // Updated User schema
-const BusinessUserSchema: Schema<BusinessUser> = new mongoose.Schema({
+const AdminSchema: Schema<Admin> = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Name is required"],
@@ -52,8 +52,8 @@ const BusinessUserSchema: Schema<BusinessUser> = new mongoose.Schema({
   },
 });
 
-const BusinessUserModel =
-  (mongoose.models.BusinessUsers as mongoose.Model<BusinessUser>) ||
-  mongoose.model<BusinessUser>("BusinessUsers", BusinessUserSchema);
+const AdminModel =
+  (mongoose.models.Admins as mongoose.Model<Admin>) ||
+  mongoose.model<Admin>("Admins", AdminSchema);
 
-export default BusinessUserModel;
+export default AdminModel;

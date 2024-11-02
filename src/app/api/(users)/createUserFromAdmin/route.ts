@@ -1,4 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
+import AdminModel from "@/model/admin";
 import BusinessUserModel from "@/model/businessUser";
 import UserModel from "@/model/user";
 import bcrypt from "bcryptjs";
@@ -10,11 +11,49 @@ export async function POST(request: NextRequest) {
   const emailLc = email.toLowerCase();
   const companyNameLc = companyName.toLowerCase();
   try {
-    const existingUser = await UserModel.findOne({ emailLc });
-    const existingBusinessUser = await BusinessUserModel.findOne({ emailLc });
+    if (role === "admin") {
+      if (companyNameLc !== "fsalyda") {
+        return NextResponse.json(
+          {
+            success: false,
+            message: "Admin users can only belong to Fsalyda organization",
+          },
+          { status: 200 }
+        );
+      } else {
+        const existingAdmin = await AdminModel.findOne({ email: emailLc });
+        if (existingAdmin) {
+          return NextResponse.json(
+            { success: false, message: "User already exists with this email" },
+            { status: 200 }
+          );
+        } else {
+          const hashedPassword = await bcrypt.hash(password, 10);
+          const newUser = new AdminModel({
+            name,
+            companyName: companyNameLc,
+            email: emailLc,
+            password: hashedPassword,
+            role: role,
+            isVerified: true,
+            verifyCode: "000000",
+            verifyCodeExpiry: new Date(),
+          });
+          await newUser.save();
+          return NextResponse.json(
+            { success: true, message: "Users created successfully" },
+            { status: 200 }
+          );
+        }
+      }
+    }
+    const existingUser = await UserModel.findOne({ email: emailLc });
+    const existingBusinessUser = await BusinessUserModel.findOne({
+      email: emailLc,
+    });
     if (!existingUser && !existingBusinessUser) {
       const hashedPassword = await bcrypt.hash(password, 10);
-      if (role === "manager" || role === "admin") {
+      if (role === "manager") {
         const newUser = new BusinessUserModel({
           name,
           companyName: companyNameLc,

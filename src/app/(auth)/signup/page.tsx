@@ -13,9 +13,9 @@ export default function SignUpPage() {
         <div className="max-sm:w-[90vw] w-full max-w-md pt-5 px-8 bg-white/30 backdrop-blur-sm rounded-lg shadow-2xl">
           <div className="text-center text-[#343666] space-y-4 p-2">
             <h1 className="text-3xl font-extrabold tracking-tight lg:text-5xl">
-              Join ProGest
+              Join Fsalyda
             </h1>
-            <p className="">SignUp to become a pro with ProGest</p>
+            <p className="">SignUp to become a pro with Fsalyda</p>
           </div>
           <SignUpForm />
           <div className="flex items-center justify-center flex-wrap space-y-2 text-center py-5 text-[#343666] text-lg">

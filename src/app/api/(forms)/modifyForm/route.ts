@@ -4,8 +4,14 @@ import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
   await dbConnect();
-  const { companyName, formName, formItems, formItemsLength, formItemDetails } =
-    await request.json();
+  const {
+    companyName,
+    formName,
+    formItems,
+    formItemsLength,
+    formItemDetails,
+    usersWithAccess,
+  } = await request.json();
   try {
     const existingForm = await FormModel.findOne({
       companyName,
@@ -22,6 +28,7 @@ export async function POST(request: NextRequest) {
     existingForm.formItems = formItems;
     existingForm.formItemsLength = formItemsLength;
     existingForm.formItemDetails = formItemDetails;
+    existingForm.usersWithAccess = usersWithAccess;
     await existingForm.save();
     return NextResponse.json(
       { success: true, message: "Form Saved successfully" },

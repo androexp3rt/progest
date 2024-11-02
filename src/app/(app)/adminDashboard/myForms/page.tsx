@@ -16,6 +16,11 @@ import { FilledForm } from "@/model/filledForm";
 import PreviewFilledForm from "@/components/previewFilledForm";
 
 export default function Forms() {
+  const { data: session } = useSession();
+  const companyName: string = session?.user.companyName;
+  const email: string = session?.user.email;
+  const role: string = session?.user.role;
+
   const [forms, setForms] = useState<Form[]>([]);
   const [filledForms, setFilledForms] = useState<FilledFormsMap>({});
   const [loadingForms, setLoadingForms] = useState(false);
@@ -33,16 +38,12 @@ export default function Forms() {
   const [eFormName, setEFormName] = useState("");
   const [showModifyFormModal, setShowModifyFormModal] = useState(false);
   const [eCompanyName, setECompanyName] = useState("");
+  const [eUsersWithAccess, setEUsersWithAccess] = useState<string[]>([]);
 
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [recordToPreview, setRecordToPreview] = useState<FormItemDetails[]>([]);
   const [recordState, setRecordState] = useState<FormState>({});
   const [recordTitle, setRecordTitle] = useState("");
-
-  const { data: session } = useSession();
-  const companyName: string = session?.user.companyName;
-  const email: string = session?.user.email;
-  const role: string = session?.user.role;
 
   const getFilledForms = async (formName: string) => {
     setLoadingFilledForms(true);
@@ -308,6 +309,7 @@ export default function Forms() {
                             setEFormItemsLength(form.formItemsLength);
                             setEFormName(form.title);
                             setECompanyName(form.companyName);
+                            setEUsersWithAccess(form.usersWithAccess);
                             setShowModifyFormModal(true);
                           }}
                         >
@@ -422,6 +424,7 @@ export default function Forms() {
             eFormItemsLength={eFormItemsLength}
             eFormName={eFormName}
             eCompanyName={eCompanyName}
+            eUsersWithAccess={eUsersWithAccess}
             setShowModifyFormModal={setShowModifyFormModal}
             role={role}
           />

@@ -31,7 +31,9 @@ export default function Forms() {
   const [eFormItemsLength, setEFormItemsLength] = useState(0);
   const [eFormName, setEFormName] = useState("");
   const [showModifyFormModal, setShowModifyFormModal] = useState(false);
+  const [eUsersWithAccess, setEUsersWithAccess] = useState<string[]>([]);
   const [eCompanyName, setECompanyName] = useState("");
+
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [recordToPreview, setRecordToPreview] = useState<FormItemDetails[]>([]);
   const [recordState, setRecordState] = useState<FormState>({});
@@ -320,6 +322,7 @@ export default function Forms() {
                             setEFormItemsLength(form.formItemsLength);
                             setEFormName(form.title);
                             setECompanyName(form.companyName);
+                            setEUsersWithAccess(form.usersWithAccess);
                             setShowModifyFormModal(true);
                           }}
                         >
@@ -438,6 +441,7 @@ export default function Forms() {
             eFormItemsLength={eFormItemsLength}
             eFormName={eFormName}
             eCompanyName={eCompanyName}
+            eUsersWithAccess={eUsersWithAccess}
             setShowModifyFormModal={setShowModifyFormModal}
             role={role}
           />

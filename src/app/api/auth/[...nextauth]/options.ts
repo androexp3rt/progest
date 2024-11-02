@@ -2,6 +2,7 @@ import { NextAuthOptions, User } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
 import bcrypt from "bcryptjs";
 import dbConnect from "@/lib/dbConnect";
+import AdminModel from "@/model/admin";
 import BusinessUserModel from "@/model/businessUser";
 import UserModel from "@/model/user";
 
@@ -31,15 +32,20 @@ export const authOptions: NextAuthOptions = {
         await dbConnect();
         try {
           if (credentials) {
-            let user = await BusinessUserModel.findOne({
-              email: credentials?.identifier,
+            let user = await AdminModel.findOne({
+              email: credentials?.identifier.toLowerCase(),
             });
             if (!user) {
-              user = await UserModel.findOne({
-                email: credentials?.identifier,
+              user = await BusinessUserModel.findOne({
+                email: credentials?.identifier.toLowerCase(),
               });
               if (!user) {
-                throw new Error("No user found with this email");
+                user = await UserModel.findOne({
+                  email: credentials?.identifier.toLowerCase(),
+                });
+                if (!user) {
+                  throw new Error("No user found with this email");
+                }
               }
             }
             if (!user.isVerified) {

@@ -19,6 +19,7 @@ import EditCheckBox from "./editModalComponents/editCheckBox";
 import EditDateTime from "./editModalComponents/editDate&Time";
 import EditTextArea from "./editModalComponents/editTextArea";
 import DeleteModal from "./deleteModal";
+import SelectUserAccessModal from "./selectUserAccessModal";
 
 type Props = {
   eFormItemDetails: FormItemDetails[];
@@ -26,6 +27,7 @@ type Props = {
   eFormItemsLength: number;
   eFormName: string;
   eCompanyName: string;
+  eUsersWithAccess: string[];
   role: string;
   setShowModifyFormModal: React.Dispatch<React.SetStateAction<boolean>> | null;
 };
@@ -36,6 +38,7 @@ export default function CreateForm({
   eFormItemsLength,
   eFormName,
   eCompanyName,
+  eUsersWithAccess,
   role,
   setShowModifyFormModal,
 }: Props) {
@@ -50,6 +53,8 @@ export default function CreateForm({
   const [itemToEditName, setItemToEditName] = useState("");
   const [editedName, setEditedName] = useState("");
   const [isSavingForm, setIsSavingForm] = useState(false);
+  const [showSUAM, setShowSUAM] = useState(false);
+  const [usersWithAccess, setUsersWithAccess] = useState<string[]>([]);
 
   useEffect(() => {
     setFormItemDetails(eFormItemDetails);
@@ -75,6 +80,7 @@ export default function CreateForm({
     setFormItems(newFormItems);
     setFormItemsLength(eFormItemsLength);
     setFormName(eFormName);
+    setUsersWithAccess(eUsersWithAccess);
   }, [eFormItemDetails, eFormItems, eFormItemsLength, eFormName, eCompanyName]);
 
   const fields = [
@@ -342,21 +348,21 @@ export default function CreateForm({
       document.addEventListener("click", unselectFormItem);
     }
   }, [selectedFormItem, unselectFormItem]);
-  const saveFormToDatabase = async () => {
-    setIsSavingForm(true);
+
+  const validateFormBeforeSave = () => {
     if (setShowModifyFormModal && formName !== eFormName) {
       toast("Form Name can't be modified", { type: "error" });
-      return setIsSavingForm(false);
+      return false;
     }
     if (formName.length === 0) {
       toast("Form Name is Required", { type: "error" });
-      return setIsSavingForm(false);
+      return false;
     }
     if (formItems.length === 0) {
       toast("Atleast one form field is Required", {
         type: "error",
       });
-      return setIsSavingForm(false);
+      return false;
     }
     const validationErrors: string[] = [];
     formItemDetails.map((itemD) => {
@@ -426,10 +432,12 @@ export default function CreateForm({
     });
     if (validationErrors.length > 0) {
       toast(validationErrors.join(",\n"), { type: "error" });
-      setIsSavingForm(false);
-      return;
+      return false;
     }
-    // save the form
+    return true;
+  };
+  const saveFormToDatabase = async () => {
+    setIsSavingForm(true);
     await Promise.all(
       formItemDetails.map(async (itemD) => {
         if (itemD.title === "Image") {
@@ -458,6 +466,7 @@ export default function CreateForm({
           formItems,
           formItemsLength,
           companyName: eCompanyName,
+          usersWithAccess,
         });
       } else {
         response = await axios.post("/api/modifyForm", {
@@ -466,6 +475,7 @@ export default function CreateForm({
           formItems,
           formItemsLength,
           companyName: eCompanyName,
+          usersWithAccess,
         });
       }
       if (response.data.success) {
@@ -627,7 +637,11 @@ export default function CreateForm({
         <div className="flex justify-between mt-4">
           <button
             className="bg-green-500 text-white px-4 py-2 rounded-lg flex items-center"
-            onClick={async () => saveFormToDatabase()}
+            onClick={async () => {
+              if (validateFormBeforeSave()) {
+                setShowSUAM(true);
+              }
+            }}
           >
             {isSavingForm ? (
               <div className="flex items-center justify-center space-x-2 text-white">
@@ -662,6 +676,17 @@ export default function CreateForm({
         </div>
         {/* Delete Modal */}
         <DeleteModal deleteFormItem={deleteFormItem} />
+        {/* Select Users for access Modal */}
+        <SelectUserAccessModal
+          showSUAM={showSUAM}
+          setShowSUAM={setShowSUAM}
+          isSavingForm={isSavingForm}
+          setIsSavingForm={setIsSavingForm}
+          companyName={eCompanyName}
+          usersWithAccess={usersWithAccess}
+          setUsersWithAccess={setUsersWithAccess}
+          saveFormToDatabase={saveFormToDatabase}
+        />
         {/* edit Modal */}
         <div
           id="editModal"

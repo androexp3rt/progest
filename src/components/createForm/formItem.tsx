@@ -35,7 +35,7 @@ export default function FormItem({
   return (
     <div
       id={`s${id}`}
-      className="flex items-center justify-between p-2 bg-green-100"
+      className="w-full flex items-center justify-between p-2 bg-green-100"
       onClick={(e) => {
         if (
           (e.target as HTMLElement).closest(`#s${id}`) &&
@@ -45,12 +45,12 @@ export default function FormItem({
         }
       }}
     >
-      <div className="flex items-center">
+      <div className="w-full flex items-center">
         <i className={`${icon} ${color}`} />
         <input
           id={`${id}inputElement`}
           type="text"
-          className={`ml-2 text-lg font-semibold outline-green-400 rounded-md p-2 ${
+          className={`ml-2 w-[65%] text-lg font-semibold outline-green-400 rounded-md p-2 ${
             isNewItem ? "" : "hidden"
           }`}
           autoFocus

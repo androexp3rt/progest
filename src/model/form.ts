@@ -9,6 +9,7 @@ export interface Form extends Document {
   formItemsLength: number;
   createdAt: Date;
   companyName: string;
+  usersWithAccess: string[];
 }
 
 export const FormSchema: Schema<Form> = new mongoose.Schema({
@@ -35,6 +36,10 @@ export const FormSchema: Schema<Form> = new mongoose.Schema({
   },
   companyName: {
     type: String,
+    required: true,
+  },
+  usersWithAccess: {
+    type: [],
     required: true,
   },
 });

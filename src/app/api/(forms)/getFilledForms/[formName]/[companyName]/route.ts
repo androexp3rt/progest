@@ -12,7 +12,7 @@ export async function GET(request: NextRequest, context: { params: Params }) {
   const companyName = context.params.companyName;
   try {
     let forms;
-    if (companyName === "ProGest") {
+    if (companyName === "fsalyda") {
       forms = await FilledFormModel.find({ title: formName });
     } else {
       forms = await FilledFormModel.find({ title: formName, companyName });
