@@ -25,26 +25,18 @@ export default function VerifyForm() {
         email: params.email,
         code: data.code,
       });
-
-      toast(response.data.message, {
-        className: "",
-        type: "success",
-        data: response.data.message,
-      });
-
-      router.replace("/signin");
+      if (response.data.success) {
+        toast(response.data.message, { type: "success" });
+        router.replace("/signin");
+      } else {
+        toast(response.data.message, { type: "error" });
+      }
     } catch (error) {
       const axiosError = error as AxiosError<ApiResponse>;
       toast(
         axiosError.response?.data.message ??
           "An error occurred. Please try again.",
-        {
-          className: "",
-          type: "error",
-          data:
-            axiosError.response?.data.message ??
-            "An error occurred. Please try again.",
-        }
+        { type: "error" }
       );
     }
   };

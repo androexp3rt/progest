@@ -48,13 +48,11 @@ export default function SignUpForm() {
     setIsSubmitting(true);
     try {
       const response = await axios.post<ApiResponse>("/api/signup", data);
-      toast(response.data.message, {
-        className: "",
-        type: "success",
-        data: response.data.message,
-      });
-      router.replace(`/verify/${data.email}`);
-      setIsSubmitting(false);
+      if (response.data.success) {
+        toast(response.data.message, { type: "success" });
+        router.replace(`/verify/${data.email}`);
+        setIsSubmitting(false);
+      }
     } catch (error) {
       console.error("Error during sign-up:", error);
       const axiosError = error as AxiosError<ApiResponse>;
@@ -62,11 +60,7 @@ export default function SignUpForm() {
       const errorMessage =
         axiosError.response?.data.message ??
         "There was a problem with your sign up. Please try again.";
-      toast(errorMessage, {
-        className: "",
-        type: "error",
-        data: errorMessage,
-      });
+      toast(errorMessage, { type: "error" });
       setIsSubmitting(false);
     }
   };

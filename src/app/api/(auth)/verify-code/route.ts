@@ -1,9 +1,10 @@
 import dbConnect from "@/lib/dbConnect";
+import AdminModel, { Admin } from "@/model/admin";
 import BusinessUserModel from "@/model/businessUser";
+import NotificationModel from "@/model/notification";
 
 export async function POST(request: Request) {
   await dbConnect();
-
   try {
     const { email, code } = await request.json();
     const decodedemail = decodeURIComponent(email);
@@ -15,7 +16,6 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
-
     // Check if the code is correct and not expired
     const isCodeValid = user.verifyCode === code;
     const isCodeNotExpired = new Date(user.verifyCodeExpiry) > new Date();
@@ -24,7 +24,16 @@ export async function POST(request: Request) {
       // Update the user's verification status
       user.isVerified = true;
       await user.save();
-
+      const adminUsers = await AdminModel.find({});
+      const admins: string[] = [];
+      adminUsers.map((admin: Admin) => admins.push(admin.email));
+      const notification = new NotificationModel({
+        title: "New SignUp",
+        message: `A new Business User ${decodedemail} has registered.`,
+        toUser: admins,
+        fromUser: decodedemail,
+      });
+      await notification.save();
       return Response.json(
         { success: true, message: "Account verified successfully" },
         { status: 200 }

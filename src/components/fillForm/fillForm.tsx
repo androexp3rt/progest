@@ -319,7 +319,6 @@ export default function FillForm({
                               formState[`${itemD.newTitle}RowCount`] as string
                             )
                           ) {
-                            console.log(tablecol);
                             recordData.append(
                               `${itemD.newTitle}[${index}][${i}]`,
                               tablecol
