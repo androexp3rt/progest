@@ -1,9 +1,11 @@
 "use client";
 import Notifications from "@/components/notification";
 import { Notification } from "@/model/notification";
+import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
@@ -14,16 +16,19 @@ export default function AdminDashboard() {
     const fetchNotifications = async () => {
       setLoadingNotifications(true);
       try {
-        const responseStream = await fetch("/api/getNotifications");
-        const response = await responseStream.json();
-        if (response.success) {
+        const response = await axios.post("/api/getNotifications", { email });
+        // const responseStream = await fetch("/api/getNotifications");
+        // const response = await responseStream.json();
+        if (response.data.success) {
           const notif: Notification[] = [];
-          response.notifications.map((n: Notification) => {
+          response.data.notifications.map((n: Notification) => {
             if (n.toUser.includes(email)) notif.push(n);
           });
           setNotifications(notif);
+          // toast(response.data.message, { type: "success" });
         } else {
           setNotifications([]);
+          toast(response.data.message, { type: "error" });
         }
       } catch (error) {
         console.log("Error fecting Notifications", error);

@@ -43,37 +43,40 @@ export default function Forms() {
   const email: string = session?.user.email;
   const role: string = session?.user.role;
 
-  const getFilledForms = useCallback(async (formName: string) => {
-    setLoadingFilledForms(true);
-    try {
-      const responseStream = await fetch(
-        `/api/getFilledForms/${formName}/${companyName}`,
-        {
-          cache: "no-store",
+  const getFilledForms = useCallback(
+    async (formName: string) => {
+      setLoadingFilledForms(true);
+      try {
+        const responseStream = await fetch(
+          `/api/getFilledForms/${formName}/${companyName}`,
+          {
+            cache: "no-store",
+          }
+        );
+        const response = await responseStream.json();
+        if (response.success) {
+          setFilledForms((prevFilledForms) => ({
+            ...prevFilledForms,
+            [formName]: response.forms,
+          }));
+        } else {
+          setFilledForms((prevFilledForms) => ({
+            ...prevFilledForms,
+            [formName]: [],
+          }));
         }
-      );
-      const response = await responseStream.json();
-      if (response.success) {
-        setFilledForms((prevFilledForms) => ({
-          ...prevFilledForms,
-          [formName]: response.forms,
-        }));
-      } else {
+      } catch (error) {
+        console.log(error);
         setFilledForms((prevFilledForms) => ({
           ...prevFilledForms,
           [formName]: [],
         }));
+      } finally {
+        setLoadingFilledForms(false);
       }
-    } catch (error) {
-      console.log(error);
-      setFilledForms((prevFilledForms) => ({
-        ...prevFilledForms,
-        [formName]: [],
-      }));
-    } finally {
-      setLoadingFilledForms(false);
-    }
-  }, []);
+    },
+    [companyName]
+  );
 
   const getForms = async () => {
     setLoadingForms(true);

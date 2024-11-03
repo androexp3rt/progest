@@ -4,9 +4,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
-export async function GET(request: NextRequest) {
+export async function POST(request: NextRequest) {
   await dbConnect();
   try {
+    const { email } = await request.json();
     const notifications = await NotificationModel.find({});
     if (!notifications || notifications.length === 0) {
       return NextResponse.json(

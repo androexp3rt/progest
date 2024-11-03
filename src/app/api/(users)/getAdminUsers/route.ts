@@ -5,7 +5,7 @@ import { NextResponse } from "next/server";
 export async function GET() {
   await dbConnect();
   try {
-    let users = await AdminModel.find({});
+    const users = await AdminModel.find({});
     if (!users || users.length === 0) {
       return NextResponse.json(
         { success: false, message: "No Admins found" },
