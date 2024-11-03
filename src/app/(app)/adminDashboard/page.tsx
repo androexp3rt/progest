@@ -20,11 +20,7 @@ export default function AdminDashboard() {
         // const responseStream = await fetch("/api/getNotifications");
         // const response = await responseStream.json();
         if (response.data.success) {
-          const notif: Notification[] = [];
-          response.data.notifications.map((n: Notification) => {
-            if (n.toUser.includes(email)) notif.push(n);
-          });
-          setNotifications(notif);
+          setNotifications(response.data.notifications);
           // toast(response.data.message, { type: "success" });
         } else {
           setNotifications([]);
@@ -47,7 +43,7 @@ export default function AdminDashboard() {
         <div className="w-full max-w-lg min-h-20 flex flex-col items-center bg-white/50 backdrop-blur-sm rounded-lg p-2 space-y-5">
           <h1 className="text-2xl font-bold">Notifications</h1>
           <div
-            className={`relative w-full flex flex-col items-center ${
+            className={`relative w-full flex flex-col items-center space-y-2 ${
               loadingNotifications ? "justify-center" : ""
             }`}
           >

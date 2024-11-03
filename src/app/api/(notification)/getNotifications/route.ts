@@ -1,5 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
-import NotificationModel from "@/model/notification";
+import NotificationModel, { Notification } from "@/model/notification";
 import { NextRequest, NextResponse } from "next/server";
 
 export const runtime = "nodejs";
@@ -15,11 +15,15 @@ export async function POST(request: NextRequest) {
         { status: 200 }
       );
     }
+    const notif: Notification[] = [];
+    notifications.map((n: Notification) => {
+      if (n.toUser.includes(email)) notif.push(n);
+    });
     return new NextResponse(
       JSON.stringify({
         success: true,
         message: "Notifications fetched successfully",
-        notifications,
+        notifications: notif,
       }),
       {
         status: 200,
