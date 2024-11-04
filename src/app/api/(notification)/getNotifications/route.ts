@@ -1,6 +1,5 @@
 import dbConnect from "@/lib/dbConnect";
 import NotificationModel, { Notification } from "@/model/notification";
-import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
