@@ -425,6 +425,7 @@ export default function Forms() {
             eFormName={eFormName}
             eCompanyName={eCompanyName}
             eUsersWithAccess={eUsersWithAccess}
+            creatorEmail={email}
             setShowModifyFormModal={setShowModifyFormModal}
             role={role}
           />
