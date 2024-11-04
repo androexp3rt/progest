@@ -1,20 +1,23 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import LoginBtn from "./loginBtn";
 import logo from "@/../public/logo.png";
+import { Notification } from "@/model/notification";
+import { useSession } from "next-auth/react";
+import axios from "axios";
 
 export default function Navbar() {
+  const { data: session } = useSession();
+  const role = session?.user.role;
+  const email = session?.user.email;
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  // const [isServicesExpanded, setIsServicesExpanded] = useState(false);
+  const [unreadNotifications, setUnreadNotifications] = useState(0);
 
   const hideDrawer = (e: Event) => {
-    const services = document.getElementById("services");
-    if ((e.target as HTMLElement).closest("#services") !== services) {
-      setIsDrawerOpen(false);
-      document.removeEventListener("click", hideDrawer);
-    }
+    setIsDrawerOpen(false);
+    document.removeEventListener("click", hideDrawer);
   };
   const toggleDrawer = () => {
     setIsDrawerOpen(isDrawerOpen ? false : true);
@@ -22,22 +25,28 @@ export default function Navbar() {
       document.addEventListener("click", hideDrawer);
     }
   };
-  // const hideDropdown = () => {
-  //   document.getElementById("dropdown")?.classList.add("hidden");
-  //   setIsServicesExpanded(false);
-  //   document.removeEventListener("click", hideDropdown);
-  // };
-  // const toggleDropdown = () => {
-  //   document.getElementById("dropdown")?.classList.toggle("hidden");
-  //   setIsServicesExpanded(
-  //     document.getElementById("dropdown")?.classList.contains("hidden")
-  //       ? false
-  //       : true
-  //   );
-  //   if (!document.getElementById("dropdown")?.classList.contains("hidden")) {
-  //     document.addEventListener("click", hideDropdown);
-  //   }
-  // };
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const response = await axios.post("/api/getNotifications", { email });
+        if (response.data.success) {
+          let un = 0;
+          response.data.notifications.map((n: Notification) => {
+            if (!n.isRead) un++;
+          });
+          setUnreadNotifications(un);
+        } else {
+          setUnreadNotifications(0);
+        }
+      } catch (error) {
+        console.log("Error fecting Notifications", error);
+      }
+    };
+    fetchNotifications();
+    // Set up a polling interval (adjust as needed)
+    const intervalId = setInterval(fetchNotifications, 5000); // Fetch data every 5 seconds
+    return () => clearInterval(intervalId);
+  }, [session]);
 
   const ulClass = isDrawerOpen
     ? "flex flex-col absolute top-20 right-0 bg-gray-300 w-[60vw] min-h-[90vh] z-[10] justify-start items-center"
@@ -56,7 +65,7 @@ export default function Navbar() {
           width={2048}
           height={2048}
         />
-        <span className="text-4xl">FSALYDA</span>
+        <span className="max-sm:text-2xl sm:text-4xl">FSALYDA</span>
       </div>
       <div className="hamburger flex items-center justify-end w-[40%]">
         <ul id="drawer" className={ulClass}>
@@ -64,12 +73,29 @@ export default function Navbar() {
             <Link href="/">Home</Link>
           </li>
           <li className={liClass}>
-            <Link href="/dashboard">Dashboard</Link>
+            <Link href={role === "user" ? "/dashboard" : `/${role}Dashboard`}>
+              Dashboard
+            </Link>
           </li>
           <li className={liClass}>
             <LoginBtn />
           </li>
         </ul>
+        <Link
+          href={role === "user" ? "/dashboard" : `/${role}Dashboard`}
+          className="relative max-lg:mr-2 lg:ml-2 p-1"
+        >
+          <div
+            className={`absolute top-0 right-0 z-10 flex items-center justify-center bg-red-500 w-4 h-4 rounded-full text-white text-[8px] overflow-hidden ${
+              unreadNotifications === 0 ? "hidden" : ""
+            }`}
+          >
+            {unreadNotifications}
+          </div>
+          <div className="w-full h-full flex items-center justify-center">
+            <i className="fa-solid fa-bell max-sm:text-2xl sm:text-3xl" />
+          </div>
+        </Link>
         <svg
           aria-hidden="true"
           id="hamburger"

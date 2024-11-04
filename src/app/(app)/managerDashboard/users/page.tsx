@@ -15,10 +15,11 @@ import "react-toastify/dist/ReactToastify.css";
 import { Loader2 } from "lucide-react";
 
 export default function Users() {
-  const [users, setUsers] = useState<User[]>([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
+  const creatorEmail: string = session?.user.email;
+  const [users, setUsers] = useState<User[]>([]);
+  const [loadingUsers, setLoadingUsers] = useState(false);
 
   const form = useForm<z.infer<typeof newUserFromManagerSchema>>({
     resolver: zodResolver(newUserFromManagerSchema),
@@ -88,7 +89,7 @@ export default function Users() {
     form.reset();
   };
   const onSubmit = async (data: z.infer<typeof newUserFromManagerSchema>) => {
-    const newData = { ...data, companyName };
+    const newData = { ...data, companyName, creatorEmail };
     try {
       const response = await axios.post("/api/createUser", newData);
       if (response.data.success) {

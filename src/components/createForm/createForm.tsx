@@ -29,6 +29,7 @@ type Props = {
   eCompanyName: string;
   eUsersWithAccess: string[];
   role: string;
+  creatorEmail: string;
   setShowModifyFormModal: React.Dispatch<React.SetStateAction<boolean>> | null;
 };
 
@@ -40,6 +41,7 @@ export default function CreateForm({
   eCompanyName,
   eUsersWithAccess,
   role,
+  creatorEmail,
   setShowModifyFormModal,
 }: Props) {
   const router = useRouter();
@@ -467,6 +469,7 @@ export default function CreateForm({
           formItemsLength,
           companyName: eCompanyName,
           usersWithAccess,
+          creatorEmail,
         });
       } else {
         response = await axios.post("/api/modifyForm", {
@@ -476,6 +479,7 @@ export default function CreateForm({
           formItemsLength,
           companyName: eCompanyName,
           usersWithAccess,
+          creatorEmail,
         });
       }
       if (response.data.success) {

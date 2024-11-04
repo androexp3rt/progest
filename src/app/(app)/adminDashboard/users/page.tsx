@@ -18,6 +18,7 @@ export default function AdminDashboard() {
   const [users, setUsers] = useState<User[]>([]);
   const [loadingUsers, setLoadingUsers] = useState(false);
   const { data: session } = useSession();
+  const creatorEmail = session?.user.email;
 
   const form = useForm<z.infer<typeof newUserFromAdminSchema>>({
     resolver: zodResolver(newUserFromAdminSchema),
@@ -61,8 +62,9 @@ export default function AdminDashboard() {
     form.reset({}, { keepErrors: false });
   };
   const onSubmit = async (data: z.infer<typeof newUserFromAdminSchema>) => {
+    const newData = { ...data, creatorEmail };
     try {
-      const response = await axios.post("/api/createUserFromAdmin", data);
+      const response = await axios.post("/api/createUserFromAdmin", newData);
       if (response.data.success) {
         toast(response.data.message, { type: "success" });
         hideCreateUserForm();

@@ -5,34 +5,29 @@ import axios from "axios";
 import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
 
 export default function AdminDashboard() {
   const { data: session } = useSession();
   const email = session?.user.email;
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [loadingNotifications, setLoadingNotifications] = useState(false);
+
   useEffect(() => {
     const fetchNotifications = async () => {
-      setLoadingNotifications(true);
       try {
         const response = await axios.post("/api/getNotifications", { email });
-        // const responseStream = await fetch("/api/getNotifications");
-        // const response = await responseStream.json();
         if (response.data.success) {
           setNotifications(response.data.notifications);
-          // toast(response.data.message, { type: "success" });
         } else {
           setNotifications([]);
-          toast(response.data.message, { type: "error" });
         }
       } catch (error) {
         console.log("Error fecting Notifications", error);
-      } finally {
-        setLoadingNotifications(false);
       }
     };
     fetchNotifications();
+    // Set up a polling interval (adjust as needed)
+    const intervalId = setInterval(fetchNotifications, 5000); // Fetch data every 5 seconds
+    return () => clearInterval(intervalId);
   }, [session]);
   return (
     <main className="w-full h-full flex flex-col bg-background bg-auto bg-no-repeat bg-center">
@@ -42,14 +37,8 @@ export default function AdminDashboard() {
         </h1>
         <div className="w-full max-w-lg min-h-20 flex flex-col items-center bg-white/50 backdrop-blur-sm rounded-lg p-2 space-y-5">
           <h1 className="text-2xl font-bold">Notifications</h1>
-          <div
-            className={`relative w-full flex flex-col items-center space-y-2 ${
-              loadingNotifications ? "justify-center" : ""
-            }`}
-          >
-            {loadingNotifications ? (
-              <Loader2 className="animate-spin w-10 h-10" />
-            ) : notifications?.length === 0 ? (
+          <div className="relative w-full flex flex-col items-center space-y-2">
+            {notifications?.length === 0 ? (
               <p className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 font-bold text-lg">
                 No Notifications Found
               </p>

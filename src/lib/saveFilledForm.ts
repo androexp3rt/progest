@@ -4,6 +4,9 @@ import FilledFormModel from "@/model/filledForm";
 import { uploadStreamOnCloudinary } from "./cloudinary";
 import { UploadApiResponse } from "cloudinary";
 import { FormItemDetails, FormState } from "@/types/types";
+import AdminModel, { Admin } from "@/model/admin";
+import BusinessUserModel, { BusinessUser } from "@/model/businessUser";
+import NotificationModel from "@/model/notification";
 
 export const uploadFileToCloudinary = async (file: File): Promise<string> => {
   let imgUrl: string = "";
@@ -118,6 +121,22 @@ export const SaveFilledForm = async (
       filledBy,
     });
     await newForm.save();
+    const toUsers: string[] = [];
+    const admins = await AdminModel.find();
+    admins.map((a: Admin) => toUsers.push(a.email));
+    const managers = await BusinessUserModel.find({ companyName });
+    managers.map((m: BusinessUser) => toUsers.push(m.email));
+    if (toUsers.includes(filledBy)) {
+      const index = toUsers.indexOf(filledBy);
+      toUsers.splice(index, 1);
+    }
+    const notification = new NotificationModel({
+      title: "New Form Submission",
+      message: `There is a new submission for the form ${title}, by ${filledBy}, for the company ${companyName}`,
+      toUser: toUsers,
+      from: filledBy,
+    });
+    await notification.save();
     return { success: true, message: "Record Saved successfully", status: 200 };
   } catch (error) {
     console.log(error);
