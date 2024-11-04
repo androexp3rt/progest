@@ -5,6 +5,8 @@ import FormModel from "@/model/form";
 import NotificationModel from "@/model/notification";
 import { NextRequest, NextResponse } from "next/server";
 
+export const revalidate = true;
+
 export async function POST(request: NextRequest) {
   await dbConnect();
   const {

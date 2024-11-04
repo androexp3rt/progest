@@ -3,6 +3,8 @@ import FilledFormModel from "@/model/filledForm";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
+export const revalidate = true;
+
 export async function POST(request: NextRequest) {
   await dbConnect();
   const { id } = await request.json();

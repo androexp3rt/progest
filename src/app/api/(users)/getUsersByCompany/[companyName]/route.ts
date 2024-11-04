@@ -2,6 +2,8 @@ import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/user";
 import { NextRequest, NextResponse } from "next/server";
 
+export const revalidate = true;
+
 type Params = {
   companyName: string;
 };

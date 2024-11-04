@@ -2,6 +2,8 @@ import dbConnect from "@/lib/dbConnect";
 import NotificationModel from "@/model/notification";
 import { NextRequest, NextResponse } from "next/server";
 
+export const revalidate = true;
+
 export async function POST(req: NextRequest) {
   await dbConnect();
   try {

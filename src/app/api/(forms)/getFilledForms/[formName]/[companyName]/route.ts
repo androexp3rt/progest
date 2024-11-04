@@ -2,6 +2,8 @@ import dbConnect from "@/lib/dbConnect";
 import FilledFormModel from "@/model/filledForm";
 import { NextRequest, NextResponse } from "next/server";
 
+export const revalidate = true;
+
 type Params = {
   formName: string;
   companyName: string;
