@@ -83,7 +83,7 @@ export default function Forms() {
       setLoadingForms(true);
       try {
         const responseStream = await fetch(
-          `/api/getFormsByCompany/${companyName}`,
+          `/api/getFormsByCompany/${companyName}ud`,
           {
             cache: "no-store",
           }

@@ -1,8 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
 import UserModel from "@/model/user";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-
-export const revalidate = 10;
 
 type Params = {
   companyName: string;
@@ -18,6 +17,7 @@ export async function GET(request: NextRequest, context: { params: Params }) {
         { status: 200 }
       );
     }
+    revalidatePath("/managerDashboard/users");
     return NextResponse.json(
       { success: true, message: "Users fetched successfully", users: users },
       { status: 200 }

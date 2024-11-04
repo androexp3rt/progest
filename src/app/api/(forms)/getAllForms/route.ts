@@ -1,8 +1,7 @@
 import dbConnect from "@/lib/dbConnect";
 import FormModel from "@/model/form";
+import { revalidatePath } from "next/cache";
 import { NextResponse } from "next/server";
-
-export const revalidate = 1;
 
 export async function GET() {
   await dbConnect();
@@ -17,6 +16,7 @@ export async function GET() {
     forms = forms.toSorted((a, b) =>
       a.companyName.localeCompare(b.companyName)
     );
+    revalidatePath("/adminDashboard/myForms");
     return NextResponse.json(
       { success: true, message: "Forms fetched successfully", forms: forms },
       { status: 200 }

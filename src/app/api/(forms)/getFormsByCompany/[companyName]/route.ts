@@ -1,15 +1,16 @@
 import dbConnect from "@/lib/dbConnect";
 import FormModel from "@/model/form";
+import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
-
-export const revalidate = 10;
 
 type Params = {
   companyName: string;
 };
 export async function GET(request: NextRequest, context: { params: Params }) {
   await dbConnect();
-  const companyName = context.params.companyName;
+  const companyNamePn = context.params.companyName;
+  const companyName = companyNamePn.slice(0, -2);
+  const pn = companyNamePn.slice(-2);
   try {
     const forms = await FormModel.find({ companyName });
     if (!forms || forms.length === 0) {
@@ -17,6 +18,11 @@ export async function GET(request: NextRequest, context: { params: Params }) {
         { success: false, message: "No Forms found" },
         { status: 200 }
       );
+    }
+    if (pn === "ud") {
+      revalidatePath("/dashboard");
+    } else if (pn === "md") {
+      revalidatePath("/managerDashboard");
     }
     return NextResponse.json(
       { success: true, message: "Forms fetched successfully", forms: forms },
