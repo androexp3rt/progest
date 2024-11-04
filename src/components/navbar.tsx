@@ -26,26 +26,28 @@ export default function Navbar() {
     }
   };
   useEffect(() => {
-    const fetchNotifications = async () => {
-      try {
-        const response = await axios.post("/api/getNotifications", { email });
-        if (response.data.success) {
-          let un = 0;
-          response.data.notifications.map((n: Notification) => {
-            if (!n.isRead) un++;
-          });
-          setUnreadNotifications(un);
-        } else {
-          setUnreadNotifications(0);
+    if (email) {
+      const fetchNotifications = async () => {
+        try {
+          const response = await axios.post("/api/getNotifications", { email });
+          if (response.data.success) {
+            let un = 0;
+            response.data.notifications.map((n: Notification) => {
+              if (!n.isRead) un++;
+            });
+            setUnreadNotifications(un);
+          } else {
+            setUnreadNotifications(0);
+          }
+        } catch (error) {
+          console.log("Error fecting Notifications", error);
         }
-      } catch (error) {
-        console.log("Error fecting Notifications", error);
-      }
-    };
-    fetchNotifications();
-    // Set up a polling interval (adjust as needed)
-    const intervalId = setInterval(fetchNotifications, 5000); // Fetch data every 5 seconds
-    return () => clearInterval(intervalId);
+      };
+      fetchNotifications();
+      // Set up a polling interval (adjust as needed)
+      const intervalId = setInterval(fetchNotifications, 5000); // Fetch data every 5 seconds
+      return () => clearInterval(intervalId);
+    }
   }, [session, email]);
 
   const ulClass = isDrawerOpen
