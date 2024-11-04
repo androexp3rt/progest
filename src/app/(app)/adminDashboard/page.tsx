@@ -2,7 +2,6 @@
 import Notifications from "@/components/notification";
 import { Notification } from "@/model/notification";
 import axios from "axios";
-import { Loader2 } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 

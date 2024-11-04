@@ -15,7 +15,7 @@ export default function Navbar() {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [unreadNotifications, setUnreadNotifications] = useState(0);
 
-  const hideDrawer = (e: Event) => {
+  const hideDrawer = () => {
     setIsDrawerOpen(false);
     document.removeEventListener("click", hideDrawer);
   };
@@ -46,7 +46,7 @@ export default function Navbar() {
     // Set up a polling interval (adjust as needed)
     const intervalId = setInterval(fetchNotifications, 5000); // Fetch data every 5 seconds
     return () => clearInterval(intervalId);
-  }, [session]);
+  }, [session, email]);
 
   const ulClass = isDrawerOpen
     ? "flex flex-col absolute top-20 right-0 bg-gray-300 w-[60vw] min-h-[90vh] z-[10] justify-start items-center"
