@@ -2,7 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import FormModel from "@/model/form";
 import { NextResponse } from "next/server";
 
-export const revalidate = true;
+export const revalidate = 10;
 
 export async function GET() {
   await dbConnect();

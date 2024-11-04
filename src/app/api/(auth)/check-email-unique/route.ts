@@ -3,8 +3,6 @@ import BusinessUserModel from "@/model/businessUser";
 import { z } from "zod";
 import { emailValidation } from "@/schemas/signUpSchema";
 
-export const revalidate = true;
-
 const EmailQuerySchema = z.object({
   email: emailValidation,
 });
