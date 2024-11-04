@@ -2,7 +2,7 @@ import dbConnect from "@/lib/dbConnect";
 import AdminModel from "@/model/admin";
 import { NextResponse } from "next/server";
 
-export const revalidate = true;
+export const revalidate = 10;
 
 export async function GET() {
   await dbConnect();

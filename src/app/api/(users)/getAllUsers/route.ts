@@ -3,7 +3,7 @@ import UserModel from "@/model/user";
 import BusinessUserModel from "@/model/businessUser";
 import { NextResponse } from "next/server";
 
-export const revalidate = true;
+export const revalidate = 10;
 
 export async function GET() {
   await dbConnect();
