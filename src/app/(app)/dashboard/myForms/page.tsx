@@ -8,7 +8,6 @@ import { Loader2 } from "lucide-react";
 import FillForm from "@/components/fillForm/fillForm";
 import { FormItemDetails, FormState } from "@/types/types";
 import { FilledFormsMap } from "@/types/types";
-// import CreateForm from "@/components/createForm/createForm";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { FilledForm } from "@/model/filledForm";
@@ -18,7 +17,6 @@ export default function Forms() {
   const { data: session } = useSession();
   const companyName: string = session?.user.companyName;
   const email: string = session?.user.email;
-  // const role: string = session?.user.role;
 
   const [forms, setForms] = useState<Form[]>([]);
   const [filledForms, setFilledForms] = useState<FilledFormsMap>({});
@@ -29,15 +27,6 @@ export default function Forms() {
   const [formToFillTitle, setFormToFillTitle] = useState("");
   const [showRecords, setshowRecords] = useState(false);
   const [formNameToShowRecords, setFormNameToShowRecords] = useState("");
-  // const [eFormItemDetails, setEFormItemDetails] = useState<FormItemDetails[]>(
-  //   []
-  // );
-  // const [eFormItems, setEFormItems] = useState<ReactElement[]>([]);
-  // const [eFormItemsLength, setEFormItemsLength] = useState(0);
-  // const [eFormName, setEFormName] = useState("");
-  // const [eCompanyName, setECompanyName] = useState("");
-  // const [eUsersWithAccess, setEUsersWithAccess] = useState<string[]>([]);
-  // const [showModifyFormModal, setShowModifyFormModal] = useState(false);
   const [showPreviewModal, setShowPreviewModal] = useState(false);
   const [recordToPreview, setRecordToPreview] = useState<FormItemDetails[]>([]);
   const [recordState, setRecordState] = useState<FormState>({});
@@ -282,26 +271,6 @@ export default function Forms() {
                           >
                             Fill Form
                           </button>
-                          {/* <button
-                            className="max-sm:p-1 sm:p-2 bg-white rounded-lg"
-                            onClick={() => {
-                              setEFormItemDetails(form.formItemDetails);
-                              setEFormItems(form.formItems);
-                              setEFormItemsLength(form.formItemsLength);
-                              setEFormName(form.title);
-                              setECompanyName(form.companyName);
-                              setEUsersWithAccess(form.usersWithAccess);
-                              setShowModifyFormModal(true);
-                            }}
-                          >
-                            <i className="fa fa-edit" />
-                          </button> */}
-                          {/* <button
-                        className="p-2 flex items-center justify-center space-x-2 bg-white rounded-lg disabled:text-gray-200"
-                        onClick={() => deleteForm(form._id)}
-                      >
-                        <i className="fa fa-trash" />
-                      </button> */}
                         </div>
                       </div>
                       <div
@@ -408,23 +377,6 @@ export default function Forms() {
           formToFillTitle={recordTitle}
           setFormToFillTitle={setRecordTitle}
         />
-        {/* <div
-          className={`${
-            showModifyFormModal ? "" : "hidden"
-          } fixed inset-0 z-10 bg-gray-800 bg-opacity-50 flex flex-col items-start justify-center overflow-scroll px-5 space-y-2`}
-        >
-          <CreateForm
-            eFormItemDetails={eFormItemDetails}
-            eFormItems={eFormItems}
-            eFormItemsLength={eFormItemsLength}
-            eFormName={eFormName}
-            eCompanyName={eCompanyName}
-            eUsersWithAccess={eUsersWithAccess}
-            creatorEmail={email}
-            setShowModifyFormModal={setShowModifyFormModal}
-            role={role}
-          />
-        </div> */}
       </div>
     </div>
   );

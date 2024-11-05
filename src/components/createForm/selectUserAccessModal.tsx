@@ -29,7 +29,7 @@ export default function SelectUserAccessModal({
         setLoadingUsers(true);
         try {
           const responseStream = await fetch(
-            `/api/getUsersByCompany/${companyName}`,
+            `/api/getUsersByCompany?companyName=${companyName}`,
             {
               cache: "no-store",
             }
