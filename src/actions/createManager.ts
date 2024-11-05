@@ -2,7 +2,7 @@
 import dbConnect from "@/lib/dbConnect";
 import bcrypt from "bcryptjs";
 import AdminModel, { Admin } from "@/model/admin";
-import BusinessUserModel, { BusinessUser } from "@/model/businessUser";
+import BusinessUserModel from "@/model/businessUser";
 import NotificationModel from "@/model/notification";
 
 export const CreateManager = async (
