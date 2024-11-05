@@ -5,8 +5,6 @@ import FormModel from "@/model/form";
 import NotificationModel from "@/model/notification";
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = true;
-
 export async function POST(request: NextRequest) {
   await dbConnect();
   const {
@@ -34,13 +32,17 @@ export async function POST(request: NextRequest) {
     existingForm.usersWithAccess.map((e: string) => {
       if (!usersWithAccess.includes(e)) toDisUsers.push(e);
     });
-    const disNotif = new NotificationModel({
-      title: "Form Access revoked",
-      message: `Your access to the form ${formName} is revoked by ${creatorEmail}`,
-      toUser: toDisUsers,
-      fromUser: creatorEmail,
-    });
-    await disNotif.save();
+    await Promise.all(
+      toDisUsers.map(async (u: string) => {
+        const disNotif = new NotificationModel({
+          title: "Form Access revoked",
+          message: `Your access to the form ${formName} is revoked by ${creatorEmail}`,
+          toUser: u,
+          fromUser: creatorEmail,
+        });
+        await disNotif.save();
+      })
+    );
     existingForm.title = formName;
     existingForm.formItems = formItems;
     existingForm.formItemsLength = formItemsLength;
@@ -57,13 +59,17 @@ export async function POST(request: NextRequest) {
       const index = toUsers.indexOf(creatorEmail);
       toUsers.splice(index, 1);
     }
-    const notification = new NotificationModel({
-      title: "Form Modified",
-      message: `A Form ${formName} is modified by ${creatorEmail} for the company ${companyName}`,
-      toUser: toUsers,
-      fromUser: creatorEmail,
-    });
-    await notification.save();
+    await Promise.all(
+      toUsers.map(async (u: string) => {
+        const notification = new NotificationModel({
+          title: "Form Modified",
+          message: `A Form ${formName} is modified by ${creatorEmail} for the company ${companyName}`,
+          toUser: u,
+          fromUser: creatorEmail,
+        });
+        await notification.save();
+      })
+    );
     return NextResponse.json(
       { success: true, message: "Form Saved successfully" },
       { status: 200 }

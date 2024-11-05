@@ -1,33 +1,28 @@
 "use client";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ApiResponse } from "@/types/ApiResponse";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
 import axios, { AxiosError } from "axios";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { signUpValidationSchema } from "@/schemas/signUpSchema";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { Form, FormField, FormItem, FormMessage } from "./ui/form";
-import { Input } from "./ui/input";
-import * as z from "zod";
-import { Button } from "./ui/button";
+import { Signup } from "@/actions/signup";
+import SignupButton from "./signupButton";
 
 export default function SignUpForm() {
   const router = useRouter();
-
   const [email, setEmail] = useState("");
   const [emailMessage, setEmailMessage] = useState("");
   const [isCheckingEmail, setIsCheckingEmail] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const ref = useRef<HTMLFormElement>(null);
 
   const checkUsernameUnique = async () => {
     setIsCheckingEmail(true);
     setEmailMessage(""); // Reset message
     try {
       const response = await axios.get<ApiResponse>(
-        `/api/check-email-unique?email=${email}`
+        `/api/check-email-unique?email=${email.trim()}`
       );
       setEmailMessage(response.data.message);
     } catch (error) {
@@ -39,150 +34,80 @@ export default function SignUpForm() {
       setIsCheckingEmail(false);
     }
   };
-
-  const form = useForm<z.infer<typeof signUpValidationSchema>>({
-    resolver: zodResolver(signUpValidationSchema),
-  });
-
-  const onSubmit = async (data: z.infer<typeof signUpValidationSchema>) => {
-    setIsSubmitting(true);
-    try {
-      const response = await axios.post<ApiResponse>("/api/signup", data);
-      if (response.data.success) {
-        toast(response.data.message, { type: "success" });
-        router.replace(`/verify/${data.email}`);
-        setIsSubmitting(false);
-      }
-    } catch (error) {
-      console.error("Error during sign-up:", error);
-      const axiosError = error as AxiosError<ApiResponse>;
-      // Default error message
-      const errorMessage =
-        axiosError.response?.data.message ??
-        "There was a problem with your sign up. Please try again.";
-      toast(errorMessage, { type: "error" });
-      setIsSubmitting(false);
+  const validateForm = (formData: FormData) => {
+    const formDataObject = Object.fromEntries(formData.entries());
+    const { success, error } = signUpValidationSchema.safeParse(formDataObject);
+    if (success) {
+      return true;
+    } else {
+      const errors: string[] = [];
+      error.errors.map((e) => {
+        errors.push(e.message);
+      });
+      toast(errors.join(",\n"), { type: "error" });
+      return false;
     }
   };
-
+  const inputClass = "w-full p-2 rounded-md outline-none";
   return (
-    <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="text-[#343666] space-y-3"
-      >
-        <FormField
-          name="companyName"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <Input
-                {...field}
-                name="companyName"
-                placeholder="Company Name"
-                className="outline-none placeholder:text-white"
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="fullName"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <Input
-                {...field}
-                name="fullName"
-                placeholder="Full Name"
-                className="outline-none placeholder:text-white"
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="email"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <Input
-                {...field}
-                name="email"
-                placeholder="Email Address"
-                className="outline-none placeholder:text-white"
-                onChange={(e) => {
-                  field.onChange(e);
-                  setEmail(e.target.value);
-                  checkUsernameUnique();
-                }}
-              />
-              {isCheckingEmail && <Loader2 className="animate-spin" />}
-              {!isCheckingEmail && emailMessage && (
-                <p
-                  className={`text-sm ${
-                    emailMessage === "Email is unique"
-                      ? "text-green-500"
-                      : "text-red-500"
-                  }`}
-                >
-                  {emailMessage}
-                </p>
-              )}
-              <p className="text-muted text-sm">
-                We will send you a verification code
-              </p>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="password"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <Input
-                type="password"
-                placeholder="Password"
-                {...field}
-                name="password"
-                className="outline-none placeholder:text-white"
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          name="confirmPassword"
-          control={form.control}
-          render={({ field }) => (
-            <FormItem>
-              <Input
-                type="password"
-                placeholder="Confirm Password"
-                {...field}
-                name="confirmPassword"
-                className="outline-none placeholder:text-white"
-              />
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Button
-          type="submit"
-          className="w-full bg-[#343666] h-10"
-          disabled={isSubmitting}
+    <form
+      ref={ref}
+      action={async (formData) => {
+        if (validateForm(formData)) {
+          const resp = await Signup(formData);
+          if (resp.success) {
+            ref.current?.reset();
+            toast(resp.message, { type: "success" });
+            router.replace(`/verify/${email.trim()}`);
+          } else {
+            toast(resp.message, { type: "error" });
+            if (resp.error) {
+              console.log(resp.error);
+            }
+          }
+        }
+      }}
+      className="text-[#343666] space-y-3"
+    >
+      <input
+        name="companyName"
+        placeholder="Company Name"
+        className={inputClass}
+      />
+      <input name="fullName" placeholder="Full Name" className={inputClass} />
+      <input
+        name="email"
+        placeholder="Email Address"
+        className={inputClass}
+        onChange={(e) => setEmail(e.target.value)}
+        onBlur={() => checkUsernameUnique()}
+      />
+      {isCheckingEmail && <Loader2 className="animate-spin" />}
+      {!isCheckingEmail && emailMessage && (
+        <p
+          className={`text-sm ${
+            emailMessage === "Email is unique"
+              ? "text-green-500"
+              : "text-red-500"
+          }`}
         >
-          {isSubmitting ? (
-            <>
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-              Please wait
-            </>
-          ) : (
-            "Sign Up"
-          )}
-        </Button>
-      </form>
-    </Form>
+          {emailMessage}
+        </p>
+      )}
+      <p className="text-muted text-sm">We will send you a verification code</p>
+      <input
+        type="password"
+        placeholder="Password"
+        name="password"
+        className={inputClass}
+      />
+      <input
+        type="password"
+        placeholder="Confirm Password"
+        name="confirmPassword"
+        className={inputClass}
+      />
+      <SignupButton />
+    </form>
   );
 }

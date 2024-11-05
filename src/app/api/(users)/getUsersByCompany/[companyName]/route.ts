@@ -8,7 +8,8 @@ type Params = {
 };
 export async function GET(request: NextRequest, context: { params: Params }) {
   await dbConnect();
-  const companyName = context.params.companyName;
+  const par = await context.params;
+  const companyName = par.companyName;
   try {
     const users = await UserModel.find({ companyName });
     if (!users || users.length === 0) {

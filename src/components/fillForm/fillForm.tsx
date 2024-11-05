@@ -14,7 +14,7 @@ import RenderTextArea from "./renderTextArea";
 import RenderDateTime from "./renderDate&Time";
 import RenderCheckbox from "./renderCheckbox";
 import { Loader2 } from "lucide-react";
-import { SaveFilledForm } from "@/lib/saveFilledForm";
+import { SaveFilledForm } from "@/actions/saveFilledForm";
 import { FormState } from "@/types/types";
 
 type Props = {

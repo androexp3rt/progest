@@ -5,8 +5,7 @@ export interface BusinessUser extends Document {
   companyName: string;
   email: string;
   password: string;
-  verifyCode: string;
-  verifyCodeExpiry: Date;
+  maxUsers: number;
   isVerified: boolean;
   role: string;
 }
@@ -33,23 +32,17 @@ const BusinessUserSchema: Schema<BusinessUser> = new mongoose.Schema({
     type: String,
     required: [true, "Password is required"],
   },
-  verifyCode: {
-    type: String,
-    required: [true, "Verify Code is required"],
-  },
-  verifyCodeExpiry: {
-    type: Date,
-    required: [true, "Verify Code Expiry is required"],
-  },
-  isVerified: {
-    type: Boolean,
-    default: false,
-  },
   role: {
     type: String,
     default: "user",
     required: [true, "User Role is required"],
   },
+  maxUsers: {
+    type: Number,
+    default: 10,
+    required: [true, "Maximum number of users is required"],
+  },
+  isVerified: { type: Boolean, default: false, required: true },
 });
 
 const BusinessUserModel =

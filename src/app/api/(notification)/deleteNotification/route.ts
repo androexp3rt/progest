@@ -3,8 +3,6 @@ import NotificationModel from "@/model/notification";
 import mongoose from "mongoose";
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = true;
-
 export async function POST(req: NextRequest) {
   await dbConnect();
   try {
@@ -18,6 +16,7 @@ export async function POST(req: NextRequest) {
         { status: 200 }
       );
     }
+    console.log(notification);
     await notification.deleteOne();
     return NextResponse.json(
       { success: true, message: "Notification deleted successfully" },

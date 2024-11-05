@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
     }
     const notif: Notification[] = [];
     notifications.map((n: Notification) => {
-      if (n.toUser.includes(email)) notif.push(n);
+      if (n.toUser === email) notif.push(n);
     });
     return NextResponse.json(
       {

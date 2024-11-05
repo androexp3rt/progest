@@ -10,13 +10,11 @@ type Props = {
 };
 
 export default function Notifications({ id, title, message, isRead }: Props) {
-  const [read, setRead] = useState(isRead);
   const handleRead = async () => {
     try {
       const response = await axios.post(`/api/markNotificationRead`, { id });
       if (response.data.success) {
         toast(response.data.message, { type: "success" });
-        setRead(true);
       } else {
         toast(response.data.message, { type: "error" });
       }
@@ -43,7 +41,7 @@ export default function Notifications({ id, title, message, isRead }: Props) {
   return (
     <div
       className={`w-full flex flex-col items-start justify-start p-2 ${
-        read ? "bg-gray-100" : "bg-amber-100"
+        isRead ? "bg-gray-100" : "bg-amber-100"
       } rounded-lg`}
     >
       <h2 className="w-full max-sm:text-md text-lg font-bold">{title}</h2>
@@ -53,7 +51,7 @@ export default function Notifications({ id, title, message, isRead }: Props) {
           <button
             className="p-2 rounded-lg bg-black text-white text-sm disabled:bg-gray-200"
             onClick={handleRead}
-            disabled={read}
+            disabled={isRead}
           >
             Mark as Read
           </button>

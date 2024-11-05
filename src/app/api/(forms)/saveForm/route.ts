@@ -5,8 +5,6 @@ import FormModel from "@/model/form";
 import NotificationModel from "@/model/notification";
 import { NextRequest, NextResponse } from "next/server";
 
-export const revalidate = true;
-
 export async function POST(request: NextRequest) {
   await dbConnect();
   const {
@@ -44,13 +42,17 @@ export async function POST(request: NextRequest) {
         const index = toUsers.indexOf(creatorEmail);
         toUsers.splice(index, 1);
       }
-      const notification = new NotificationModel({
-        title: "New Form Created",
-        message: `A new Form ${formName} is created by ${creatorEmail} for the company ${companyName}`,
-        toUser: toUsers,
-        fromUser: creatorEmail,
-      });
-      await notification.save();
+      await Promise.all(
+        toUsers.map(async (u: string) => {
+          const notification = new NotificationModel({
+            title: "New Form Created",
+            message: `A new Form ${formName} is created by ${creatorEmail} for the company ${companyName}`,
+            toUser: u,
+            fromUser: creatorEmail,
+          });
+          await notification.save();
+        })
+      );
       return NextResponse.json(
         { success: true, message: "Form Saved successfully" },
         { status: 200 }

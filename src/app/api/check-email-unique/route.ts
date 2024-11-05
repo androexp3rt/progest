@@ -1,7 +1,9 @@
 import dbConnect from "@/lib/dbConnect";
-import BusinessUserModel from "@/model/businessUser";
 import { z } from "zod";
 import { emailValidation } from "@/schemas/signUpSchema";
+import UserModel from "@/model/user";
+import BusinessUserModel from "@/model/businessUser";
+import AdminModel from "@/model/admin";
 
 const EmailQuerySchema = z.object({
   email: emailValidation,
@@ -21,34 +23,42 @@ export async function GET(request: Request) {
         {
           success: false,
           message:
-            emailErrors?.length > 0
-              ? emailErrors.join(", ")
-              : "Invalid query parameters",
-        },
-        { status: 400 }
-      );
-    }
-
-    const { email } = result.data;
-    const existingVerifiedUser = await BusinessUserModel.findOne({
-      email,
-      isVerified: true,
-    });
-
-    if (existingVerifiedUser) {
-      return Response.json(
-        {
-          success: false,
-          message: "Email is already taken",
+            emailErrors?.length > 0 ? emailErrors.join(", ") : "Invalid email",
         },
         { status: 200 }
       );
     }
 
+    const { email } = result.data;
+    let existingVerifiedUser = await UserModel.findOne({
+      email,
+      isVerified: true,
+    });
+    if (!existingVerifiedUser) {
+      existingVerifiedUser = await BusinessUserModel.findOne({
+        email,
+        isVerified: true,
+      });
+      if (!existingVerifiedUser) {
+        existingVerifiedUser = await AdminModel.findOne({
+          email,
+          isVerified: true,
+        });
+        if (!existingVerifiedUser) {
+          return Response.json(
+            {
+              success: true,
+              message: "Email is unique",
+            },
+            { status: 200 }
+          );
+        }
+      }
+    }
     return Response.json(
       {
-        success: true,
-        message: "Email is unique",
+        success: false,
+        message: "Email is already taken",
       },
       { status: 200 }
     );

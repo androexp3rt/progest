@@ -1,7 +1,7 @@
 "use server";
-import dbConnect from "./dbConnect";
+import dbConnect from "../lib/dbConnect";
 import FilledFormModel from "@/model/filledForm";
-import { uploadStreamOnCloudinary } from "./cloudinary";
+import { uploadStreamOnCloudinary } from "../lib/cloudinary";
 import { UploadApiResponse } from "cloudinary";
 import { FormItemDetails, FormState } from "@/types/types";
 import AdminModel, { Admin } from "@/model/admin";
@@ -130,13 +130,17 @@ export const SaveFilledForm = async (
       const index = toUsers.indexOf(filledBy);
       toUsers.splice(index, 1);
     }
-    const notification = new NotificationModel({
-      title: "New Form Submission",
-      message: `There is a new submission for the form ${title}, by ${filledBy}, for the company ${companyName}`,
-      toUser: toUsers,
-      from: filledBy,
-    });
-    await notification.save();
+    await Promise.all(
+      toUsers.map(async (u: string) => {
+        const notification = new NotificationModel({
+          title: "New Form Submission",
+          message: `There is a new submission for the form ${title}, by ${filledBy}, for the company ${companyName}`,
+          toUser: u,
+          fromUser: filledBy,
+        });
+        await notification.save();
+      })
+    );
     return { success: true, message: "Record Saved successfully", status: 200 };
   } catch (error) {
     console.log(error);
