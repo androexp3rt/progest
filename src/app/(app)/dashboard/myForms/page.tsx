@@ -47,7 +47,7 @@ export default function Forms() {
     setLoadingFilledForms(true);
     try {
       const responseStream = await fetch(
-        `/api/getFilledForms/${formName}/${companyName}`,
+        `/api/getFilledForms?formName=${formName}&companyName=${companyName}`,
         {
           cache: "no-store",
         }
@@ -83,7 +83,7 @@ export default function Forms() {
       setLoadingForms(true);
       try {
         const responseStream = await fetch(
-          `/api/getFormsByCompany/${companyName}ud`,
+          `/api/getFormsByCompany?companyName=${companyName}ud`,
           {
             cache: "no-store",
           }
@@ -102,6 +102,8 @@ export default function Forms() {
       }
     };
     getCompanyForms();
+    const intervalId = setInterval(getCompanyForms, 180000); // Fetch data every 30 mins
+    return () => clearInterval(intervalId);
   }, [session, companyName]);
 
   const displayFormToFill = ({

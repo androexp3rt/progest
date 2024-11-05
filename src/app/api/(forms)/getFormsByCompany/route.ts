@@ -3,14 +3,12 @@ import FormModel from "@/model/form";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = {
-  companyName: string;
-};
-export async function GET(request: NextRequest, context: { params: Params }) {
+export async function GET(request: NextRequest) {
   await dbConnect();
-  const companyNamePn = context.params.companyName;
-  const companyName = companyNamePn.slice(0, -2);
-  const pn = companyNamePn.slice(-2);
+  const { searchParams } = new URL(request.url);
+  const companyNamePn = searchParams.get("companyName");
+  const companyName = companyNamePn?.slice(0, -2);
+  const pn = companyNamePn?.slice(-2);
   try {
     const forms = await FormModel.find({ companyName });
     if (!forms || forms.length === 0) {

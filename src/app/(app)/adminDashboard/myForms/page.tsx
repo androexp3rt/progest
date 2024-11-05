@@ -49,7 +49,7 @@ export default function Forms() {
     setLoadingFilledForms(true);
     try {
       const responseStream = await fetch(
-        `/api/getFilledForms/${formName}/${companyName}`,
+        `/api/getFilledForms?formName=${formName}&companyName=${companyName}`,
         {
           cache: "no-store",
         }

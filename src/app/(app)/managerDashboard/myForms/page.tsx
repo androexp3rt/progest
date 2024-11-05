@@ -48,7 +48,7 @@ export default function Forms() {
       setLoadingFilledForms(true);
       try {
         const responseStream = await fetch(
-          `/api/getFilledForms/${formName}/${companyName}`,
+          `/api/getFilledForms?formName=${formName}&companyName=${companyName}`,
           {
             cache: "no-store",
           }
@@ -82,7 +82,7 @@ export default function Forms() {
     setLoadingForms(true);
     try {
       const responseStream = await fetch(
-        `/api/getFormsByCompany/${companyName}md`,
+        `/api/getFormsByCompany?companyName=${companyName}md`,
         {
           cache: "no-store",
         }
@@ -108,7 +108,7 @@ export default function Forms() {
       setLoadingForms(true);
       try {
         const responseStream = await fetch(
-          `/api/getFormsByCompany/${companyName}md`,
+          `/api/getFormsByCompany?companyName=${companyName}md`,
           {
             cache: "no-store",
           }

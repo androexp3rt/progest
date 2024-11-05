@@ -2,15 +2,12 @@ import dbConnect from "@/lib/dbConnect";
 import FilledFormModel from "@/model/filledForm";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = {
-  formName: string;
-  companyName: string;
-};
-export async function GET(request: NextRequest, context: { params: Params }) {
+export async function GET(request: NextRequest) {
   await dbConnect();
-  const formName = context.params.formName;
-  const companyName = context.params.companyName;
   try {
+    const { searchParams } = new URL(request.url);
+    const formName = searchParams.get("formName");
+    const companyName = searchParams.get("companyName");
     let forms;
     if (companyName === "fsalyda") {
       forms = await FilledFormModel.find({ title: formName });
