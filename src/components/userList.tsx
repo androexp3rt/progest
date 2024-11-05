@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { User } from "@/model/user";
-import axios from "axios";
 import { toast } from "react-toastify";
 import { DeleteUser } from "@/actions/deleteUserById";
 
