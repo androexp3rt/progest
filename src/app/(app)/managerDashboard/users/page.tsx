@@ -14,7 +14,7 @@ export default function AdminDashboard() {
   const getAllUsers = async () => {
     try {
       const responseStream = await fetch(
-        `/api/getUsersByCompany/${companyName}`
+        `/api/getUsersByCompany?companyName=${companyName}`
       );
       const response = await responseStream.json();
       if (response.success) {

@@ -3,13 +3,10 @@ import UserModel from "@/model/user";
 import { revalidatePath } from "next/cache";
 import { NextRequest, NextResponse } from "next/server";
 
-type Params = {
-  companyName: string;
-};
-export async function GET(request: NextRequest, context: { params: Params }) {
+export async function GET(request: NextRequest) {
   await dbConnect();
-  const par = await context.params;
-  const companyName = par.companyName;
+  const { searchParams } = new URL(request.url);
+  const companyName = searchParams.get("companyName");
   try {
     const users = await UserModel.find({ companyName });
     if (!users || users.length === 0) {
