@@ -21,7 +21,7 @@ export default function RenderImage({ itemD }: Props) {
         {itemD.newTitle} :
       </p>
       <div className="w-full bg-white rounded-lg p-2 flex flex-wrap justify-center gap-5">
-        {itemD.imageFileNames?.map((url, index) => {
+        {itemD.imageFileURLs?.map((url, index) => {
           return (
             <Image key={index} src={url} alt="image" width={400} height={200} />
           );

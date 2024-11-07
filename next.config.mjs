@@ -14,7 +14,12 @@ const nextConfig = {
     ];
   },
   images: {
-    domains: ["res.cloudinary.com"],
+    domains: ["res.cloudinary.com", "fsalydabucket.s3.amazonaws.com"],
+  },
+  experimental: {
+    serverActions: {
+      bodySizeLimit: "10mb",
+    },
   },
 };
 

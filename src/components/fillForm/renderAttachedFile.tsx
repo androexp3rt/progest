@@ -77,7 +77,7 @@ export default function RenderAttachedFile({
     if (validateFiles(droppedFiles)) {
       const newFiles = [...droppedFiles];
       droppedFiles.forEach((file, index) => {
-        const newName = `Uploaded File ${
+        const newName = `Uploaded_File_${
           (formState[itemD.newTitle] as File[])?.length + index + 1
         }`;
         const blob = new Blob([file], { type: file.type });
@@ -99,7 +99,7 @@ export default function RenderAttachedFile({
   const handleSFIC = (e: React.ChangeEvent<HTMLInputElement>) => {
     const droppedFiles = Array.from(e.target.files!);
     if (validateFiles(droppedFiles)) {
-      const newName = `Uploaded File`;
+      const newName = `Uploaded_File`;
       const blob = new Blob([droppedFiles[0]], { type: droppedFiles[0].type });
       droppedFiles[0] = new File([blob], newName, {
         type: droppedFiles[0].type,
@@ -148,7 +148,7 @@ export default function RenderAttachedFile({
                 className="w-full flex items-center justify-between border border-black rounded-lg p-1"
               >
                 <Link href={url} target="_blank">
-                  <span>{`Uploaded file ${index + 1}`}</span>
+                  <span>{`Uploaded_file_${index + 1}`}</span>
                 </Link>
               </li>
             );
@@ -211,9 +211,7 @@ export default function RenderAttachedFile({
                 className="flex items-center justify-between border border-black rounded-lg p-1"
               >
                 <span>
-                  {`${file.name}.${file.type} (${(file.size / 1024).toFixed(
-                    2
-                  )} KB)`}
+                  {`${file.name} (${(file.size / 1024).toFixed(2)} KB)`}
                 </span>
                 <i
                   className="fa fa-trash"

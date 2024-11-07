@@ -34,7 +34,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ imageFiles, setImgFiles }) => {
     const droppedFiles = Array.from(e.dataTransfer.files);
     const newFiles = [...droppedFiles];
     droppedFiles.forEach(async (file, index) => {
-      const newName = `Uploaded Image ${files.length + index + 1}`;
+      const newName = `Uploaded_Image_${files.length + index + 1}`;
       const blob = new Blob([file], { type: file.type });
       newFiles.splice(index, 1, new File([blob], newName, { type: file.type }));
     });
@@ -48,7 +48,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ imageFiles, setImgFiles }) => {
     const droppedFiles = Array.from(e.target.files!);
     const newFiles = [...droppedFiles];
     droppedFiles.forEach(async (file, index) => {
-      const newName = `Uploaded Image ${files.length + index + 1}`;
+      const newName = `Uploaded_Image_${files.length + index + 1}`;
       const blob = new Blob([file], { type: file.type });
       newFiles.splice(index, 1, new File([blob], newName, { type: file.type }));
     });

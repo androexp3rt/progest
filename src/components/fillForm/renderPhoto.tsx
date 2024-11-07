@@ -44,8 +44,8 @@ export default function RenderPhoto({
       droppedFiles.forEach((file, index) => {
         const newName =
           droppedFiles.length === 1
-            ? "Uploaded File"
-            : `Uploaded File ${
+            ? "Uploaded_File"
+            : `Uploaded_File_${
                 (formState[itemD.newTitle] as File[])?.length + index + 1
               }`;
         const blob = new Blob([file], { type: file.type });
@@ -77,7 +77,7 @@ export default function RenderPhoto({
     if (validateFiles(droppedFiles)) {
       const newFiles = [...droppedFiles];
       droppedFiles.forEach((file, index) => {
-        const newName = `Uploaded File ${
+        const newName = `Uploaded_File_${
           (formState[itemD.newTitle] as File[])?.length + index + 1
         }`;
         const blob = new Blob([file], { type: file.type });
@@ -100,7 +100,7 @@ export default function RenderPhoto({
   const handleSFIC = (e: React.ChangeEvent<HTMLInputElement>) => {
     const droppedFiles = Array.from(e.target.files!);
     if (validateFiles(droppedFiles)) {
-      const newName = `Uploaded File`;
+      const newName = `Uploaded_File`;
       const blob = new Blob([droppedFiles[0]], { type: droppedFiles[0].type });
       droppedFiles[0] = new File([blob], newName, {
         type: droppedFiles[0].type,

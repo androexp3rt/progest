@@ -3,7 +3,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import { FormItemDetails } from "@/types/types";
 import { Loader2 } from "lucide-react";
-import { uploadImagesToCloudinary } from "@/lib/upload";
+// import { uploadImagesToCloudinary } from "@/lib/upload";
 import { useRouter } from "next/navigation";
 import FormItem from "./formItem";
 import EditInputField from "./editModalComponents/editInputField";
@@ -20,6 +20,7 @@ import EditDateTime from "./editModalComponents/editDate&Time";
 import EditTextArea from "./editModalComponents/editTextArea";
 import DeleteModal from "./deleteModal";
 import SelectUserAccessModal from "./selectUserAccessModal";
+import { uploadFileToS3 } from "@/lib/s3config";
 
 type Props = {
   eFormItemDetails: FormItemDetails[];
@@ -440,25 +441,18 @@ export default function CreateForm({
   };
   const saveFormToDatabase = async () => {
     setIsSavingForm(true);
-    await Promise.all(
-      formItemDetails.map(async (itemD) => {
-        if (itemD.title === "Image") {
-          const imageFormData = new FormData();
-          itemD.imageFiles!.forEach((file, index) => {
-            imageFormData.append(`file${index}`, file);
-            itemD.imageFileNames!.splice(index, 1, `file${index}`);
-          });
-          const imgUrls = await uploadImagesToCloudinary(
-            imageFormData,
-            itemD.imageFileNames!
-          );
-          imgUrls.forEach((url, index) => {
-            itemD.imageFileNames!.splice(index, 1, url);
-            itemD.imageFiles!.splice(0, 1);
-          });
+    for (const itemD of formItemDetails) {
+      if (itemD.title === "Image") {
+        for (let i = 0; i < itemD.imageFiles!.length; i++) {
+          const file = itemD.imageFiles![i];
+          const { success, url } = await uploadFileToS3(file);
+          if (success) {
+            itemD.imageFileURLs!.splice(i, 1, url!);
+            itemD.imageFiles!.splice(i, 1);
+          }
         }
-      })
-    );
+      }
+    }
     try {
       let response;
       if (!setShowModifyFormModal) {

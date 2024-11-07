@@ -1,25 +1,11 @@
 "use server";
 import dbConnect from "../lib/dbConnect";
 import FilledFormModel from "@/model/filledForm";
-import { uploadStreamOnCloudinary } from "../lib/cloudinary";
-import { UploadApiResponse } from "cloudinary";
 import { FormItemDetails, FormState } from "@/types/types";
 import AdminModel, { Admin } from "@/model/admin";
 import BusinessUserModel, { BusinessUser } from "@/model/businessUser";
 import NotificationModel from "@/model/notification";
-
-export const uploadFileToCloudinary = async (file: File): Promise<string> => {
-  let imgUrl: string = "";
-  const arrayBuffer = await file.arrayBuffer();
-  const buffer = new Uint8Array(arrayBuffer);
-  const result: UploadApiResponse | undefined = await uploadStreamOnCloudinary(
-    buffer
-  );
-  if (result) {
-    imgUrl = result.secure_url;
-  }
-  return imgUrl;
-};
+import { uploadFileToS3 } from "@/lib/s3config";
 
 export const SaveFilledForm = async (
   companyName: string,
@@ -44,10 +30,10 @@ export const SaveFilledForm = async (
         });
         const photoArr: string[] = [];
         for (let i = 0; i < photoCount; i++) {
-          const url = await uploadFileToCloudinary(
+          const { success, url } = await uploadFileToS3(
             recordData.get(`${itemD.newTitle}[${i}]`) as File
           );
-          photoArr.push(url);
+          if (success) photoArr.push(url!);
         }
         recordState[itemD.newTitle] = photoArr;
       } else if (itemD.title === "Attached file") {
@@ -56,14 +42,14 @@ export const SaveFilledForm = async (
             attachmentCount++;
           }
         });
-        const photoArr: string[] = [];
+        const attachArr: string[] = [];
         for (let i = 0; i < attachmentCount; i++) {
-          const url = await uploadFileToCloudinary(
+          const { success, url } = await uploadFileToS3(
             recordData.get(`${itemD.newTitle}[${i}]`) as File
           );
-          photoArr.push(url);
+          if (success) attachArr.push(url!);
         }
-        recordState[itemD.newTitle] = photoArr;
+        recordState[itemD.newTitle] = attachArr;
       } else if (itemD.title === "List") {
         if (itemD.listMultipleSelection) {
           entries.forEach((entry) => {
@@ -82,10 +68,10 @@ export const SaveFilledForm = async (
           ) as string;
         }
       } else if (itemD.title === "Voice Recorder") {
-        const url = await uploadFileToCloudinary(
+        const { success, url } = await uploadFileToS3(
           recordData.get(`${itemD.newTitle}`) as File
         );
-        recordState[itemD.newTitle] = url;
+        if (success) recordState[itemD.newTitle] = url!;
       } else if (itemD.title === "Table") {
         const tableRowCount = parseInt(
           recordData.get(`${itemD.newTitle}RowCount`) as string
